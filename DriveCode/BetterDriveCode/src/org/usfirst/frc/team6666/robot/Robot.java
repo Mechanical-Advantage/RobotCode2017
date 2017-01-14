@@ -75,6 +75,7 @@ public class Robot extends SampleRobot {
 			left1.set(controller.getRawAxis(3)*1500);
 			right1.set(controller.getRawAxis(1)*1500);
 			SmartDashboard.putNumber("Velocity", velocity );
+			SmartDashboard.putNumber("Target Velocity", controller.getRawAxis(3)*1500);
 			
 			//System.out.println("PLEASE PRINT");
 			//System.out.println(controller.getY());
