@@ -41,7 +41,9 @@ public class Robot extends SampleRobot {
 	public Robot() {
 
 		right1 = new CANTalon(1); // Initialize the CanTalonSRX on device 1.
+		//right1.setSafetyEnabled(false);
 		right2 = new CANTalon(2);
+		//right2.setSafetyEnabled(false);
 		left1 = new CANTalon(3);
 		left2 = new CANTalon(4);
 		right1.changeControlMode(TalonControlMode.Speed);
@@ -49,7 +51,7 @@ public class Robot extends SampleRobot {
 		right1.reverseSensor(false);
 		right1.configNominalOutputVoltage(+0.0f, -0.0f);
 		right1.configPeakOutputVoltage(+12.0f, -12.0f);
-		right1.setProfile(0);
+		//right1.setProfile(0);
 		right1.setF(1);
 		right1.setP(1);
 		right1.setI(0);
@@ -59,7 +61,7 @@ public class Robot extends SampleRobot {
 		left1.reverseSensor(false);
 		left1.configNominalOutputVoltage(+0.0f, -0.0f);
 		left1.configPeakOutputVoltage(+12.0f, -12.0f);
-		left1.setProfile(0);
+		//left1.setProfile(0);
 		left1.setF(1);
 		left1.setP(1);
 		left1.setI(0);
@@ -69,7 +71,7 @@ public class Robot extends SampleRobot {
 		left2.changeControlMode(CANTalon.TalonControlMode.Follower);
 		left2.set(3);
 
-		myRobot = new RobotDrive(right1, right2, left1, left2);
+		//myRobot = new RobotDrive(right1, right2, left1, left2);
 		controller = new Joystick(0);
 	}
 
@@ -97,6 +99,9 @@ public class Robot extends SampleRobot {
 			//left1.set(controller.getRawAxis(1)*-1500); // and this
 			SmartDashboard.putNumber("Velocity", velocity );
 			SmartDashboard.putString("GraphData", genGraphStr((double)velocity,SmartDashboard.getNumber("PID/setpoint")));
+			SmartDashboard.putString("VoltageCurrentGraph", genGraphStr(right1.getOutputVoltage()*-1, right1.getOutputCurrent()));
+			SmartDashboard.putNumber("Output Voltage", right1.getOutputVoltage());
+			SmartDashboard.putNumber("Output Current", right1.getOutputCurrent());
 			//SmartDashboard.putNumber("Target Velocity", targetvelocity); // and this
 			
 			// this block is for PID tuning
@@ -119,8 +124,12 @@ public class Robot extends SampleRobot {
 				right1.enable();
 				left2.enable();
 				right2.enable();
+				right2.set(1); // talons lose their setting but NOT mode when disabled
+				left2.set(3);
 				left1.set(SmartDashboard.getNumber("PID/setpoint")*-1);
 				right1.set(SmartDashboard.getNumber("PID/setpoint")*-1); // only multiply by -1 to drive in a straight line (sides are inverted). Remove top *-1
+				//right1.set(1);
+				//right2.set(1);
 			}
 			
 			//System.out.println("PLEASE PRINT");
