@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.StringJoiner;
 
 /**
  * This is a short program demonstrating how to use the basic velocity closed loop throttle
@@ -75,6 +76,14 @@ public class Robot extends SampleRobot {
 	/**
 	 * Runs the motor.
 	 */
+	private String genGraphStr(double...data) {
+		StringJoiner sj = new StringJoiner(":");
+		for (double item : data) {
+			sj.add(String.valueOf(item));
+		}
+		return sj.toString();
+	}
+	
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
 			
@@ -82,11 +91,13 @@ public class Robot extends SampleRobot {
 			//right2.set(Math.pow(controller.getRawAxis(3), 3));
 			//left1.set(-1 * Math.pow(controller.getRawAxis(1), 3));
 			//left2.set(-1 * Math.pow(controller.getRawAxis(1), 3));
-			int velocity = right1.getEncVelocity();
-			//right1.set(controller.getRawAxis(3)*1500); // uncomment to use controller
+			int velocity = right1.getEncVelocity()*-1;
+			//double targetvelocity = controller.getRawAxis(3)*-1500; // uncomment to use controller
+			//right1.set(controller.getRawAxis(3)*1500); // and this
 			//left1.set(controller.getRawAxis(1)*-1500); // and this
-			SmartDashboard.putNumber("Velocity", velocity*-1 );
-			//SmartDashboard.putNumber("Target Velocity", controller.getRawAxis(3)*-1500); // and this
+			SmartDashboard.putNumber("Velocity", velocity );
+			SmartDashboard.putString("GraphData", genGraphStr((double)velocity,SmartDashboard.getNumber("PID/setpoint")));
+			//SmartDashboard.putNumber("Target Velocity", targetvelocity); // and this
 			
 			// this block is for PID tuning
 			left1.setP(SmartDashboard.getNumber("PID/p"));
@@ -98,10 +109,16 @@ public class Robot extends SampleRobot {
 			right1.setD(SmartDashboard.getNumber("PID/d"));
 			right1.setF(SmartDashboard.getNumber("PID/f"));
 			if (!SmartDashboard.getBoolean("PID/disabled")) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
-				left1.set(0);
-				right1.set(0);
+				left1.disable();
+				right1.disable();
+				left2.disable();
+				right2.disable();
 			}
 			else {
+				left1.enable();
+				right1.enable();
+				left2.enable();
+				right2.enable();
 				left1.set(SmartDashboard.getNumber("PID/setpoint")*-1);
 				right1.set(SmartDashboard.getNumber("PID/setpoint")*-1); // only multiply by -1 to drive in a straight line (sides are inverted). Remove top *-1
 			}
