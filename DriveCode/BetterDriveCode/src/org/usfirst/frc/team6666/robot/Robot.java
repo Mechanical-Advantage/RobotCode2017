@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * This is a short sample program demonstrating how to use the basic throttle
+ * This is a short program demonstrating how to use the basic velocity closed loop throttle
  * mode of the new CAN Talon.
  */
 public class Robot extends SampleRobot {
@@ -72,10 +72,27 @@ public class Robot extends SampleRobot {
 			//left1.set(-1 * Math.pow(controller.getRawAxis(1), 3));
 			//left2.set(-1 * Math.pow(controller.getRawAxis(1), 3));
 			int velocity = right1.getEncVelocity();
-			right1.set(controller.getRawAxis(3)*1500);
-			left1.set(controller.getRawAxis(1)*-1500);
-			SmartDashboard.putNumber("Velocity", velocity );
-			SmartDashboard.putNumber("Target Velocity", controller.getRawAxis(3)*1500);
+			//right1.set(controller.getRawAxis(3)*1500);
+			//left1.set(controller.getRawAxis(1)*-1500);
+			SmartDashboard.putNumber("Velocity", velocity*-1 );
+			//SmartDashboard.putNumber("Target Velocity", controller.getRawAxis(3)*-1500);
+			
+			left1.setP(SmartDashboard.getNumber("PID/p"));
+			left1.setI(SmartDashboard.getNumber("PID/i"));
+			left1.setD(SmartDashboard.getNumber("PID/d"));
+			left1.setF(SmartDashboard.getNumber("PID/f"));
+			right1.setP(SmartDashboard.getNumber("PID/p"));
+			right1.setI(SmartDashboard.getNumber("PID/i"));
+			right1.setD(SmartDashboard.getNumber("PID/d"));
+			right1.setF(SmartDashboard.getNumber("PID/f"));
+			if (!SmartDashboard.getBoolean("PID/disabled")) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
+				left1.set(0);
+				right1.set(0);
+			}
+			else {
+				left1.set(SmartDashboard.getNumber("PID/setpoint"));
+				right1.set(SmartDashboard.getNumber("PID/setpoint")*-1);
+			}
 			
 			//System.out.println("PLEASE PRINT");
 			//System.out.println(controller.getY());
