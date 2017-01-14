@@ -35,8 +35,8 @@ public class Robot extends SampleRobot {
 		left1.configNominalOutputVoltage(+0.0f, -0.0f);
 		left1.configPeakOutputVoltage(+12.0f, -12.0f);
 		left1.setProfile(0);
-		left1.setF(0);
-		left1.setP(0);
+		left1.setF(1);
+		left1.setP(1);
 		left1.setI(0);
 		left1.setD(0);
 		right1.changeControlMode(TalonControlMode.Speed);
@@ -45,8 +45,8 @@ public class Robot extends SampleRobot {
 		right1.configNominalOutputVoltage(+0.0f, -0.0f);
 		right1.configPeakOutputVoltage(+12.0f, -12.0f);
 		right1.setProfile(0);
-		right1.setF(0);
-		right1.setP(0);
+		right1.setF(1);
+		right1.setP(1);
 		right1.setI(0);
 		right1.setD(0);
 		left2.changeControlMode(CANTalon.TalonControlMode.Follower);
@@ -76,8 +76,8 @@ public class Robot extends SampleRobot {
 			right1.set(controller.getRawAxis(1)*1500);
 			SmartDashboard.putNumber("Velocity", velocity );
 			
-			System.out.println("PLEASE PRINT");
-			System.out.println(controller.getY());
+			//System.out.println("PLEASE PRINT");
+			//System.out.println(controller.getY());
 			
 			//left2.set(0.5);
 			//right1.set(-0.5);
@@ -89,7 +89,7 @@ public class Robot extends SampleRobot {
 								// you
 								// anything.
 			
-			System.out.println(controller.getX());
+			//System.out.println(controller.getX());
 
 		}
 		left1.disable();
