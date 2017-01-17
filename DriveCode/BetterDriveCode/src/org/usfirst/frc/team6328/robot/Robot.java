@@ -38,8 +38,9 @@ public class Robot extends SampleRobot {
 	//Joystick leftStick; // set to ID 2 in DriverStation
 	
 
-	public Robot() {
-
+	public Robot() { 
+		// setupRobotDrive();
+		// setupSmartDashboard
 		right1 = new CANTalon(1); // Initialize the CanTalonSRX on device 1.
 		//right1.setSafetyEnabled(false);
 		right2 = new CANTalon(2);
@@ -85,7 +86,10 @@ public class Robot extends SampleRobot {
 		}
 		return sj.toString();
 	}
-	
+	/*
+	 * TODO Try and make a new class for operating the code ex. RobotDriver
+	 * 	 
+	 */
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
 			
@@ -105,15 +109,15 @@ public class Robot extends SampleRobot {
 			//SmartDashboard.putNumber("Target Velocity", targetvelocity); // and this
 			
 			// this block is for PID tuning
-			left1.setP(SmartDashboard.getNumber("PID/p"));
-			left1.setI(SmartDashboard.getNumber("PID/i"));
-			left1.setD(SmartDashboard.getNumber("PID/d"));
-			left1.setF(SmartDashboard.getNumber("PID/f"));
-			right1.setP(SmartDashboard.getNumber("PID/p"));
-			right1.setI(SmartDashboard.getNumber("PID/i"));
-			right1.setD(SmartDashboard.getNumber("PID/d"));
-			right1.setF(SmartDashboard.getNumber("PID/f"));
-			if (!SmartDashboard.getBoolean("PID/disabled")) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
+			left1.setP(SmartDashboard.getNumber("PID/p", 1));
+			left1.setI(SmartDashboard.getNumber("PID/i", 0));
+			left1.setD(SmartDashboard.getNumber("PID/d", 0));
+			left1.setF(SmartDashboard.getNumber("PID/f", 1));
+			right1.setP(SmartDashboard.getNumber("PID/p", 1));
+			right1.setI(SmartDashboard.getNumber("PID/i", 0));
+			right1.setD(SmartDashboard.getNumber("PID/d", 0));
+			right1.setF(SmartDashboard.getNumber("PID/f", 1));
+			if (!SmartDashboard.getBoolean("PID/disabled", true)) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
 				left1.disable();
 				right1.disable();
 				left2.disable();
