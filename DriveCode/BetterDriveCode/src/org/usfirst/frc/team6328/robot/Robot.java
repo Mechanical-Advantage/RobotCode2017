@@ -117,7 +117,7 @@ public class Robot extends SampleRobot {
 			right1.setI(SmartDashboard.getNumber("PID/i", 0));
 			right1.setD(SmartDashboard.getNumber("PID/d", 0));
 			right1.setF(SmartDashboard.getNumber("PID/f", 1));
-			if (!SmartDashboard.getBoolean("PID/disabled", true)) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
+			if (!SmartDashboard.getBoolean("PID/disabled", false)) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
 				left1.disable();
 				right1.disable();
 				left2.disable();
