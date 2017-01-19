@@ -76,9 +76,6 @@ public class Robot extends SampleRobot {
 		controller = new Joystick(0);
 	}
 
-	/**
-	 * Runs the motor.
-	 */
 	private String genGraphStr(double...data) {
 		StringJoiner sj = new StringJoiner(":");
 		for (double item : data) {
@@ -91,6 +88,10 @@ public class Robot extends SampleRobot {
 	 * 	 
 	 */
 	public void operatorControl() {
+		left1.enable();
+		left2.enable();
+		right1.enable();
+		right2.enable();
 		while (isOperatorControl() && isEnabled()) {
 			
 			//right1.set(Math.pow(controller.getRawAxis(3), 3));
