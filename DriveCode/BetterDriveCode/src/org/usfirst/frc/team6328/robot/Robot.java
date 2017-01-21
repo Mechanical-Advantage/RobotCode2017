@@ -15,8 +15,8 @@
 package org.usfirst.frc.team6328.robot;
 
 //import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.*;
+import com.ctre.CANTalon;
+import com.ctre.CANTalon.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
@@ -57,6 +57,7 @@ public class Robot extends SampleRobot {
 		right1.setP(1);
 		right1.setI(0);
 		right1.setD(0);
+		right1.setVoltageRampRate(0);
 		left1.changeControlMode(TalonControlMode.Speed);
 		left1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		left1.reverseSensor(false);
@@ -67,6 +68,7 @@ public class Robot extends SampleRobot {
 		left1.setP(1);
 		left1.setI(0);
 		left1.setD(0);
+		left1.setVoltageRampRate(0);
 		right2.changeControlMode(CANTalon.TalonControlMode.Follower);
 		right2.set(1);
 		left2.changeControlMode(CANTalon.TalonControlMode.Follower);
@@ -103,7 +105,8 @@ public class Robot extends SampleRobot {
 			//right1.set(controller.getRawAxis(3)*1500); // and this
 			//left1.set(controller.getRawAxis(1)*-1500); // and this
 			SmartDashboard.putNumber("Velocity", velocity );
-			SmartDashboard.putString("GraphData", genGraphStr((double)velocity,SmartDashboard.getNumber("PID/setpoint")));
+			SmartDashboard.putString("GraphData", genGraphStr((double)velocity,SmartDashboard.getNumber("PID/setpoint", 0))); // PID tuning mode
+			//SmartDashboard.putString("GraphData", genGraphStr((double)velocity,targetvelocity)); // controller mode
 			SmartDashboard.putString("VoltageCurrentGraph", genGraphStr(right1.getOutputVoltage()*-1, right1.getOutputCurrent()));
 			SmartDashboard.putNumber("Output Voltage", right1.getOutputVoltage());
 			SmartDashboard.putNumber("Output Current", right1.getOutputCurrent());
@@ -131,8 +134,8 @@ public class Robot extends SampleRobot {
 				right2.enable();
 				right2.set(1); // talons lose their setting but NOT mode when disabled
 				left2.set(3);
-				left1.set(SmartDashboard.getNumber("PID/setpoint")*-1);
-				right1.set(SmartDashboard.getNumber("PID/setpoint")*-1); // only multiply by -1 to drive in a straight line (sides are inverted). Remove top *-1
+				left1.set(SmartDashboard.getNumber("PID/setpoint", 0)*-1);
+				right1.set(SmartDashboard.getNumber("PID/setpoint", 0)*-1); // only multiply by -1 to drive in a straight line (sides are inverted). Remove top *-1
 				//right1.set(1);
 				//right2.set(1);
 			}

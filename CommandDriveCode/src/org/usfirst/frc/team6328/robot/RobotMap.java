@@ -20,4 +20,6 @@ public class RobotMap {
 	public static int rightSlave = 2;
 	public static int leftMaster = 3;
 	public static int leftSlave = 4;
+	
+	public static int maxVelocity = 950; // maximum velocity when sticks are fully forward (value of 1)
 }

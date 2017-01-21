@@ -1,12 +1,14 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
+import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
@@ -31,7 +33,7 @@ public class DriveTrain extends Subsystem {
 		leftTalonMaster.reverseSensor(false);
 		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
-		setupVelocityClosedLoop(1,0,0,1);
+		setupVelocityClosedLoop(2,0,40,1.07); // PID tuning P,I,D,F
 		rightTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		rightTalonSlave.set(RobotMap.rightMaster);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
