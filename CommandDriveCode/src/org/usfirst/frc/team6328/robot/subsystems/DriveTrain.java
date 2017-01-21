@@ -1,6 +1,7 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
 import org.usfirst.frc.team6328.robot.RobotMap;
+import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
@@ -55,6 +56,34 @@ public class DriveTrain extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
+    	setDefaultCommand(new DriveWithJoystick());
+    }
+    
+    public void drive(int right, int left) {
+    	rightTalonMaster.set(right);
+    	leftTalonMaster.set(left*-1); // motors are reversed on left and right sides
+    }
+    
+    public void drive(double right, double left) {
+    	rightTalonMaster.set(right);
+    	leftTalonMaster.set(left*-1);
+    }
+    
+    public void stop() {
+    	rightTalonMaster.set(0);
+    	leftTalonMaster.set(0);
+    }
+    
+    public void enable() {
+    	rightTalonMaster.enable();
+    	leftTalonMaster.enable();
+    	rightTalonSlave.set(RobotMap.rightMaster); // reset slave master, talons lose their master when disabled
+    	leftTalonMaster.set(RobotMap.leftMaster);
+    }
+    
+    public void disable() {
+    	rightTalonMaster.disable();
+    	leftTalonMaster.disable();
     }
 }
 
