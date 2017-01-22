@@ -38,6 +38,10 @@ public class DriveTrain extends Subsystem {
 		rightTalonSlave.set(RobotMap.rightMaster);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		leftTalonSlave.set(RobotMap.leftMaster);
+		rightTalonMaster.enableBrakeMode(true);
+		leftTalonMaster.enableBrakeMode(true);
+		rightTalonSlave.enableBrakeMode(true);
+		leftTalonSlave.enableBrakeMode(true);
 	}
 	
 	private void setupVelocityClosedLoop(double p, double i, double d, double f) {
@@ -62,13 +66,28 @@ public class DriveTrain extends Subsystem {
     }
     
     public void drive(int right, int left) {
-    	rightTalonMaster.set(right);
-    	leftTalonMaster.set(left*-1); // motors are reversed on left and right sides
+    	drive((double)right, (double)left);
+    }
+    
+    private double calcActualVelocity(double input) {
+    	if (input>=-1 && input<=1) {
+    		return 0;
+    	}
+    	else if (input>1 && input<RobotMap.minVelocity) {
+    		return RobotMap.minVelocity;
+    	}
+    	else if (input<-1 && input>RobotMap.minVelocity*-1) {
+    		return RobotMap.minVelocity*-1;
+    	}
+    	else {
+    		return input;
+    	}
     }
     
     public void drive(double right, double left) {
-    	rightTalonMaster.set(right);
-    	leftTalonMaster.set(left*-1);
+    	enable();
+    	rightTalonMaster.set(calcActualVelocity(right*-1));
+    	leftTalonMaster.set(calcActualVelocity(left)); // motors are reversed on left and right sides
     }
     
     public void stop() {

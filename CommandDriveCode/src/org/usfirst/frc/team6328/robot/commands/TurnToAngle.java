@@ -14,13 +14,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class TurnToAngle extends Command implements PIDOutput {
 	
-	static final double kP = 0.1;
-    static final double kI = 0.00;
-    static final double kD = 0.00;
-    static final double kF = 0.00;
-    static final double kToleranceDegrees = 2.0f;
+	static final double kP = 0.01;
+    static final double kI = 0.000;
+    static final double kD = 0.003;
+    static final double kF = 0.0;
+    static final double kToleranceDegrees = 1.0f;
+    static final int kToleranceBufSamples = 10;
     private PIDController turnController;
     private double targetAngle;
+    private boolean resetCompleted;
     
     private double rotateToAngleRate;
 
@@ -29,46 +31,61 @@ public class TurnToAngle extends Command implements PIDOutput {
         // eg. requires(chassis);
     	super("TurnToAngle");
     	requires(Robot.driveSubsystem);
-    	turnController = new PIDController(kP, kI, kD, kF, Robot.ahrs, this);
-    	turnController.setInputRange(-180.0f,  180.0f);
-        turnController.setOutputRange(-1.0, 1.0);
-        turnController.setAbsoluteTolerance(kToleranceDegrees);
-        turnController.setContinuous(true);
-        LiveWindow.addActuator("DriveSystem", "RotateController", turnController);
-        
+
         // limit input to -180 to 180
         targetAngle = (angle>180) ? 180 : angle;
         targetAngle = (targetAngle<-180) ? -180 : targetAngle;
-        
-        turnController.setSetpoint(targetAngle);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.ahrs.reset();
+    	turnController = new PIDController(kP, kI, kD, kF, Robot.ahrs, this);
+    	turnController.setInputRange(-180.0f,  180.0f);
+        turnController.setOutputRange(-1.0, 1.0);
+        turnController.setAbsoluteTolerance(kToleranceDegrees);
+        turnController.setToleranceBuffer(kToleranceBufSamples);
+        turnController.setContinuous(true);
+        LiveWindow.addActuator("DriveSystem", "RotateController", turnController);
+        
+        turnController.setSetpoint(targetAngle);
+        System.out.println(Robot.ahrs.getYaw());
+        System.out.println("Resetting");
+    	Robot.ahrs.zeroYaw();
+    	/*while (Math.abs(Robot.ahrs.getYaw())>0.1) {
+    		Timer.delay(0.01);
+    	}*/
+    	System.out.println(Robot.ahrs.getYaw());
     	turnController.enable();
-    	 
+    	resetCompleted = false;
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double outputVelocity = rotateToAngleRate*RobotMap.maxVelocity;
-    	SmartDashboard.putNumber("Angle", Robot.ahrs.getAngle());
-    	SmartDashboard.putNumber("Rate", Robot.ahrs.getRate());
-    	SmartDashboard.putNumber("Yaw", Robot.ahrs.getYaw());
-    	
-    	Robot.driveSubsystem.drive(outputVelocity*-1, outputVelocity);
+    	if (Math.abs(Robot.ahrs.getYaw())<0.1) resetCompleted = true;
+    	if (resetCompleted) {
+	    	System.out.print("Execute ");
+	    	System.out.println(Robot.ahrs.getYaw());
+	    	double outputVelocity = rotateToAngleRate*RobotMap.maxVelocity;
+	    	SmartDashboard.putNumber("Angle", Robot.ahrs.getAngle());
+	    	SmartDashboard.putNumber("Rate", Robot.ahrs.getRate());
+	    	SmartDashboard.putNumber("Yaw", Robot.ahrs.getYaw());
+	    	SmartDashboard.putNumber("Turn to angle rate", rotateToAngleRate);
+	    	SmartDashboard.putNumber("Velocity", outputVelocity);
+	    	
+	    	Robot.driveSubsystem.drive(outputVelocity*-1, outputVelocity);
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return turnController.onTarget();
+    	System.out.println("isFinished:" + Robot.ahrs.getYaw() + " / onTarget:" + turnController.onTarget());
+        return resetCompleted && (Math.abs(Robot.ahrs.getYaw() - targetAngle) < kToleranceDegrees) && turnController.onTarget();
     }
 
     // Called once after isFinished returns true
     protected void end() {
+    	Robot.driveSubsystem.disable();
     	turnController.disable();
-    	Robot.driveSubsystem.stop();
     }
 
     // Called when another command which requires one or more of the same

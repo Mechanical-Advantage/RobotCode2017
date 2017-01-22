@@ -26,8 +26,9 @@ public class DriveWithJoystick extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.driveSubsystem.drive(Robot.oi.getController().getRawAxis(rightAxis)*RobotMap.maxVelocity, 
-    			Robot.oi.getController().getRawAxis(leftAxis)*RobotMap.maxVelocity);
+    	// cube to improve low speed control, multiply by -1 because negative joystick means forward
+    	Robot.driveSubsystem.drive(Math.pow(Robot.oi.getController().getRawAxis(rightAxis), 3)*RobotMap.maxVelocity*-1, 
+    			Math.pow(Robot.oi.getController().getRawAxis(leftAxis), 3)*RobotMap.maxVelocity*-1);
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -53,10 +53,10 @@ public class Robot extends SampleRobot {
 		right1.configNominalOutputVoltage(+0.0f, -0.0f);
 		right1.configPeakOutputVoltage(+12.0f, -12.0f);
 		//right1.setProfile(0);
-		right1.setF(1);
-		right1.setP(1);
+		right1.setF(1.07);
+		right1.setP(2);
 		right1.setI(0);
-		right1.setD(0);
+		right1.setD(40);
 		right1.setVoltageRampRate(0);
 		left1.changeControlMode(TalonControlMode.Speed);
 		left1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
@@ -64,10 +64,10 @@ public class Robot extends SampleRobot {
 		left1.configNominalOutputVoltage(+0.0f, -0.0f);
 		left1.configPeakOutputVoltage(+12.0f, -12.0f);
 		//left1.setProfile(0);
-		left1.setF(1);
-		left1.setP(1);
+		left1.setF(1.07);
+		left1.setP(2);
 		left1.setI(0);
-		left1.setD(0);
+		left1.setD(40);
 		left1.setVoltageRampRate(0);
 		right2.changeControlMode(CANTalon.TalonControlMode.Follower);
 		right2.set(1);

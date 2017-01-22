@@ -53,7 +53,7 @@ public class Robot extends IterativeRobot {
 	 * the robot is disabled.
      */
     public void disabledInit(){
-
+    	SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
     }
 	
 	public void disabledPeriodic() {
