@@ -55,13 +55,15 @@ public class TurnToAngle extends Command implements PIDOutput {
     		Timer.delay(0.01);
     	}*/
     	System.out.println(Robot.ahrs.getYaw());
-    	turnController.enable();
     	resetCompleted = false;
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (Math.abs(Robot.ahrs.getYaw())<0.1) resetCompleted = true;
+    	if (Math.abs(Robot.ahrs.getYaw())<0.1) {
+    		resetCompleted = true;
+    		turnController.enable();
+    	}
     	if (resetCompleted) {
 	    	System.out.print("Execute ");
 	    	System.out.println(Robot.ahrs.getYaw());

@@ -93,7 +93,7 @@ public class DriveTrain extends Subsystem {
     	enable();
     	rightTalonMaster.set(calcActualVelocity(right));
     	leftTalonMaster.set(calcActualVelocity(left));
-    	System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
+    	//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
     }
     
     public void stop() {

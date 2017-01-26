@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+
+import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 import org.usfirst.frc.team6328.robot.subsystems.DriveTrain;
@@ -32,7 +34,7 @@ public class Robot extends IterativeRobot {
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
 
     Command autonomousCommand;
-    SendableChooser chooser;
+    SendableChooser<Command> chooser;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -40,10 +42,13 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
 		oi = new OI();
-        chooser = new SendableChooser();
+        chooser = new SendableChooser<Command>();
         chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
         chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
+        chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
+        chooser.addObject("Rotate 24 degrees", new TurnToAngle(24));
+        chooser.addObject("Drive 24 inches", new DriveDistance(24));
         SmartDashboard.putData("Auto mode", chooser);
     }
 	
