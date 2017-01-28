@@ -42,10 +42,7 @@ public class DriveTrain extends Subsystem {
 		rightTalonSlave.set(RobotMap.rightMaster);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		leftTalonSlave.set(RobotMap.leftMaster);
-		rightTalonMaster.enableBrakeMode(true);
-		leftTalonMaster.enableBrakeMode(true);
-		rightTalonSlave.enableBrakeMode(true);
-		leftTalonSlave.enableBrakeMode(true);
+		enableBrakeMode(true);
 	}
 	
 	private void setupVelocityClosedLoop(double p, double i, double d, double f) {
@@ -75,13 +72,13 @@ public class DriveTrain extends Subsystem {
     }
     
     private double calcActualVelocity(double input) {
-    	if (input>=-1 && input<=1) {
+    	if (input>=-0.1 && input<=0.1) {
     		return 0;
     	}
-    	else if (input>1 && input<RobotMap.minVelocity) {
+    	else if (input>0.1 && input<RobotMap.minVelocity) {
     		return RobotMap.minVelocity;
     	}
-    	else if (input<-1 && input>RobotMap.minVelocity*-1) {
+    	else if (input<-0.1 && input>RobotMap.minVelocity*-1) {
     		return RobotMap.minVelocity*-1;
     	}
     	else {
@@ -111,6 +108,13 @@ public class DriveTrain extends Subsystem {
     public void disable() {
     	rightTalonMaster.disable();
     	leftTalonMaster.disable();
+    }
+    
+    public void enableBrakeMode(boolean enable) {
+    	rightTalonMaster.enableBrakeMode(enable);
+		leftTalonMaster.enableBrakeMode(enable);
+		rightTalonSlave.enableBrakeMode(enable);
+		leftTalonSlave.enableBrakeMode(enable);
     }
     
     public void resetPosition() {

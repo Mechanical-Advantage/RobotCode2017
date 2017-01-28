@@ -13,16 +13,22 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- *
+ * Drive the robot a specified distance
  */
 public class DriveDistance extends Command {
 
-	static final double kP = 0.03;
+	static final double kP = 0.023;
     static final double kI = 0.0;
-    static final double kD = 0.0;
-    static final double kF = 0.0;
-    static final double kToleranceInches = 1.0f;
+    static final double kD = 0.005;
+    static final double kF = 0.3;
+    static final double kToleranceInches = 0.25f;
     static final int kToleranceBufSamples = 10;
+    // PID output will be limited to negative to positive this. Multiplied by RobotMap maxVelocity to get target
+    static final double kMaxOutput = 0.4;
+    // Limit change in one iteration to this - % of max output
+    static final double kMaxChange = 0.05; 
+
+    static final double maxOutputVelocityChange = RobotMap.maxVelocity * kMaxOutput * kMaxChange;
     private PIDController distanceControllerLeft;
     private PIDController distanceControllerRight;
 	private double targetDistance;
@@ -31,7 +37,8 @@ public class DriveDistance extends Command {
 	private DistancePIDOutput pidOutputLeft = new DistancePIDOutput();
 	private DistancePIDOutput pidOutputRight = new DistancePIDOutput();
 	private boolean resetCompleted;
-	
+	private double lastOutputLeft, lastOutputRight;
+
     public DriveDistance(double distance) { // in inches
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
@@ -50,39 +57,58 @@ public class DriveDistance extends Command {
         resetCompleted = false;
         System.out.println("Starting distance right " + Robot.driveSubsystem.getDistanceRight());
         System.out.println("Starting Distance Left " + Robot.driveSubsystem.getDistanceLeft());
+        lastOutputLeft = lastOutputRight = 0;
     }
 
 	private void setupDistanceController(PIDController distanceController) {
-		distanceController.setOutputRange(-1.0f, 1.0f);
+		distanceController.setOutputRange(kMaxOutput*-1, kMaxOutput);
         distanceController.setAbsoluteTolerance(kToleranceInches);
         distanceController.setToleranceBuffer(kToleranceBufSamples);
         distanceController.setContinuous(true);
         distanceController.setSetpoint(targetDistance);
 	}
 
+	private double calcNewVelocity(DistancePIDOutput pidOut, double lastOutput) {
+    	double targetOutput = pidOut.getDriveDistanceRate()*RobotMap.maxVelocity;
+    	if (Math.abs(lastOutput - targetOutput) > maxOutputVelocityChange){
+    		if (lastOutput < targetOutput) {
+        		targetOutput = lastOutput + maxOutputVelocityChange;
+    		} else {
+    			targetOutput = lastOutput - maxOutputVelocityChange;
+    		}
+    	}
+    	return targetOutput;
+	}
+	
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (Robot.driveSubsystem.getDistanceLeft()<0.1 && Robot.driveSubsystem.getDistanceRight()<0.1) {
+    	if (Math.abs(Robot.driveSubsystem.getDistanceLeft())<0.1 && Math.abs(Robot.driveSubsystem.getDistanceRight())<0.1) {
     		resetCompleted = true;
     		distanceControllerLeft.enable();
             distanceControllerRight.enable();
     	}
     	if (resetCompleted) {
-	    	double outputVelocityLeft = pidOutputLeft.getDriveDistanceRate()*RobotMap.maxVelocity;
-	    	double outputVelocityRight = pidOutputRight.getDriveDistanceRate()*RobotMap.maxVelocity;
-	    	Robot.driveSubsystem.drive(outputVelocityRight, outputVelocityLeft);
+    		
+	    	//double outputVelocityLeft = pidOutputLeft.getDriveDistanceRate()*RobotMap.maxVelocity;
+	    	//double outputVelocityRight = pidOutputRight.getDriveDistanceRate()*RobotMap.maxVelocity;
+    		double outputVelocityLeft = calcNewVelocity(pidOutputLeft, lastOutputLeft);
+	    	double outputVelocityRight = calcNewVelocity(pidOutputRight, lastOutputRight);
+    		Robot.driveSubsystem.drive(outputVelocityRight, outputVelocityLeft);
+    		lastOutputLeft = outputVelocityLeft;
+    		lastOutputRight = outputVelocityRight;
 	    	SmartDashboard.putNumber("Right Velocity", outputVelocityRight);
 	    	SmartDashboard.putNumber("Left Velocity", outputVelocityLeft);
+	    	SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocityLeft, outputVelocityRight));
+	    	SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
+	    	SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
+	    	SmartDashboard.putString("DriveDistance Graph", genGraphStr(targetDistance, Robot.driveSubsystem.getDistanceLeft(), 
+	    			Robot.driveSubsystem.getDistanceRight()));
     	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	System.out.println("onTarget Left " + distanceControllerLeft.onTarget() + " " + Robot.driveSubsystem.getDistanceLeft());
-    	SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
-    	SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
-    	SmartDashboard.putString("DriveDistance Graph", genGraphStr(targetDistance, Robot.driveSubsystem.getDistanceLeft(), 
-    			Robot.driveSubsystem.getDistanceRight()));
     	System.out.println("onTarget Right " + distanceControllerRight.onTarget() + " " + Robot.driveSubsystem.getDistanceRight());
         return (distanceControllerLeft.onTarget() && distanceControllerRight.onTarget());
     }

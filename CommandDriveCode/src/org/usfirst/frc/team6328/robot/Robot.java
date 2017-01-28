@@ -49,6 +49,9 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
         chooser.addObject("Rotate 24 degrees", new TurnToAngle(24));
         chooser.addObject("Drive 24 inches", new DriveDistance(24));
+        chooser.addObject("Drive 6 inches", new DriveDistance(6));
+        chooser.addObject("Drive 10 feet", new DriveDistance(120));
+        chooser.addObject("Drive backwards 10 feet", new DriveDistance(-120));
         SmartDashboard.putData("Auto mode", chooser);
     }
 	
@@ -58,7 +61,10 @@ public class Robot extends IterativeRobot {
 	 * the robot is disabled.
      */
     public void disabledInit(){
+    	driveSubsystem.enableBrakeMode(false);
     	SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
+    	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
+    	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
     }
 	
 	public void disabledPeriodic() {
@@ -75,6 +81,7 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
+    	driveSubsystem.enableBrakeMode(true);
         autonomousCommand = (Command) chooser.getSelected();
         
 		/* String autoSelected = SmartDashboard.getString("Auto Selector", "Default");
@@ -100,6 +107,7 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopInit() {
+    	driveSubsystem.enableBrakeMode(true);
 		// This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to 
         // continue until interrupted by another command, remove
