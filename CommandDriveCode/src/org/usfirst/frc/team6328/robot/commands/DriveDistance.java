@@ -17,16 +17,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveDistance extends Command {
 
-	static final double kP = 0.023;
-    static final double kI = 0.0;
-    static final double kD = 0.005;
-    static final double kF = 0.3;
-    static final double kToleranceInches = 0.25f;
+	static final double kP = 0.017; // 0.023
+    static final double kI = 0.0; // 0.0
+    static final double kD = 0.0; // 0.005
+    static final double kF = 0.5; // 0.3
+    static final double kToleranceInches = 0.5f;
     static final int kToleranceBufSamples = 10;
     // PID output will be limited to negative to positive this. Multiplied by RobotMap maxVelocity to get target
-    static final double kMaxOutput = 0.4;
+    static final double kMaxOutput = 0.8;
     // Limit change in one iteration to this - % of max output
-    static final double kMaxChange = 0.05; 
+    static final double kMaxChange = 0.03; 
 
     static final double maxOutputVelocityChange = RobotMap.maxVelocity * kMaxOutput * kMaxChange;
     private PIDController distanceControllerLeft;
@@ -49,8 +49,8 @@ public class DriveDistance extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	distanceControllerLeft = new PIDController(kP, kI, kD, kF, pidSourceLeft, pidOutputLeft);
-    	distanceControllerRight = new PIDController(kP, kI, kD, kF, pidSourceRight, pidOutputRight);
+    	distanceControllerLeft = new PIDController(kP, kI, kD, kF, pidSourceLeft, pidOutputLeft, 0.02);
+    	distanceControllerRight = new PIDController(kP, kI, kD, kF, pidSourceRight, pidOutputRight, 0.02);
         setupDistanceController(distanceControllerLeft);
         setupDistanceController(distanceControllerRight);
         Robot.driveSubsystem.resetPosition();
@@ -98,7 +98,7 @@ public class DriveDistance extends Command {
     		lastOutputRight = outputVelocityRight;
 	    	SmartDashboard.putNumber("Right Velocity", outputVelocityRight);
 	    	SmartDashboard.putNumber("Left Velocity", outputVelocityLeft);
-	    	SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocityLeft, outputVelocityRight));
+	    	SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocityLeft, outputVelocityRight, pidOutputLeft.getDriveDistanceRate()*RobotMap.maxVelocity, pidOutputRight.getDriveDistanceRate()*RobotMap.maxVelocity));
 	    	SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
 	    	SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
 	    	SmartDashboard.putString("DriveDistance Graph", genGraphStr(targetDistance, Robot.driveSubsystem.getDistanceLeft(), 
@@ -110,7 +110,9 @@ public class DriveDistance extends Command {
     protected boolean isFinished() {
     	System.out.println("onTarget Left " + distanceControllerLeft.onTarget() + " " + Robot.driveSubsystem.getDistanceLeft());
     	System.out.println("onTarget Right " + distanceControllerRight.onTarget() + " " + Robot.driveSubsystem.getDistanceRight());
-        return (distanceControllerLeft.onTarget() && distanceControllerRight.onTarget());
+        return (distanceControllerLeft.onTarget() && distanceControllerRight.onTarget()) && 
+        		((Math.abs(Robot.driveSubsystem.getDistanceLeft() - targetDistance) < kToleranceInches) && 
+        				(Math.abs(Robot.driveSubsystem.getDistanceRight() - targetDistance) < kToleranceInches));
     }
 
     // Called once after isFinished returns true

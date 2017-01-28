@@ -52,6 +52,9 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Drive 6 inches", new DriveDistance(6));
         chooser.addObject("Drive 10 feet", new DriveDistance(120));
         chooser.addObject("Drive backwards 10 feet", new DriveDistance(-120));
+        chooser.addObject("Drive backwards 24 inches", new DriveDistance(-24));
+        chooser.addObject("Drive 60 inches", new DriveDistance(60));
+        chooser.addObject("Drive backwards 60 inches", new DriveDistance(-60));
         SmartDashboard.putData("Auto mode", chooser);
     }
 	
