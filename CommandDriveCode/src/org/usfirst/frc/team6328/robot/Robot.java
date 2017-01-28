@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
+import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 import org.usfirst.frc.team6328.robot.subsystems.DriveTrain;
@@ -55,6 +56,8 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Drive backwards 24 inches", new DriveDistance(-24));
         chooser.addObject("Drive 60 inches", new DriveDistance(60));
         chooser.addObject("Drive backwards 60 inches", new DriveDistance(-60));
+        chooser.addObject("Drive 6 feet with gyro correction", new DriveDistanceOnHeading(72));
+        chooser.addObject("Drive 10 feet with gyro correction", new DriveDistanceOnHeading(120));
         SmartDashboard.putData("Auto mode", chooser);
     }
 	
