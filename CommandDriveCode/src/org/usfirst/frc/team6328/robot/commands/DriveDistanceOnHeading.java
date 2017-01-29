@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Drive the specified distance on the specified heading
+ * Does not turn first, really use it to drive straight
+ * Also is not good if the robot is strongly knocked off course (like being kicked)
  */
 public class DriveDistanceOnHeading extends Command {
 	
@@ -25,16 +27,16 @@ public class DriveDistanceOnHeading extends Command {
     static final int kToleranceBufSamplesDistance = 10;
     static final double kUpdatePeriodDistance = 0.02;
     
-    static final double kPAngle = 0.01;
+    static final double kPAngle = 0.07;
     static final double kIAngle = 0.000;
-    static final double kDAngle = 0.003;
+    static final double kDAngle = 0.0;
     static final double kFAngle = 0.0;
-    static final double kToleranceDegrees = 1.0f;
+    static final double kToleranceDegrees = 0.5f;
     static final int kToleranceBufSamplesAngle = 10;
     static final double kTurnCorrectionAmount = 0.2;
     
     // PID output will be limited to negative to positive this. Multiplied by RobotMap maxVelocity to get target
-    static final double kMaxOutput = 0.8;
+    static final double kMaxOutput = 0.9;
     // Limit change in one iteration to this - % of max output
     static final double kMaxChange = 0.03; 
 
@@ -122,6 +124,7 @@ public class DriveDistanceOnHeading extends Command {
     		Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
     		SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
     		SmartDashboard.putNumber("Turn controller output", pidOutputAngle.getPIDRate());
+    		SmartDashboard.putString("Yaw Graph", genGraphStr(targetAngle, Robot.ahrs.getYaw()));
     	}
     }
 

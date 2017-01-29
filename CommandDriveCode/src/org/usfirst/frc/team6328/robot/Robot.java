@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
+import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
+import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 import org.usfirst.frc.team6328.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team6328.robot.subsystems.ExampleSubsystem;
@@ -58,7 +60,11 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Drive backwards 60 inches", new DriveDistance(-60));
         chooser.addObject("Drive 6 feet with gyro correction", new DriveDistanceOnHeading(72));
         chooser.addObject("Drive 10 feet with gyro correction", new DriveDistanceOnHeading(120));
+        chooser.addObject("Turn around and drive 5 feet", new TurnAndDriveDistance(60, 180));
+        chooser.addObject("Turn 45 degrees and drive 2 feet", new TurnAndDriveDistance(24, 45));
+        chooser.addObject("Drive square 5 feet length", new DriveSquare(60));
         SmartDashboard.putData("Auto mode", chooser);
+        System.out.println(ahrs.getFirmwareVersion());
     }
 	
 	/**
