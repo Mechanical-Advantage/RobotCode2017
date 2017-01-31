@@ -64,7 +64,7 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Turn 45 degrees and drive 2 feet", new TurnAndDriveDistance(24, 45));
         chooser.addObject("Drive square 5 feet length", new DriveSquare(60));
         SmartDashboard.putData("Auto mode", chooser);
-        System.out.println(ahrs.getFirmwareVersion());
+        System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
     }
 	
 	/**

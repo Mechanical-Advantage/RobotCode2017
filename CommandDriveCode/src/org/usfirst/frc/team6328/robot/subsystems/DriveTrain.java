@@ -1,5 +1,7 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
+import java.util.StringJoiner;
+
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
@@ -91,6 +93,9 @@ public class DriveTrain extends Subsystem {
     	rightTalonMaster.set(calcActualVelocity(right));
     	leftTalonMaster.set(calcActualVelocity(left));
     	//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
+    	SmartDashboard.putString("Voltage-Current Graph", genGraphStr(leftTalonMaster.getOutputVoltage(), 
+    			leftTalonMaster.getOutputCurrent(), rightTalonMaster.getOutputVoltage(), 
+    			rightTalonMaster.getOutputCurrent()));
     }
     
     public void stop() {
@@ -139,5 +144,21 @@ public class DriveTrain extends Subsystem {
     public double getDistanceLeft() {
     	return wheelDiameter*Math.PI*getRotationsLeft();
     }
+    
+    public double getVelocityRight() {
+    	return rightTalonMaster.getEncVelocity();
+    }
+    
+    public double getVelocityLeft() {
+    	return leftTalonMaster.getEncVelocity();
+    }
+    
+    private String genGraphStr(double...data) {
+		StringJoiner sj = new StringJoiner(":");
+		for (double item : data) {
+			sj.add(String.valueOf(item));
+		}
+		return sj.toString();
+	}
 }
 

@@ -113,14 +113,14 @@ public class Robot extends SampleRobot {
 			//SmartDashboard.putNumber("Target Velocity", targetvelocity); // and this
 			
 			// this block is for PID tuning
-			left1.setP(SmartDashboard.getNumber("PID/p", 1));
+			left1.setP(SmartDashboard.getNumber("PID/p", 2));
 			left1.setI(SmartDashboard.getNumber("PID/i", 0));
-			left1.setD(SmartDashboard.getNumber("PID/d", 0));
-			left1.setF(SmartDashboard.getNumber("PID/f", 1));
-			right1.setP(SmartDashboard.getNumber("PID/p", 1));
+			left1.setD(SmartDashboard.getNumber("PID/d", 40));
+			left1.setF(SmartDashboard.getNumber("PID/f", 1.07));
+			right1.setP(SmartDashboard.getNumber("PID/p", 2));
 			right1.setI(SmartDashboard.getNumber("PID/i", 0));
-			right1.setD(SmartDashboard.getNumber("PID/d", 0));
-			right1.setF(SmartDashboard.getNumber("PID/f", 1));
+			right1.setD(SmartDashboard.getNumber("PID/d", 40));
+			right1.setF(SmartDashboard.getNumber("PID/f", 1.07));
 			if (!SmartDashboard.getBoolean("PID/disabled", false)) { // this makes red (false) on the dashboard mean disabled (and makes it default), the dashboard wirtes true on green
 				left1.disable();
 				right1.disable();

@@ -107,7 +107,7 @@ public class DriveDistanceOnHeading extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (Math.abs(Robot.driveSubsystem.getDistanceLeft())<0.1 && Math.abs(Robot.driveSubsystem.getDistanceRight())<0.1) {
+    	if (Robot.driveSubsystem.getVelocityLeft()<1 && Robot.driveSubsystem.getVelocityRight()<1) {
     		resetCompletedDistance = true;
     		distanceController.enable();
             turnController.enable();

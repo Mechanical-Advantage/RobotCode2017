@@ -23,6 +23,7 @@ public class TurnToAngle extends Command implements PIDOutput {
     private PIDController turnController;
     private double targetAngle;
     private boolean resetCompleted;
+    private double startingUpdateCount;
     
     private double rotateToAngleRate;
 
@@ -51,6 +52,7 @@ public class TurnToAngle extends Command implements PIDOutput {
         System.out.println(Robot.ahrs.getYaw());
         System.out.println("Resetting");
     	Robot.ahrs.zeroYaw();
+    	startingUpdateCount = Robot.ahrs.getUpdateCount();
     	/*while (Math.abs(Robot.ahrs.getYaw())>0.1) {
     		Timer.delay(0.01);
     	}*/
@@ -60,7 +62,11 @@ public class TurnToAngle extends Command implements PIDOutput {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (Math.abs(Robot.ahrs.getYaw())<0.1) {
+    	/*if (Robot.ahrs.getRate() < 0.3 && !resetStarted) {
+    		Robot.ahrs.zeroYaw();
+    		resetStarted = true;
+    	}*/
+    	if (Robot.ahrs.getUpdateCount() >= startingUpdateCount+2) {
     		resetCompleted = true;
     		turnController.enable();
     	}
