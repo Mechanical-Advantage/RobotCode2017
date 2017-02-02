@@ -1,5 +1,7 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.Robot;
+
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
@@ -7,7 +9,8 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  */
 public class DriveSquare extends CommandGroup {
 
-    public DriveSquare(double sideLength) {
+    public DriveSquare(double sideLength, boolean toRight) {
+    	int turnAmount = 0;
         // Add Commands here:
         // e.g. addSequential(new Command1());
         //      addSequential(new Command2());
@@ -24,10 +27,16 @@ public class DriveSquare extends CommandGroup {
         // e.g. if Command1 requires chassis, and Command2 requires arm,
         // a CommandGroup containing them would require both the chassis and the
         // arm.
+    	if ((toRight && sideLength>0) || (!toRight && sideLength<0)) {
+    		turnAmount = 90;
+    	}
+    	else if ((!toRight && sideLength>0) || (toRight && sideLength<0)) {
+    		turnAmount = -90;
+    	}
     	addSequential(new DriveDistanceOnHeading(sideLength));
-    	addSequential(new TurnAndDriveDistance(sideLength, 90));
-    	addSequential(new TurnAndDriveDistance(sideLength, 90));
-    	addSequential(new TurnAndDriveDistance(sideLength, 90));
-    	addSequential(new TurnToAngle(90));
+    	addSequential(new TurnAndDriveDistance(sideLength, turnAmount));
+    	addSequential(new TurnAndDriveDistance(sideLength, turnAmount));
+    	addSequential(new TurnAndDriveDistance(sideLength, turnAmount));
+    	addSequential(new TurnToAngle(turnAmount));
     }
 }

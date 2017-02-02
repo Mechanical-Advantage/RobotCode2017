@@ -50,6 +50,7 @@ public class DriveDistanceOnHeading extends Command {
 	private PIDOutputter pidOutputDistance = new PIDOutputter();
 	private PIDOutputter pidOutputAngle = new PIDOutputter();
 	private boolean resetCompletedDistance;
+	private boolean resetStartedDistance;
 	private double lastOutputDistance;
     
     public DriveDistanceOnHeading(double distance) {
@@ -90,7 +91,7 @@ public class DriveDistanceOnHeading extends Command {
         turnController.setSetpoint(targetAngle);
         lastOutputDistance = 0;
         resetCompletedDistance = false;
-        Robot.driveSubsystem.resetPosition();
+        resetStartedDistance = false;
     }
     
     private double calcNewVelocity(PIDOutputter pidOut, double lastOutput) {
@@ -107,7 +108,11 @@ public class DriveDistanceOnHeading extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (Robot.driveSubsystem.getVelocityLeft()<1 && Robot.driveSubsystem.getVelocityRight()<1) {
+    	if (!resetStartedDistance && Math.abs(Robot.driveSubsystem.getVelocityLeft())<1 && Math.abs(Robot.driveSubsystem.getVelocityRight())<1) {
+    		Robot.driveSubsystem.resetPosition();
+    		resetStartedDistance = true;
+    	}
+    	if (resetStartedDistance && Math.abs(Robot.driveSubsystem.getDistanceLeft())<0.1 && Math.abs(Robot.driveSubsystem.getDistanceRight())<0.1) {
     		resetCompletedDistance = true;
     		distanceController.enable();
             turnController.enable();
@@ -116,10 +121,6 @@ public class DriveDistanceOnHeading extends Command {
     		double outputVelocity = calcNewVelocity(pidOutputDistance, lastOutputDistance);
     		lastOutputDistance = outputVelocity;
     		double outputTurnVelocity = pidOutputAngle.getPIDRate()*RobotMap.maxVelocity*kTurnCorrectionAmount;
-    		// if driving backwards, invert the turn so it still turns the right way (sides need to be adjusted the opposite direction
-    		if (targetDistance<0) {
-    			outputTurnVelocity*=-1;
-    		}
     		// subtract from right side, add to left side (drive left on positive)
     		Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
     		SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
