@@ -39,18 +39,30 @@ public class OI {
     // until it is finished as determined by it's isFinished method.
     // button.whenReleased(new ExampleCommand());
 	
-	private int controllerID = 0;
+	// for gamepad f310
+	/*private int controllerID = 0;
+	private static int rightAxis = 5; // 5 for Xinput, 3 for Directinput (X/D switch on controller)
+	private static int leftAxis = 1; // 1 for both Xinput and Directinput
 	private Joystick controller = new Joystick(controllerID);
 	private Button rightButton = new JoystickButton(controller, 1);
-	private Button leftButton = new JoystickButton(controller, 2);
+	private Button leftButton = new JoystickButton(controller, 2);*/
+	
+	// map left stick to ID 0 and right to ID 1 in driver station
+	private Joystick leftController = new Joystick(0);
+	private Joystick rightController = new Joystick(1);
+	private Button rightButton = new JoystickButton(rightController, 5);
+	private Button leftButton = new JoystickButton(rightController, 4);
 	
 	public OI() {
 		rightButton.whenPressed(new TurnToAngle(90));
 		leftButton.whenPressed(new TurnToAngle(-90));
 	}
 	
-	public Joystick getController() {
-		return controller;
+	public double getLeftAxis() {
+		return leftController.getRawAxis(1);
+	}
+	public double getRightAxis() {
+		return rightController.getRawAxis(1);
 	}
 }
 

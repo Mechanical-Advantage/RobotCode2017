@@ -1,6 +1,8 @@
 
 package org.usfirst.frc.team6328.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
@@ -35,6 +37,7 @@ public class Robot extends IterativeRobot {
 	public static final DriveTrain driveSubsystem = new DriveTrain();
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
+	//public static CameraServer cameraserver = CameraServer.getInstance();
 
     Command autonomousCommand;
     SendableChooser<Command> chooser;
@@ -79,6 +82,7 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
     	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
     	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
+    	//cameraserver.removeCamera("Front Camera");
     }
 	
 	public void disabledPeriodic() {
@@ -121,6 +125,7 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopInit() {
+    	//UsbCamera frontCamera;
     	driveSubsystem.enableBrakeMode(true);
 		// This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to 
@@ -130,6 +135,9 @@ public class Robot extends IterativeRobot {
         
         ahrs.reset();
         driveSubsystem.resetPosition();
+        
+        // camera support
+        //frontCamera = cameraserver.startAutomaticCapture("Front Camera", 0);
     }
 
     /**
