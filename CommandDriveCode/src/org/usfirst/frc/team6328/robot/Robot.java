@@ -37,7 +37,7 @@ public class Robot extends IterativeRobot {
 	public static final DriveTrain driveSubsystem = new DriveTrain();
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
-	//public static CameraServer cameraserver = CameraServer.getInstance();
+	//public static CameraServer cameraServer = CameraServer.getInstance();
 
     Command autonomousCommand;
     SendableChooser<Command> chooser;
@@ -70,6 +70,8 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
         SmartDashboard.putData("Auto mode", chooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
+        UsbCamera frontCamera = CameraServer.getInstance().startAutomaticCapture("Front Camera", 0);
+        frontCamera.setResolution(320, 240);
     }
 	
 	/**
@@ -82,7 +84,6 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
     	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
     	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
-    	//cameraserver.removeCamera("Front Camera");
     }
 	
 	public void disabledPeriodic() {
@@ -125,7 +126,7 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopInit() {
-    	//UsbCamera frontCamera;
+    	UsbCamera frontCamera;
     	driveSubsystem.enableBrakeMode(true);
 		// This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to 
@@ -135,9 +136,6 @@ public class Robot extends IterativeRobot {
         
         ahrs.reset();
         driveSubsystem.resetPosition();
-        
-        // camera support
-        //frontCamera = cameraserver.startAutomaticCapture("Front Camera", 0);
     }
 
     /**
