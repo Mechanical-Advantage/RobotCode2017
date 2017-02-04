@@ -1,14 +1,14 @@
 
 package org.usfirst.frc.team6328.robot;
 
-import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.CameraServer;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+//import edu.wpi.first.wpilibj.CameraServer;
 
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
@@ -16,6 +16,7 @@ import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
+import org.usfirst.frc.team6328.robot.subsystems.CameraSystem;
 import org.usfirst.frc.team6328.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team6328.robot.subsystems.ExampleSubsystem;
 
@@ -36,12 +37,11 @@ public class Robot extends IterativeRobot {
 
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DriveTrain driveSubsystem = new DriveTrain();
+	
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
 	//public static CameraServer cameraServer = CameraServer.getInstance();
-	public UsbCamera frontCamera = new UsbCamera("Front Camera", 0);
-	public UsbCamera rearCamera = new UsbCamera("Rear Camera", 1);
-	public MjpegServer mjpegServer = CameraServer.getInstance().addServer("Server", 1181);
+	public static final CameraSystem cameraSubsystem = new CameraSystem();
 
     Command autonomousCommand;
     SendableChooser<Command> chooser;
@@ -74,14 +74,6 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
         SmartDashboard.putData("Auto mode", chooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
-        
-        // camera setup
-        //UsbCamera frontCamera = CameraServer.getInstance().startAutomaticCapture("Front Camera", 0);
-        frontCamera.setResolution(320, 240);
-        frontCamera.setFPS(24);
-        rearCamera.setResolution(320, 240);
-        rearCamera.setFPS(24);
-        mjpegServer.setSource(frontCamera);
     }
 	
 	/**
@@ -160,14 +152,5 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
-    }
-    
-    public static void setCamera(boolean useFrontCamera) {
-    	if (useFrontCamera) {
-    		mjpegServer.setSource(frontCamera);
-    	}
-    	else {
-    		mjpegServer.setSource(rearCamera);
-    	}
     }
 }
