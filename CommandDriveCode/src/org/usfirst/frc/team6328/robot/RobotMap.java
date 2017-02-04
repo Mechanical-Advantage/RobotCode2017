@@ -27,17 +27,27 @@ public class RobotMap {
 	}*/
 	public static int rightMaster;
 	public static int rightSlave;
+	public static int rightSlave2;
 	public static int leftMaster;
 	public static int leftSlave;
+	public static int leftSlave2;
 	public static int minVelocity = 40; // lower values will be treated as this value
 	public static int maxVelocity = 950; // maximum velocity when sticks are fully forward (value of 1)
-	public boolean PracticeRobot= true;
+	public static final boolean practiceRobot = true;
 	public RobotMap(){
-		if(PracticeRobot == true){
+		if(practiceRobot == true){
 				rightMaster = 1;
 				rightSlave = 2;
 				leftMaster= 3;
 				leftSlave = 4;
+		}
+		else {
+			rightMaster = 1;
+			rightSlave = 2;
+			rightSlave2 = 5;
+			leftMaster = 3;
+			leftSlave = 4;
+			leftSlave2 = 6;
 		}
 	}
 	

@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	public final RobotMap RobotMap = new RobotMap();
+	public static final RobotMap RobotMap = new RobotMap();
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DriveTrain driveSubsystem = new DriveTrain();
 	
