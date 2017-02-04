@@ -15,12 +15,37 @@ public class RobotMap {
     // number and the module. For example you with a rangefinder:
     // public static int rangefinderPort = 1;
     // public static int rangefinderModule = 1;
-
-	public static int rightMaster = 1;
-	public static int rightSlave = 2;
-	public static int leftMaster = 3;
-	public static int leftSlave = 4;
-	
+/*	public enum RobotType{
+		PRACTICE(0), COMPETITION(1);
+		private int type;
+		private RobotType(int a){
+			this.type=a;
+		}
+		public int getValue(){
+			return type;			
+		}
+	}*/
+	public static int rightMaster;
+	public static int rightSlave;
+	public static int leftMaster;
+	public static int leftSlave;
 	public static int minVelocity = 40; // lower values will be treated as this value
 	public static int maxVelocity = 950; // maximum velocity when sticks are fully forward (value of 1)
+	public boolean PracticeRobot= true;
+	public RobotMap(){
+		if(PracticeRobot == true){
+				rightMaster = 1;
+				rightSlave = 2;
+				leftMaster= 3;
+				leftSlave = 4;
+		}
+	}
+	
+	
+	//RobotType robot = RobotType.PRACTICE;
+
+	
+	
+	
 }
+
