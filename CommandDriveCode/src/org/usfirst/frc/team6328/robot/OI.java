@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
+import org.usfirst.frc.team6328.robot.commands.SetCamera;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 
 /**
@@ -52,10 +53,14 @@ public class OI {
 	private Joystick rightController = new Joystick(1);
 	private Button rightButton = new JoystickButton(rightController, 5);
 	private Button leftButton = new JoystickButton(rightController, 4);
+	private Button frontCameraButton = new JoystickButton(leftController, 3);
+	private Button rearCameraButton = new JoystickButton(leftController, 2);
 	
 	public OI() {
 		rightButton.whenPressed(new TurnToAngle(90));
 		leftButton.whenPressed(new TurnToAngle(-90));
+		frontCameraButton.whenPressed(new SetCamera(true));
+		rearCameraButton.whenPressed(new SetCamera(false));
 	}
 	
 	public double getLeftAxis() {

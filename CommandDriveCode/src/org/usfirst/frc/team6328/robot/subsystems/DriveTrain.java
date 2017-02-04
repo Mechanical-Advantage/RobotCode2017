@@ -9,6 +9,8 @@ import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
+
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -45,6 +47,11 @@ public class DriveTrain extends Subsystem {
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		leftTalonSlave.set(RobotMap.leftMaster);
 		enableBrakeMode(true);
+		
+		rightTalonMaster.setExpiration(0.5);
+		rightTalonSlave.setExpiration(0.5);
+		leftTalonMaster.setExpiration(0.5);
+		leftTalonSlave.setExpiration(0.5);
 	}
 	
 	private void setupVelocityClosedLoop(double p, double i, double d, double f) {

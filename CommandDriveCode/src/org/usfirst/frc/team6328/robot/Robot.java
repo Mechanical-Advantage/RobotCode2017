@@ -1,6 +1,7 @@
 
 package org.usfirst.frc.team6328.robot;
 
+import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -38,6 +39,9 @@ public class Robot extends IterativeRobot {
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
 	//public static CameraServer cameraServer = CameraServer.getInstance();
+	public UsbCamera frontCamera = new UsbCamera("Front Camera", 0);
+	public UsbCamera rearCamera = new UsbCamera("Rear Camera", 1);
+	public MjpegServer mjpegServer = CameraServer.getInstance().addServer("Server", 1181);
 
     Command autonomousCommand;
     SendableChooser<Command> chooser;
@@ -70,8 +74,14 @@ public class Robot extends IterativeRobot {
         chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
         SmartDashboard.putData("Auto mode", chooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
-        UsbCamera frontCamera = CameraServer.getInstance().startAutomaticCapture("Front Camera", 0);
+        
+        // camera setup
+        //UsbCamera frontCamera = CameraServer.getInstance().startAutomaticCapture("Front Camera", 0);
         frontCamera.setResolution(320, 240);
+        frontCamera.setFPS(24);
+        rearCamera.setResolution(320, 240);
+        rearCamera.setFPS(24);
+        mjpegServer.setSource(frontCamera);
     }
 	
 	/**
@@ -150,5 +160,14 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
+    }
+    
+    public static void setCamera(boolean useFrontCamera) {
+    	if (useFrontCamera) {
+    		mjpegServer.setSource(frontCamera);
+    	}
+    	else {
+    		mjpegServer.setSource(rearCamera);
+    	}
     }
 }
