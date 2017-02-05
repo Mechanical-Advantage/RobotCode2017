@@ -31,11 +31,20 @@ public class RobotMap {
 	public static int leftMaster;
 	public static int leftSlave;
 	public static int leftSlave2;
+	public static int intake;
+	public static int loader;
+	public static int trigger;
+	public static int climber;
+	public static int shooterMaster;
+	public static int shooterSlave;
+	public static int gearSolenoid1;
+	public static int gearSolenoid2;
 	public static int minVelocity = 40; // lower values will be treated as this value
 	public static int maxVelocity = 950; // maximum velocity when sticks are fully forward (value of 1)
 	public static final boolean practiceRobot = true;
+	public static final boolean tuningMode = false;
 	public RobotMap(){
-		if(practiceRobot == true){
+		if (practiceRobot) {
 				rightMaster = 1;
 				rightSlave = 2;
 				leftMaster= 3;
@@ -48,6 +57,14 @@ public class RobotMap {
 			leftMaster = 3;
 			leftSlave = 4;
 			leftSlave2 = 6;
+			intake = 0;
+			loader = 0;
+			trigger = 0;
+			climber = 0;
+			shooterMaster = 0;
+			shooterSlave = 0;
+			gearSolenoid1 = 0;
+			gearSolenoid2 = 1;
 		}
 	}
 	

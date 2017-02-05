@@ -55,8 +55,6 @@ public class DriveDistance extends Command {
         setupDistanceController(distanceControllerRight);
         Robot.driveSubsystem.resetPosition();
         resetCompleted = false;
-        System.out.println("Starting distance right " + Robot.driveSubsystem.getDistanceRight());
-        System.out.println("Starting Distance Left " + Robot.driveSubsystem.getDistanceLeft());
         lastOutputLeft = lastOutputRight = 0;
     }
 
@@ -96,20 +94,20 @@ public class DriveDistance extends Command {
     		Robot.driveSubsystem.drive(outputVelocityRight, outputVelocityLeft);
     		lastOutputLeft = outputVelocityLeft;
     		lastOutputRight = outputVelocityRight;
-	    	SmartDashboard.putNumber("Right Velocity", outputVelocityRight);
-	    	SmartDashboard.putNumber("Left Velocity", outputVelocityLeft);
-	    	SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocityLeft, outputVelocityRight, pidOutputLeft.getDriveDistanceRate()*RobotMap.maxVelocity, pidOutputRight.getDriveDistanceRate()*RobotMap.maxVelocity));
-	    	SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
-	    	SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
-	    	SmartDashboard.putString("DriveDistance Graph", genGraphStr(targetDistance, Robot.driveSubsystem.getDistanceLeft(), 
-	    			Robot.driveSubsystem.getDistanceRight()));
+    		if (RobotMap.tuningMode) {
+    			SmartDashboard.putNumber("Right Velocity", outputVelocityRight);
+    	    	SmartDashboard.putNumber("Left Velocity", outputVelocityLeft);
+    	    	SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocityLeft, outputVelocityRight, pidOutputLeft.getDriveDistanceRate()*RobotMap.maxVelocity, pidOutputRight.getDriveDistanceRate()*RobotMap.maxVelocity));
+    	    	SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
+    	    	SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
+    	    	SmartDashboard.putString("DriveDistance Graph", genGraphStr(targetDistance, Robot.driveSubsystem.getDistanceLeft(), 
+    	    			Robot.driveSubsystem.getDistanceRight()));
+    		}
     	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	System.out.println("onTarget Left " + distanceControllerLeft.onTarget() + " " + Robot.driveSubsystem.getDistanceLeft());
-    	System.out.println("onTarget Right " + distanceControllerRight.onTarget() + " " + Robot.driveSubsystem.getDistanceRight());
         return (distanceControllerLeft.onTarget() && distanceControllerRight.onTarget()) && 
         		((Math.abs(Robot.driveSubsystem.getDistanceLeft() - targetDistance) < kToleranceInches) && 
         				(Math.abs(Robot.driveSubsystem.getDistanceRight() - targetDistance) < kToleranceInches));

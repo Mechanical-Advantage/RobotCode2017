@@ -1,22 +1,31 @@
-
 package org.usfirst.frc.team6328.robot.commands;
-
-import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc.team6328.robot.Robot;
 
-/**
- *
- */
-public class ExampleCommand extends Command {
+import edu.wpi.first.wpilibj.command.Command;
 
-    public ExampleCommand() {
+/**
+ * Runs the ball intake
+ */
+public class RunIntake extends Command {
+	
+	private boolean backwards;
+
+    public RunIntake(boolean runBackwards) {
+    	super("RunIntake");
         // Use requires() here to declare subsystem dependencies
-        requires(Robot.exampleSubsystem);
+        // eg. requires(chassis);
+    	requires(Robot.intakeSubsystem);
+    	backwards = runBackwards;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	if (backwards) {
+    		Robot.intakeSubsystem.reverse();
+    	} else {
+    		Robot.intakeSubsystem.run();
+    	}
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -35,5 +44,6 @@ public class ExampleCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	Robot.intakeSubsystem.stop();
     }
 }

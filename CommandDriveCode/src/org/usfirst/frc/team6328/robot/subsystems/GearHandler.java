@@ -2,45 +2,40 @@ package org.usfirst.frc.team6328.robot.subsystems;
 
 import org.usfirst.frc.team6328.robot.RobotMap;
 
-import com.ctre.CANTalon;
-
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * Ball intake from ground
+ * Operates gear system
  */
-public class Intake extends Subsystem {
+public class GearHandler extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
-	private final double speed = 1;
+	DoubleSolenoid solenoid;
 	
-	private CANTalon intakeTalon;
-	
-	public Intake() {
+	public GearHandler() {
 		if (!RobotMap.practiceRobot) {
-			intakeTalon = new CANTalon(RobotMap.intake);
+			solenoid = new DoubleSolenoid(RobotMap.gearSolenoid1, RobotMap.gearSolenoid2);
 		}
 	}
-	
+
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
     }
     
-    public void run() {
-    	intakeTalon.enable();
-    	intakeTalon.set(speed);
+    public void open() {
+    	solenoid.set(DoubleSolenoid.Value.kForward);
     }
     
-    public void stop() {
-    	intakeTalon.disable();
+    public void close() {
+    	solenoid.set(DoubleSolenoid.Value.kReverse);
     }
     
-    public void reverse() {
-    	intakeTalon.enable();
-    	intakeTalon.set(speed*-1);
+    public void disable() {
+    	solenoid.set(DoubleSolenoid.Value.kOff);
     }
 }
 

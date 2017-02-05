@@ -4,8 +4,14 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
-import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
+import org.usfirst.frc.team6328.robot.commands.ClimberHold;
+import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
+import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
+import org.usfirst.frc.team6328.robot.commands.RunIntakeGroup;
+import org.usfirst.frc.team6328.robot.commands.RunShooter;
+import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
+import org.usfirst.frc.team6328.robot.commands.ShakeGearHandler;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 
 /**
@@ -51,16 +57,40 @@ public class OI {
 	// map left stick to ID 0 and right to ID 1 in driver station
 	private Joystick leftController = new Joystick(0);
 	private Joystick rightController = new Joystick(1);
+	private Joystick oiController = new Joystick(2);
 	private Button rightButton = new JoystickButton(rightController, 5);
 	private Button leftButton = new JoystickButton(rightController, 4);
 	private Button frontCameraButton = new JoystickButton(leftController, 3);
 	private Button rearCameraButton = new JoystickButton(leftController, 2);
+	private Button intakeOn = new JoystickButton(oiController, 1);
+	private Button intakeOff = new JoystickButton(oiController, 1);
+	private Button shoot = new JoystickButton(oiController, 1);
+	private Button gearOpen = new JoystickButton(oiController, 1);
+	private Button gearClose = new JoystickButton(oiController, 1);
+	private Button gearShake = new JoystickButton(oiController, 1);
+	private Button shooterSwitch = new JoystickButton(oiController, 1);
+	private Button autoClimb = new JoystickButton(oiController, 1);
+	private Button climberHold = new JoystickButton(oiController, 1);
 	
 	public OI() {
 		rightButton.whenPressed(new TurnToAngle(90));
 		leftButton.whenPressed(new TurnToAngle(-90));
 		frontCameraButton.whenPressed(new SetCamera(true));
 		rearCameraButton.whenPressed(new SetCamera(false));
+		
+		RunIntakeGroup intakeGroup = new RunIntakeGroup();
+		RunTrigger backwardsTrigger = new RunTrigger(true);
+		intakeOn.whenPressed(intakeGroup);
+		intakeOff.cancelWhenPressed(intakeGroup);
+		intakeOff.cancelWhenPressed(backwardsTrigger);
+		shoot.whenActive(new RunTrigger(false));
+		shoot.whenReleased(backwardsTrigger);
+		gearOpen.whenPressed(new OpenGearHandler());
+		gearClose.whenPressed(new CloseGearHandler());
+		gearShake.whenActive(new ShakeGearHandler());
+		shooterSwitch.whenActive(new RunShooter());
+		//autoClimb.whenPressed(new AutoClimb());
+		climberHold.whenActive(new ClimberHold());
 	}
 	
 	public double getLeftAxis() {
@@ -68,6 +98,10 @@ public class OI {
 	}
 	public double getRightAxis() {
 		return rightController.getRawAxis(1);
+	}
+	
+	public double getClimbAxis() {
+		return 0; //temporary
 	}
 }
 

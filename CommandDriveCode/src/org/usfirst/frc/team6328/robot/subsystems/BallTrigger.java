@@ -7,40 +7,40 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * Ball intake from ground
+ * Trigger that loads balls into shooter
  */
-public class Intake extends Subsystem {
+public class BallTrigger extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
 	private final double speed = 1;
 	
-	private CANTalon intakeTalon;
+	private CANTalon triggerTalon;
 	
-	public Intake() {
-		if (!RobotMap.practiceRobot) {
-			intakeTalon = new CANTalon(RobotMap.intake);
+	public BallTrigger() {
+		if(!RobotMap.practiceRobot) {
+			triggerTalon = new CANTalon(RobotMap.trigger);
 		}
 	}
-	
+
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
     }
     
-    public void run() {
-    	intakeTalon.enable();
-    	intakeTalon.set(speed);
-    }
-    
-    public void stop() {
-    	intakeTalon.disable();
+    public void forward() {
+    	triggerTalon.enable();
+    	triggerTalon.set(speed);
     }
     
     public void reverse() {
-    	intakeTalon.enable();
-    	intakeTalon.set(speed*-1);
+    	triggerTalon.enable();
+    	triggerTalon.set(speed*-1);
+    }
+    
+    public void stop() {
+    	triggerTalon.disable();
     }
 }
 

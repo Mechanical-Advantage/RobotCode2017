@@ -1,8 +1,6 @@
 
 package org.usfirst.frc.team6328.robot;
 
-import edu.wpi.cscore.UsbCamera;
-
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
@@ -13,12 +11,16 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
-import org.usfirst.frc.team6328.robot.commands.ExampleCommand;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
+import org.usfirst.frc.team6328.robot.subsystems.BallTrigger;
 import org.usfirst.frc.team6328.robot.subsystems.CameraSystem;
+import org.usfirst.frc.team6328.robot.subsystems.Climber;
 import org.usfirst.frc.team6328.robot.subsystems.DriveTrain;
-import org.usfirst.frc.team6328.robot.subsystems.ExampleSubsystem;
+import org.usfirst.frc.team6328.robot.subsystems.GearHandler;
+import org.usfirst.frc.team6328.robot.subsystems.Intake;
+import org.usfirst.frc.team6328.robot.subsystems.Loader;
+import org.usfirst.frc.team6328.robot.subsystems.Shooter;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -35,8 +37,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 	public static final RobotMap RobotMap = new RobotMap();
-	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DriveTrain driveSubsystem = new DriveTrain();
+	public static final Intake intakeSubsystem = new Intake();
+	public static final Loader loaderSubsystem = new Loader();
+	public static final GearHandler gearHandlerSubsystem = new GearHandler();
+	public static final BallTrigger triggerSubsystem = new BallTrigger();
+	public static final Climber climberSubsystem = new Climber();
+	public static final Shooter shooterSubsystem = new Shooter();
 	
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
@@ -53,7 +60,7 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
 		oi = new OI();
         chooser = new SendableChooser<Command>();
-        chooser.addDefault("Default Auto", new ExampleCommand());
+        //chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
         chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
         chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
@@ -128,7 +135,6 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopInit() {
-    	UsbCamera frontCamera;
     	driveSubsystem.enableBrakeMode(true);
 		// This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to 

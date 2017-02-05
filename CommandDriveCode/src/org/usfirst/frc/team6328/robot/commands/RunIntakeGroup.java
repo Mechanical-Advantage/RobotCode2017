@@ -3,12 +3,11 @@ package org.usfirst.frc.team6328.robot.commands;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
- * Drive in a square of the specified side length
+ * Runs the intake, loader, climber as intake, and trigger backwards
  */
-public class DriveSquare extends CommandGroup {
+public class RunIntakeGroup extends CommandGroup {
 
-    public DriveSquare(double sideLength, boolean toRight) {
-    	int turnAmount = 0;
+    public RunIntakeGroup() {
         // Add Commands here:
         // e.g. addSequential(new Command1());
         //      addSequential(new Command2());
@@ -25,16 +24,9 @@ public class DriveSquare extends CommandGroup {
         // e.g. if Command1 requires chassis, and Command2 requires arm,
         // a CommandGroup containing them would require both the chassis and the
         // arm.
-    	if ((toRight && sideLength>0) || (!toRight && sideLength<0)) {
-    		turnAmount = 90;
-    	}
-    	else if ((!toRight && sideLength>0) || (toRight && sideLength<0)) {
-    		turnAmount = -90;
-    	}
-    	addSequential(new DriveDistanceOnHeading(sideLength));
-    	addSequential(new TurnAndDriveDistance(sideLength, turnAmount));
-    	addSequential(new TurnAndDriveDistance(sideLength, turnAmount));
-    	addSequential(new TurnAndDriveDistance(sideLength, turnAmount));
-    	addSequential(new TurnToAngle(turnAmount));
+    	addParallel(new RunIntake(false));
+    	addParallel(new RunLoader(false));
+    	addParallel(new RunTrigger(true));
+    	addParallel(new RunClimberForIntake());
     }
 }

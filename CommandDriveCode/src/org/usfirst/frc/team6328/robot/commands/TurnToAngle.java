@@ -49,14 +49,8 @@ public class TurnToAngle extends Command implements PIDOutput {
         LiveWindow.addActuator("DriveSystem", "RotateController", turnController);
         
         turnController.setSetpoint(targetAngle);
-        System.out.println(Robot.ahrs.getYaw());
-        System.out.println("Resetting");
     	Robot.ahrs.zeroYaw();
     	startingUpdateCount = Robot.ahrs.getUpdateCount();
-    	/*while (Math.abs(Robot.ahrs.getYaw())>0.1) {
-    		Timer.delay(0.01);
-    	}*/
-    	System.out.println(Robot.ahrs.getYaw());
     	resetCompleted = false;
     }
 
@@ -71,22 +65,20 @@ public class TurnToAngle extends Command implements PIDOutput {
     		turnController.enable();
     	}
     	if (resetCompleted) {
-	    	System.out.print("Execute ");
-	    	System.out.println(Robot.ahrs.getYaw());
 	    	double outputVelocity = rotateToAngleRate*RobotMap.maxVelocity;
-	    	SmartDashboard.putNumber("Angle", Robot.ahrs.getAngle());
-	    	SmartDashboard.putNumber("Rate", Robot.ahrs.getRate());
-	    	SmartDashboard.putNumber("Yaw", Robot.ahrs.getYaw());
-	    	SmartDashboard.putNumber("Turn to angle rate", rotateToAngleRate);
-	    	SmartDashboard.putNumber("Velocity", outputVelocity);
-	    	
+	    	if (RobotMap.tuningMode) {
+	    		SmartDashboard.putNumber("Angle", Robot.ahrs.getAngle());
+		    	SmartDashboard.putNumber("Rate", Robot.ahrs.getRate());
+		    	SmartDashboard.putNumber("Yaw", Robot.ahrs.getYaw());
+		    	SmartDashboard.putNumber("Turn to angle rate", rotateToAngleRate);
+		    	SmartDashboard.putNumber("Velocity", outputVelocity);
+	    	}
 	    	Robot.driveSubsystem.drive(outputVelocity*-1, outputVelocity);
     	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	System.out.println("isFinished:" + Robot.ahrs.getYaw() + " / onTarget:" + turnController.onTarget());
         return resetCompleted && (Math.abs(Robot.ahrs.getYaw() - targetAngle) < kToleranceDegrees) && turnController.onTarget();
     }
 

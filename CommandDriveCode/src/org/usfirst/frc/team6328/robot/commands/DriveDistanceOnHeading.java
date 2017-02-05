@@ -123,9 +123,11 @@ public class DriveDistanceOnHeading extends Command {
     		double outputTurnVelocity = pidOutputAngle.getPIDRate()*RobotMap.maxVelocity*kTurnCorrectionAmount;
     		// subtract from right side, add to left side (drive left on positive)
     		Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
-    		SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
-    		SmartDashboard.putNumber("Turn controller output", pidOutputAngle.getPIDRate());
-    		SmartDashboard.putString("Yaw Graph", genGraphStr(targetAngle, Robot.ahrs.getYaw()));
+    		if (RobotMap.tuningMode) {
+    			SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
+        		SmartDashboard.putNumber("Turn controller output", pidOutputAngle.getPIDRate());
+        		SmartDashboard.putString("Yaw Graph", genGraphStr(targetAngle, Robot.ahrs.getYaw()));
+    		}
     	}
     }
 

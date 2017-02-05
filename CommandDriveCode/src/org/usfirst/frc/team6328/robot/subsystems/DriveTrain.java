@@ -1,8 +1,5 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
-import java.util.StringJoiner;
-
-import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 
@@ -10,9 +7,7 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
@@ -21,6 +16,16 @@ public class DriveTrain extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
+	
+	private static final double kPPractice = 2;
+	private static final double kIPractice = 0;
+	private static final double kDPractice = 40;
+	private static final double kFPractice = 1.07;
+	
+	private static final double kPCompetition = 2;
+	private static final double kICompetition = 0;
+	private static final double kDCompetition = 40;
+	private static final double kFCompetition = 1.07;
 	
 	private CANTalon rightTalonMaster;
 	private CANTalon rightTalonSlave;
@@ -58,23 +63,33 @@ public class DriveTrain extends Subsystem {
 		leftTalonMaster.reverseOutput(false);
 		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
-		setupVelocityClosedLoop(2,0,40,1.07); // PID tuning P,I,D,F
+		if (RobotMap.practiceRobot) {
+			setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice);
+		} else {
+			setupVelocityClosedLoop(kPCompetition, kICompetition, kDCompetition, kFCompetition);
+		}
 		rightTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		rightTalonSlave.set(RobotMap.rightMaster);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		leftTalonSlave.set(RobotMap.leftMaster);
+		rightTalonMaster.setExpiration(0.5);
+		rightTalonSlave.setExpiration(0.5);
+		leftTalonMaster.setExpiration(0.5);
+		leftTalonSlave.setExpiration(0.5);
 		if (!RobotMap.practiceRobot){
 			rightTalonSlave2.changeControlMode(CANTalon.TalonControlMode.Follower);
 			rightTalonSlave2.set(RobotMap.rightMaster);
 			leftTalonSlave2.changeControlMode(CANTalon.TalonControlMode.Follower);
 			leftTalonSlave2.set(RobotMap.leftMaster);
+			rightTalonSlave2.setExpiration(0.5);
+			leftTalonSlave2.setExpiration(0.5);
 		}
 		enableBrakeMode(true);
 		
-		rightTalonMaster.setExpiration(0.5);
-		rightTalonSlave.setExpiration(0.5);
-		leftTalonMaster.setExpiration(0.5);
-		leftTalonSlave.setExpiration(0.5);
+		rightTalonMaster.setSafetyEnabled(false);
+		rightTalonSlave.setSafetyEnabled(false);
+		leftTalonMaster.setSafetyEnabled(false);
+		leftTalonSlave.setSafetyEnabled(false);
 	}
 	
 	private void setupVelocityClosedLoop(double p, double i, double d, double f) {
@@ -123,9 +138,6 @@ public class DriveTrain extends Subsystem {
     	rightTalonMaster.set(calcActualVelocity(right));
     	leftTalonMaster.set(calcActualVelocity(left));
     	//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
-    	SmartDashboard.putString("Voltage-Current Graph", genGraphStr(leftTalonMaster.getOutputVoltage(), 
-    			leftTalonMaster.getOutputCurrent(), rightTalonMaster.getOutputVoltage(), 
-    			rightTalonMaster.getOutputCurrent()));
     }
     
     public void stop() {
@@ -137,7 +149,11 @@ public class DriveTrain extends Subsystem {
     	rightTalonMaster.enable();
     	leftTalonMaster.enable();
     	rightTalonSlave.set(RobotMap.rightMaster); // reset slave master, talons lose their master when disabled
-    	leftTalonMaster.set(RobotMap.leftMaster);
+    	leftTalonSlave.set(RobotMap.leftMaster);
+    	if (!RobotMap.practiceRobot) {
+    		rightTalonSlave2.set(RobotMap.rightMaster);
+    		leftTalonSlave2.set(RobotMap.leftMaster);
+    	}
     }
     
     public void disable() {
@@ -186,13 +202,5 @@ public class DriveTrain extends Subsystem {
     public double getVelocityLeft() {
     	return leftTalonMaster.getEncVelocity();
     }
-    
-    private String genGraphStr(double...data) {
-		StringJoiner sj = new StringJoiner(":");
-		for (double item : data) {
-			sj.add(String.valueOf(item));
-		}
-		return sj.toString();
-	}
 }
 
