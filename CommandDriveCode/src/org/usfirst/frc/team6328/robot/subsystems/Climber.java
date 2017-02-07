@@ -17,7 +17,7 @@ public class Climber extends Subsystem {
 	
 	private final double holdSpeed = 0.2;
 	private final double intakeSpeed = -0.1;
-	private final int currentLimit = 0; // in amps
+	private final int currentLimit = 65; // in amps, max current draw spec is ~29amps
 	
 	private CANTalon climberTalon;
 	
@@ -54,6 +54,10 @@ public class Climber extends Subsystem {
     
     public void stop() {
     	climberTalon.disable();
+    }
+    
+    public double getCurrent() {
+    	return climberTalon.getOutputCurrent();
     }
 }
 

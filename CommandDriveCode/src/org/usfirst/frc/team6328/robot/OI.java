@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
+import org.usfirst.frc.team6328.robot.commands.AutoClimb;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
 import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
@@ -70,6 +71,7 @@ public class OI {
 	private Button gearShake = new JoystickButton(oiController, 1);
 	private Button shooterSwitch = new JoystickButton(oiController, 1);
 	private Button autoClimb = new JoystickButton(oiController, 1);
+	//private Button autoClimb = new JoystickButton(leftController, 8);
 	private Button climberHold = new JoystickButton(oiController, 1);
 	
 	public OI() {
@@ -89,7 +91,7 @@ public class OI {
 		gearClose.whenPressed(new CloseGearHandler());
 		gearShake.whenActive(new ShakeGearHandler());
 		shooterSwitch.whenActive(new RunShooter());
-		//autoClimb.whenPressed(new AutoClimb());
+		autoClimb.whenPressed(new AutoClimb());
 		climberHold.whenActive(new ClimberHold());
 	}
 	

@@ -47,7 +47,7 @@ public class RobotMap {
 		if (practiceRobot) {
 				rightMaster = 1;
 				rightSlave = 2;
-				leftMaster= 3;
+				leftMaster = 3;
 				leftSlave = 4;
 		}
 		else {

@@ -90,9 +90,11 @@ public class Robot extends IterativeRobot {
      */
     public void disabledInit(){
     	driveSubsystem.enableBrakeMode(false);
-    	SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
-    	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
-    	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
+    	if (org.usfirst.frc.team6328.robot.RobotMap.tuningMode) {
+    		SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
+        	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
+        	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
+    	}
     }
 	
 	public void disabledPeriodic() {
