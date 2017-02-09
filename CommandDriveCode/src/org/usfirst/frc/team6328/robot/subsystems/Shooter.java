@@ -27,6 +27,7 @@ public class Shooter extends Subsystem {
 			shooterSlave.set(RobotMap.shooterMaster);
 			
 			sensorCounter = new Counter(0);
+			
 		}
 	}
 
@@ -44,7 +45,15 @@ public class Shooter extends Subsystem {
     }
     
     public double getSpeed() {
-    	return sensorCounter.getRate()/3;
+    	return 1/sensorCounter.getPeriod()/3;
+    }
+    
+    public int getCount() {
+    	return sensorCounter.get();
+    }
+    
+    public double getPeriod() {
+    	return sensorCounter.getPeriod();
     }
 }
 

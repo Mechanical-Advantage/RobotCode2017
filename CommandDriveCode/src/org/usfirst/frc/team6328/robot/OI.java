@@ -7,8 +7,12 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
+import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
+import org.usfirst.frc.team6328.robot.commands.EnableClosedLoop;
 import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
+import org.usfirst.frc.team6328.robot.commands.RunIntake;
 import org.usfirst.frc.team6328.robot.commands.RunIntakeGroup;
+import org.usfirst.frc.team6328.robot.commands.RunLoader;
 import org.usfirst.frc.team6328.robot.commands.RunShooter;
 import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
@@ -59,6 +63,7 @@ public class OI {
 	private Joystick leftController = new Joystick(0);
 	private Joystick rightController = new Joystick(1);
 	private Joystick oiController = new Joystick(2);
+	
 	private Button rightButton = new JoystickButton(rightController, 5);
 	private Button leftButton = new JoystickButton(rightController, 4);
 	private Button frontCameraButton = new JoystickButton(leftController, 3);
@@ -73,6 +78,16 @@ public class OI {
 	private Button autoClimb = new JoystickButton(oiController, 1);
 	//private Button autoClimb = new JoystickButton(leftController, 8);
 	private Button climberHold = new JoystickButton(oiController, 1);
+	//private Button openLoopDrive = new JoystickButton(oiController, 1);
+	private Button openLoopDrive = new JoystickButton(rightController, 1); // for test robot
+	private Button straightAssist = new JoystickButton(leftController, 1);
+	
+	private Button loaderForward = new JoystickButton(oiController, 1);
+	private Button loaderBackward = new JoystickButton(oiController, 1);
+	private Button intakeForward = new JoystickButton(oiController, 1);
+	private Button intakeBackward = new JoystickButton(oiController, 1);
+	private Button triggerForward = new JoystickButton(oiController, 1);
+	private Button triggerBackward = new JoystickButton(oiController, 1);
 	
 	public OI() {
 		rightButton.whenPressed(new TurnToAngle(90));
@@ -85,14 +100,24 @@ public class OI {
 		intakeOn.whenPressed(intakeGroup);
 		intakeOff.cancelWhenPressed(intakeGroup);
 		intakeOff.cancelWhenPressed(backwardsTrigger);
-		shoot.whenActive(new RunTrigger(false));
+		shoot.whileHeld(new RunTrigger(false));
 		shoot.whenReleased(backwardsTrigger);
 		gearOpen.whenPressed(new OpenGearHandler());
 		gearClose.whenPressed(new CloseGearHandler());
-		gearShake.whenActive(new ShakeGearHandler());
-		shooterSwitch.whenActive(new RunShooter());
+		gearShake.whileHeld(new ShakeGearHandler());
+		shooterSwitch.whileHeld(new RunShooter());
 		autoClimb.whenPressed(new AutoClimb());
-		climberHold.whenActive(new ClimberHold());
+		climberHold.whileHeld(new ClimberHold());
+		openLoopDrive.whenPressed(new EnableClosedLoop(false));
+		openLoopDrive.whenReleased(new EnableClosedLoop(true));
+		straightAssist.whileHeld(new DriveWithJoystickOnHeading());
+		
+		loaderForward.whileHeld(new RunLoader(false));
+		loaderBackward.whileHeld(new RunLoader(true));
+		intakeForward.whileHeld(new RunIntake(false));
+		intakeBackward.whileHeld(new RunIntake(true));
+		triggerForward.whileHeld(new RunTrigger(false));
+		triggerBackward.whileHeld(new RunTrigger(true));
 	}
 	
 	public double getLeftAxis() {
@@ -103,7 +128,11 @@ public class OI {
 	}
 	
 	public double getClimbAxis() {
-		return 0; //temporary
+		return oiController.getRawAxis(0);
+	}
+	
+	public boolean getOpenLoop() {
+		return openLoopDrive.get();
 	}
 }
 

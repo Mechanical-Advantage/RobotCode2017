@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
+import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 
@@ -26,6 +27,8 @@ public class DriveTrain extends Subsystem {
 	private static final double kICompetition = 0;
 	private static final double kDCompetition = 40;
 	private static final double kFCompetition = 1.07;
+	
+	private static final double safetyExpiration = 2;
 	
 	private CANTalon rightTalonMaster;
 	private CANTalon rightTalonSlave;
@@ -63,33 +66,30 @@ public class DriveTrain extends Subsystem {
 		leftTalonMaster.reverseOutput(false);
 		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
-		if (RobotMap.practiceRobot) {
-			setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice);
-		} else {
-			setupVelocityClosedLoop(kPCompetition, kICompetition, kDCompetition, kFCompetition);
-		}
+		useClosedLoop();
+		resetPosition();
 		rightTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		rightTalonSlave.set(RobotMap.rightMaster);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		leftTalonSlave.set(RobotMap.leftMaster);
-		rightTalonMaster.setExpiration(0.5);
-		rightTalonSlave.setExpiration(0.5);
-		leftTalonMaster.setExpiration(0.5);
-		leftTalonSlave.setExpiration(0.5);
+		rightTalonMaster.setExpiration(safetyExpiration);
+		rightTalonSlave.setExpiration(safetyExpiration);
+		leftTalonMaster.setExpiration(safetyExpiration);
+		leftTalonSlave.setExpiration(safetyExpiration);
 		if (!RobotMap.practiceRobot){
 			rightTalonSlave2.changeControlMode(CANTalon.TalonControlMode.Follower);
 			rightTalonSlave2.set(RobotMap.rightMaster);
 			leftTalonSlave2.changeControlMode(CANTalon.TalonControlMode.Follower);
 			leftTalonSlave2.set(RobotMap.leftMaster);
-			rightTalonSlave2.setExpiration(0.5);
-			leftTalonSlave2.setExpiration(0.5);
+			rightTalonSlave2.setExpiration(safetyExpiration);
+			leftTalonSlave2.setExpiration(safetyExpiration);
 		}
 		enableBrakeMode(true);
 		
-		rightTalonMaster.setSafetyEnabled(false);
+		/*rightTalonMaster.setSafetyEnabled(false);
 		rightTalonSlave.setSafetyEnabled(false);
 		leftTalonMaster.setSafetyEnabled(false);
-		leftTalonSlave.setSafetyEnabled(false);
+		leftTalonSlave.setSafetyEnabled(false);*/
 	}
 	
 	private void setupVelocityClosedLoop(double p, double i, double d, double f) {
@@ -105,7 +105,19 @@ public class DriveTrain extends Subsystem {
 		leftTalonMaster.setP(p);
 		leftTalonMaster.setI(i);
 		leftTalonMaster.setD(d);
-		resetPosition();
+	}
+	
+	public void useClosedLoop() {
+		if (RobotMap.practiceRobot) {
+			setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice);
+		} else {
+			setupVelocityClosedLoop(kPCompetition, kICompetition, kDCompetition, kFCompetition);
+		}
+	}
+	
+	public void useOpenLoop() {
+		rightTalonMaster.changeControlMode(TalonControlMode.PercentVbus);
+		leftTalonMaster.changeControlMode(TalonControlMode.PercentVbus);
 	}
 
     public void initDefaultCommand() {
@@ -135,8 +147,14 @@ public class DriveTrain extends Subsystem {
     
     public void drive(double right, double left) {
     	enable();
-    	rightTalonMaster.set(calcActualVelocity(right));
-    	leftTalonMaster.set(calcActualVelocity(left));
+    	double velocityRight = calcActualVelocity(right);
+    	double velocityLeft = calcActualVelocity(left);
+    	if (Robot.oi.getOpenLoop()) {
+    		velocityRight/=-RobotMap.maxVelocity; // reverse needed for open loop only
+    		velocityLeft/=RobotMap.maxVelocity;
+    	}
+    	rightTalonMaster.set(velocityRight);
+    	leftTalonMaster.set(velocityLeft);
     	//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
     }
     
