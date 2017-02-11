@@ -29,6 +29,8 @@ public class DriveTrain extends Subsystem {
 	private static final double kFCompetition = 1.07;
 	
 	private static final double safetyExpiration = 2;
+	private static final int currentLimit = 50;
+	private static final boolean enableCurrentLimit = false;
 	
 	private CANTalon rightTalonMaster;
 	private CANTalon rightTalonSlave;
@@ -61,17 +63,25 @@ public class DriveTrain extends Subsystem {
 		rightTalonMaster.reverseOutput(true);
 		rightTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		rightTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
+		rightTalonMaster.EnableCurrentLimit(enableCurrentLimit);
+		rightTalonMaster.setCurrentLimit(currentLimit);
 		leftTalonMaster.setFeedbackDevice(encoderType);
 		leftTalonMaster.reverseSensor(false);
 		leftTalonMaster.reverseOutput(false);
 		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
+		leftTalonMaster.EnableCurrentLimit(enableCurrentLimit);
+		leftTalonMaster.setCurrentLimit(currentLimit);
 		useClosedLoop();
 		resetPosition();
 		rightTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		rightTalonSlave.set(RobotMap.rightMaster);
+		rightTalonSlave.EnableCurrentLimit(enableCurrentLimit);
+		rightTalonSlave.setCurrentLimit(currentLimit);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 		leftTalonSlave.set(RobotMap.leftMaster);
+		leftTalonSlave.EnableCurrentLimit(enableCurrentLimit);
+		leftTalonSlave.setCurrentLimit(currentLimit);
 		rightTalonMaster.setExpiration(safetyExpiration);
 		rightTalonSlave.setExpiration(safetyExpiration);
 		leftTalonMaster.setExpiration(safetyExpiration);
@@ -219,6 +229,11 @@ public class DriveTrain extends Subsystem {
     
     public double getVelocityLeft() {
     	return leftTalonMaster.getEncVelocity();
+    }
+    
+    // average current of left and right masters
+    public double getCurrent() {
+    	return (rightTalonMaster.getOutputCurrent()+leftTalonMaster.getOutputCurrent())/2;
     }
 }
 

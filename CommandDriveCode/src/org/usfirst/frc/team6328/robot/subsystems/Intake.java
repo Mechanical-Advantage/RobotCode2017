@@ -15,12 +15,16 @@ public class Intake extends Subsystem {
     // here. Call these from Commands.
 	
 	private final double speed = 1;
+	private final int currentLimit = 50;
+	private final boolean enableCurrentLimit = false;
 	
 	private CANTalon intakeTalon;
 	
 	public Intake() {
 		if (!RobotMap.practiceRobot) {
 			intakeTalon = new CANTalon(RobotMap.intake);
+			intakeTalon.EnableCurrentLimit(enableCurrentLimit);
+			intakeTalon.setCurrentLimit(currentLimit);
 		}
 	}
 	

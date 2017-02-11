@@ -15,12 +15,16 @@ public class Loader extends Subsystem {
     // here. Call these from Commands.
 	
 	private final double speed = 1;
+	private final int currentLimit = 50;
+	private final boolean enableCurrentLimit = false;
 	
 	private CANTalon loaderTalon;
 	
 	public Loader() {
 		if (!RobotMap.practiceRobot) {
 			loaderTalon = new CANTalon(RobotMap.loader);
+			loaderTalon.EnableCurrentLimit(enableCurrentLimit);
+			loaderTalon.setCurrentLimit(currentLimit);
 		}
 	}
 

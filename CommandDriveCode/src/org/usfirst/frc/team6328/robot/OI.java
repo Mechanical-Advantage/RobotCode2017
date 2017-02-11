@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
-import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
+import org.usfirst.frc.team6328.robot.commands.DriveVelocityOnHeading;
 import org.usfirst.frc.team6328.robot.commands.EnableClosedLoop;
 import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
 import org.usfirst.frc.team6328.robot.commands.RunIntake;
@@ -64,10 +64,12 @@ public class OI {
 	private Joystick rightController = new Joystick(1);
 	private Joystick oiController = new Joystick(2);
 	
-	private Button rightButton = new JoystickButton(rightController, 5);
-	private Button leftButton = new JoystickButton(rightController, 4);
-	private Button frontCameraButton = new JoystickButton(leftController, 3);
-	private Button rearCameraButton = new JoystickButton(leftController, 2);
+	private Button right90Button = new JoystickButton(leftController, 5);
+	private Button left90Button = new JoystickButton(leftController, 4);
+	private Button right45Button = new JoystickButton(rightController, 5);
+	private Button left45Button = new JoystickButton(rightController, 4);
+	private Button frontCameraButton = new JoystickButton(rightController, 3);
+	private Button rearCameraButton = new JoystickButton(rightController, 2);
 	private Button intakeOn = new JoystickButton(oiController, 1);
 	private Button intakeOff = new JoystickButton(oiController, 1);
 	private Button shoot = new JoystickButton(oiController, 1);
@@ -76,11 +78,12 @@ public class OI {
 	private Button gearShake = new JoystickButton(oiController, 1);
 	private Button shooterSwitch = new JoystickButton(oiController, 1);
 	private Button autoClimb = new JoystickButton(oiController, 1);
-	//private Button autoClimb = new JoystickButton(leftController, 8);
+	//private Button autoClimb = new JoystickButton(leftController, 8); // test robot
 	private Button climberHold = new JoystickButton(oiController, 1);
-	//private Button openLoopDrive = new JoystickButton(oiController, 1);
-	private Button openLoopDrive = new JoystickButton(rightController, 1); // for test robot
+	private Button openLoopDrive = new JoystickButton(rightController, 1);
 	private Button straightAssist = new JoystickButton(leftController, 1);
+	private Button driveForward = new JoystickButton(leftController, 3);
+	private Button driveBackward = new JoystickButton(leftController, 2);
 	
 	private Button loaderForward = new JoystickButton(oiController, 1);
 	private Button loaderBackward = new JoystickButton(oiController, 1);
@@ -90,8 +93,10 @@ public class OI {
 	private Button triggerBackward = new JoystickButton(oiController, 1);
 	
 	public OI() {
-		rightButton.whenPressed(new TurnToAngle(90));
-		leftButton.whenPressed(new TurnToAngle(-90));
+		right90Button.whenPressed(new TurnToAngle(90));
+		left90Button.whenPressed(new TurnToAngle(-90));
+		right45Button.whenPressed(new TurnToAngle(45));
+		left45Button.whenPressed(new TurnToAngle(-45));
 		frontCameraButton.whenPressed(new SetCamera(true));
 		rearCameraButton.whenPressed(new SetCamera(false));
 		
@@ -110,7 +115,9 @@ public class OI {
 		climberHold.whileHeld(new ClimberHold());
 		openLoopDrive.whenPressed(new EnableClosedLoop(false));
 		openLoopDrive.whenReleased(new EnableClosedLoop(true));
-		straightAssist.whileHeld(new DriveWithJoystickOnHeading());
+		straightAssist.whileHeld(new DriveVelocityOnHeading());
+		driveForward.whileHeld(new DriveVelocityOnHeading());
+		driveBackward.whileHeld(new DriveVelocityOnHeading());
 		
 		loaderForward.whileHeld(new RunLoader(false));
 		loaderBackward.whileHeld(new RunLoader(true));
@@ -133,6 +140,18 @@ public class OI {
 	
 	public boolean getOpenLoop() {
 		return openLoopDrive.get();
+	}
+	
+	// this function is used by DriveWithJoystickOnHeading to enable switching between joystick input and
+	// defined values
+	public double getSingleDriveAxis() {
+		if (driveForward.get()) {
+			return 300;
+		} else if (driveBackward.get()) {
+			return -50;
+		} else {
+			return Math.pow(getLeftAxis(), 3)*RobotMap.maxVelocity*-1; // Brian is left-handed, use as drive joystick
+		}
 	}
 }
 

@@ -16,15 +16,16 @@ public class Climber extends Subsystem {
     // here. Call these from Commands.
 	
 	private final double holdSpeed = 0.2;
-	private final double intakeSpeed = -0.1;
-	private final int currentLimit = 65; // in amps, max current draw spec is ~29amps
+	private final double intakeSpeed = -0.1; // speed when run as intake
+	private final int currentLimit = 50;
+	private final boolean enableCurrentLimit = true;
 	
 	private CANTalon climberTalon;
 	
 	public Climber() {
 		if (!RobotMap.practiceRobot) {
 			climberTalon = new CANTalon(RobotMap.climber);
-			climberTalon.EnableCurrentLimit(true);
+			climberTalon.EnableCurrentLimit(enableCurrentLimit);
 			climberTalon.setCurrentLimit(currentLimit);
 		}
 	}

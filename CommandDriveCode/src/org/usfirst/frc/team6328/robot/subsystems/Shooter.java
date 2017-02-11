@@ -15,6 +15,9 @@ public class Shooter extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
+	private final int currentLimit = 50;
+	private final boolean enableCurrentLimit = false;
+	
 	private CANTalon shooterMaster;
 	private CANTalon shooterSlave;
 	private Counter sensorCounter;
@@ -22,9 +25,13 @@ public class Shooter extends Subsystem {
 	public Shooter() {
 		if (!RobotMap.practiceRobot) {
 			shooterMaster = new CANTalon(RobotMap.shooterMaster);
+			shooterMaster.EnableCurrentLimit(enableCurrentLimit);
+			shooterMaster.setCurrentLimit(currentLimit);
 			shooterSlave = new CANTalon(RobotMap.shooterSlave);
 			shooterSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 			shooterSlave.set(RobotMap.shooterMaster);
+			shooterSlave.EnableCurrentLimit(enableCurrentLimit);
+			shooterSlave.setCurrentLimit(currentLimit);
 			
 			sensorCounter = new Counter(0);
 			

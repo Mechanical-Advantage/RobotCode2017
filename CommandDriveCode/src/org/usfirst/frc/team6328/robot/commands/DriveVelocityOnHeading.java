@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
- * Drives straight using the joystick and gyro correction
+ * Drives straight using the current single drive velocity from OI and gyro correction
  */
-public class DriveWithJoystickOnHeading extends Command {
+public class DriveVelocityOnHeading extends Command {
 	
 	//should be the same as DriveDistanceOnHeading
 	static final double kPAngle = 0.07;
@@ -26,12 +26,12 @@ public class DriveWithJoystickOnHeading extends Command {
     private PIDController turnController;
     private PIDOutputter pidOutputAngle = new PIDOutputter();
     
-    public DriveWithJoystickOnHeading() {
+    public DriveVelocityOnHeading() {
     	this(0);
     	useStartingYaw = true;
     }
 
-    public DriveWithJoystickOnHeading(double heading) {
+    public DriveVelocityOnHeading(double heading) {
     	super("DriveWithJoystickOnHeading");
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
@@ -59,7 +59,7 @@ public class DriveWithJoystickOnHeading extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double outputVelocity = Math.pow(Robot.oi.getLeftAxis(), 3)*RobotMap.maxVelocity*-1; // Brian is left-handed, use as drive joystick
+    	double outputVelocity = Robot.oi.getSingleDriveAxis();
     	double outputTurnVelocity = pidOutputAngle.getPIDRate()*RobotMap.maxVelocity*kTurnCorrectionAmount;
 		// subtract from right side, add to left side (drive left on positive)
 		Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
