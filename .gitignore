@@ -9,6 +9,14 @@ DriveCode/BetterDriveCode/.DS_Store
 
 *.class
 
-*.class
+CommandDriveCode/bin/*
 
-*.class
+CommandDriveCode/build/*
+
+CommandDriveCode/dist/*
+
+DriveCode/BetterDriveCode/bin/*
+
+DriveCode/BetterDriveCode/build/*
+
+DriveCode/BetterDriveCode/dist/*
