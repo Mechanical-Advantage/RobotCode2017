@@ -29,6 +29,8 @@ public class DriveTrain extends Subsystem {
 	private static final double kFCompetition = 1.07;
 	
 	private static final double safetyExpiration = 2;
+	private static final double sniperMode = 0.25; // multiplied by velocity in sniper mode
+	private static final boolean sniperModeLocked = false; // when set, sniper mode uses value above, when unset, value comes from throttle control on joystick
 	private static final int currentLimit = 50;
 	private static final boolean enableCurrentLimit = false;
 	
@@ -156,9 +158,21 @@ public class DriveTrain extends Subsystem {
     }
     
     public void drive(double right, double left) {
+    	double velocityRight;
+    	double velocityLeft;
     	enable();
-    	double velocityRight = calcActualVelocity(right);
-    	double velocityLeft = calcActualVelocity(left);
+    	if (Robot.oi.getSniperMode()) {
+    		if (sniperModeLocked) {
+    			velocityRight = calcActualVelocity(right*sniperMode);
+        		velocityLeft = calcActualVelocity(left*sniperMode);
+    		} else {
+    			velocityRight = calcActualVelocity(right*Robot.oi.getSniperLevel());
+        		velocityLeft = calcActualVelocity(left*Robot.oi.getSniperLevel());
+    		}
+    	} else {
+    		velocityRight = calcActualVelocity(right);
+        	velocityLeft = calcActualVelocity(left);
+    	}
     	if (Robot.oi.getOpenLoop()) {
     		velocityRight/=-RobotMap.maxVelocity; // reverse needed for open loop only
     		velocityLeft/=RobotMap.maxVelocity;

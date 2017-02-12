@@ -80,10 +80,11 @@ public class OI {
 	private Button autoClimb = new JoystickButton(oiController, 1);
 	//private Button autoClimb = new JoystickButton(leftController, 8); // test robot
 	private Button climberHold = new JoystickButton(oiController, 1);
-	private Button openLoopDrive = new JoystickButton(rightController, 1);
+	private Button openLoopDrive = new JoystickButton(oiController, 1);
 	private Button straightAssist = new JoystickButton(leftController, 1);
 	private Button driveForward = new JoystickButton(leftController, 3);
 	private Button driveBackward = new JoystickButton(leftController, 2);
+	private Button sniperMode = new JoystickButton(rightController, 1);
 	
 	private Button loaderForward = new JoystickButton(oiController, 1);
 	private Button loaderBackward = new JoystickButton(oiController, 1);
@@ -140,6 +141,15 @@ public class OI {
 	
 	public boolean getOpenLoop() {
 		return openLoopDrive.get();
+	}
+	
+	public boolean getSniperMode() {
+		return sniperMode.get();
+	}
+	
+	public double getSniperLevel() {
+		double sniperLimit = 0.5;
+		return (1-((rightController.getRawAxis(2)+1)/2))*sniperLimit; // control returns -1 to 1, scale to 0 to 1, subtract from 1 so 1 is up
 	}
 	
 	// this function is used by DriveWithJoystickOnHeading to enable switching between joystick input and

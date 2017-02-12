@@ -30,6 +30,7 @@ public class Shooter extends Subsystem {
 			shooterSlave = new CANTalon(RobotMap.shooterSlave);
 			shooterSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 			shooterSlave.set(RobotMap.shooterMaster);
+			shooterSlave.reverseOutput(true);
 			shooterSlave.EnableCurrentLimit(enableCurrentLimit);
 			shooterSlave.setCurrentLimit(currentLimit);
 			
