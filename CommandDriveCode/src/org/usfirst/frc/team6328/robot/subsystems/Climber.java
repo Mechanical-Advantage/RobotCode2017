@@ -15,10 +15,11 @@ public class Climber extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
-	private final double holdSpeed = 0.2;
-	private final double intakeSpeed = -0.1; // speed when run as intake
+	private final double holdSpeed = 1;
+	private final double intakeSpeed = 1; // speed when run as intake
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = true;
+	private final boolean brakeMode = true;
 	
 	private CANTalon climberTalon;
 	
@@ -27,6 +28,7 @@ public class Climber extends Subsystem {
 			climberTalon = new CANTalon(RobotMap.climber);
 			climberTalon.EnableCurrentLimit(enableCurrentLimit);
 			climberTalon.setCurrentLimit(currentLimit);
+			climberTalon.enableBrakeMode(brakeMode);
 		}
 	}
 

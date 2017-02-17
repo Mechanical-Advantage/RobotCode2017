@@ -17,6 +17,7 @@ public class Shooter extends Subsystem {
 	
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
+	private final boolean brakeMode = false;
 	
 	private CANTalon shooterMaster;
 	private CANTalon shooterSlave;
@@ -27,12 +28,15 @@ public class Shooter extends Subsystem {
 			shooterMaster = new CANTalon(RobotMap.shooterMaster);
 			shooterMaster.EnableCurrentLimit(enableCurrentLimit);
 			shooterMaster.setCurrentLimit(currentLimit);
+			shooterMaster.reverseOutput(false); // setting this to true does nothing, don't know why
+			shooterMaster.enableBrakeMode(brakeMode);
 			shooterSlave = new CANTalon(RobotMap.shooterSlave);
 			shooterSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 			shooterSlave.set(RobotMap.shooterMaster);
 			shooterSlave.reverseOutput(true);
 			shooterSlave.EnableCurrentLimit(enableCurrentLimit);
 			shooterSlave.setCurrentLimit(currentLimit);
+			shooterSlave.enableBrakeMode(brakeMode);
 			
 			sensorCounter = new Counter(0);
 			
@@ -45,7 +49,7 @@ public class Shooter extends Subsystem {
     }
     
     public void run() {
-    	shooterMaster.set(1);
+    	shooterMaster.set(-1);
     }
     
     public void stop() {

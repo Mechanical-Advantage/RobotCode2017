@@ -17,6 +17,7 @@ public class BallTrigger extends Subsystem {
 	private final double speed = 1;
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
+	private final boolean brakeMode = false;
 	
 	private CANTalon triggerTalon;
 	
@@ -25,6 +26,7 @@ public class BallTrigger extends Subsystem {
 			triggerTalon = new CANTalon(RobotMap.trigger);
 			triggerTalon.EnableCurrentLimit(enableCurrentLimit);
 			triggerTalon.setCurrentLimit(currentLimit);
+			triggerTalon.enableBrakeMode(brakeMode);
 		}
 	}
 

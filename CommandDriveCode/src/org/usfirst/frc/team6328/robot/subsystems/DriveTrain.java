@@ -43,6 +43,8 @@ public class DriveTrain extends Subsystem {
 	private FeedbackDevice encoderType;
 	private int ticksPerRotation; // getEncPosition values in one turn
 	private double wheelDiameter; // inches
+	private boolean reverseSensorLeft;
+	private boolean reverseSensorRight;
 	
 	public DriveTrain() {
 		rightTalonMaster = new CANTalon(RobotMap.rightMaster);
@@ -53,23 +55,31 @@ public class DriveTrain extends Subsystem {
 			encoderType = FeedbackDevice.QuadEncoder;
 			ticksPerRotation = 1440;
 			wheelDiameter = 6;
+			reverseSensorRight = true;
+			reverseSensorLeft = true;
+			rightTalonMaster.reverseSensor(reverseSensorRight);
+			rightTalonMaster.reverseOutput(true);
+			leftTalonMaster.reverseSensor(reverseSensorLeft);
+			leftTalonMaster.reverseOutput(false);
 		} else {
 			rightTalonSlave2 = new CANTalon(RobotMap.rightSlave2);
 			leftTalonSlave2 = new CANTalon(RobotMap.leftSlave2);
 			encoderType = FeedbackDevice.CtreMagEncoder_Relative;
 			ticksPerRotation = 1024;
 			wheelDiameter = 4.25;
+			reverseSensorRight = false;
+			reverseSensorLeft = true;
+			rightTalonMaster.reverseSensor(reverseSensorRight);
+			rightTalonMaster.reverseOutput(true);
+			leftTalonMaster.reverseSensor(reverseSensorLeft);
+			leftTalonMaster.reverseOutput(false);
 		}
 		rightTalonMaster.setFeedbackDevice(encoderType);
-		rightTalonMaster.reverseSensor(true); // right side is reversed
-		rightTalonMaster.reverseOutput(true);
 		rightTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		rightTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
 		rightTalonMaster.EnableCurrentLimit(enableCurrentLimit);
 		rightTalonMaster.setCurrentLimit(currentLimit);
 		leftTalonMaster.setFeedbackDevice(encoderType);
-		leftTalonMaster.reverseSensor(false);
-		leftTalonMaster.reverseOutput(false);
 		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
 		leftTalonMaster.EnableCurrentLimit(enableCurrentLimit);
@@ -221,11 +231,19 @@ public class DriveTrain extends Subsystem {
     
     // values are cast to doubles to prevent integer division
     public double getRotationsLeft() {
-    	return (double)leftTalonMaster.getEncPosition()/(double)ticksPerRotation;
+    	double rotLeft = (double)leftTalonMaster.getEncPosition()/(double)ticksPerRotation;
+    	if (reverseSensorLeft) {
+    		rotLeft*=-1;
+    	}
+    	return rotLeft;
     }
     
     public double getRotationsRight() {
-    	return (double)rightTalonMaster.getEncPosition()/(double)ticksPerRotation*-1; // even though sensor is reversed on talon, getEncPosition returns real value so needs to be reversed here
+    	double rotRight = (double)rightTalonMaster.getEncPosition()/(double)ticksPerRotation;
+    	if (reverseSensorRight) {
+    		rotRight*=-1;
+    	}
+    	return rotRight;
     }
     
     // diameter times pi equals circumference times rotations equals distance

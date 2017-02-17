@@ -17,6 +17,7 @@ public class Intake extends Subsystem {
 	private final double speed = 1;
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
+	private final boolean brakeMode = false;
 	
 	private CANTalon intakeTalon;
 	
@@ -25,6 +26,7 @@ public class Intake extends Subsystem {
 			intakeTalon = new CANTalon(RobotMap.intake);
 			intakeTalon.EnableCurrentLimit(enableCurrentLimit);
 			intakeTalon.setCurrentLimit(currentLimit);
+			intakeTalon.enableBrakeMode(brakeMode);
 		}
 	}
 	
