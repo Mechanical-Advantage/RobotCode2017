@@ -82,7 +82,8 @@ public class OI {
 	private Button gearShake = new JoystickButton(oiController, 1);
 	//private Button shooterSwitch = new JoystickButton(oiController, 1);
 	private Button shooterSwitch = new JoystickButton(rightController, 9);
-	private Button autoClimb = new JoystickButton(oiController, 1);
+	//private Button autoClimb = new JoystickButton(oiController, 1);
+	private Button autoClimb = new JoystickButton(oiController, 7);
 	//private Button autoClimb = new JoystickButton(leftController, 8); // test robot
 	//private Button climberHold = new JoystickButton(oiController, 1);
 	private Button climberHold = new JoystickButton(rightController, 8);
@@ -92,17 +93,19 @@ public class OI {
 	private Button driveForward = new JoystickButton(leftController, 3);
 	private Button driveBackward = new JoystickButton(leftController, 2);
 	private Button sniperMode = new JoystickButton(rightController, 1);
-	//private Button shakeBalls = new JoystickButton(oiController, 1);
-	private Button shakeBalls = new JoystickButton(leftController, 10);
-	//private Button ejectBalls = new JoystickButton(oiController, 1);
-	private Button ejectBalls = new JoystickButton(leftController, 11);
+	private Button shakeBalls = new JoystickButton(oiController, 1);
+	//private Button shakeBalls = new JoystickButton(leftController, 10);
+	private Button ejectBalls = new JoystickButton(oiController, 1);
+	//private Button ejectBalls = new JoystickButton(leftController, 11);
 	
 	//private Button loaderForward = new JoystickButton(oiController, 1);
 	//private Button loaderBackward = new JoystickButton(oiController, 1);
 	private Button loaderForward = new JoystickButton(rightController, 11);
 	private Button loaderBackward = new JoystickButton(rightController, 10);
-	private Button intakeForward = new JoystickButton(oiController, 1);
-	private Button intakeBackward = new JoystickButton(oiController, 1);
+	//private Button intakeForward = new JoystickButton(oiController, 1);
+	//private Button intakeBackward = new JoystickButton(oiController, 1);
+	private Button intakeForward = new JoystickButton(leftController, 11);
+	private Button intakeBackward = new JoystickButton(leftController, 10);
 	//private Button triggerForward = new JoystickButton(oiController, 1);
 	//private Button triggerBackward = new JoystickButton(oiController, 1);
 	private Button triggerForward = new JoystickButton(rightController, 6);
@@ -149,8 +152,8 @@ public class OI {
 		gearClose.whenPressed(new CloseGearHandler());
 		gearShake.whileHeld(new ShakeGearHandler());
 		shooterSwitch.whileHeld(new RunShooter());
-		autoClimb.whenPressed(new AutoClimb());
-		climberHold.whileHeld(new ClimberHold());
+		autoClimb.toggleWhenPressed(new AutoClimb());
+		climberHold.toggleWhenPressed(new ClimberHold());
 		openLoopDrive.whenPressed(new EnableClosedLoop(false));
 		openLoopDrive.whenReleased(new EnableClosedLoop(true));
 		straightAssist.whileHeld(new DriveVelocityOnHeading());
@@ -173,7 +176,7 @@ public class OI {
 	}
 	
 	public double getClimbAxis() {
-		return oiController.getRawAxis(0);
+		return oiController.getRawAxis(1);
 	}
 	
 	public boolean getOpenLoop() {

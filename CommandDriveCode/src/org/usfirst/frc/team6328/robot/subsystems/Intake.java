@@ -14,7 +14,7 @@ public class Intake extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
-	private final double speed = 1;
+	private final double speed = 0.6;
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
 	private final boolean brakeMode = false;
@@ -47,6 +47,14 @@ public class Intake extends Subsystem {
     public void reverse() {
     	intakeTalon.enable();
     	intakeTalon.set(speed*-1);
+    }
+    
+    public double getCurrent() {
+    	return intakeTalon.getOutputCurrent();
+    }
+    
+    public double getVoltage() {
+    	return intakeTalon.getOutputVoltage();
     }
 }
 

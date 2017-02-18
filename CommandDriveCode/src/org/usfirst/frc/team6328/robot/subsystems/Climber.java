@@ -15,7 +15,7 @@ public class Climber extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
-	private final double holdSpeed = 1;
+	private final double holdSpeed = 0.2;
 	private final double intakeSpeed = 1; // speed when run as intake
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = true;
@@ -61,6 +61,10 @@ public class Climber extends Subsystem {
     
     public double getCurrent() {
     	return climberTalon.getOutputCurrent();
+    }
+    
+    public double getVoltage() {
+    	return climberTalon.getOutputVoltage();
     }
 }
 

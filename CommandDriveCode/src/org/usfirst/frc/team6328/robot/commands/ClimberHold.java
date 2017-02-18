@@ -1,8 +1,10 @@
 package org.usfirst.frc.team6328.robot.commands;
 
 import org.usfirst.frc.team6328.robot.Robot;
+import org.usfirst.frc.team6328.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Keeps the climber running in hold mode
@@ -23,6 +25,10 @@ public class ClimberHold extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	if (RobotMap.tuningMode) {
+    		SmartDashboard.putNumber("Voltage Graph ClimbWithJoystick", Robot.climberSubsystem.getVoltage());
+    		SmartDashboard.putNumber("Current Graph ClimbWithJoystick", Robot.climberSubsystem.getCurrent());
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()

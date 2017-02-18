@@ -49,7 +49,7 @@ public class Shooter extends Subsystem {
     }
     
     public void run() {
-    	shooterMaster.set(-1);
+    	shooterMaster.set(-0.35); // should be 1
     }
     
     public void stop() {

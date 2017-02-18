@@ -1,20 +1,22 @@
 package org.usfirst.frc.team6328.robot.commands;
 
 import org.usfirst.frc.team6328.robot.Robot;
+import org.usfirst.frc.team6328.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Attempts to automatically climb the rope
  */
 public class AutoClimb extends CommandGroup {
 	
-	private final double wrapSpeed = 0.2;
-	private final double wrapCurrent = 3;
-	private final double climbSpeed = 1;
-	private final double climbCurrent = 60;
+	private final double wrapSpeed = -0.6;
+	private final double wrapCurrent = 10;
+	private final double climbSpeed = -1;
+	private final double climbCurrent = 48;
 
     public AutoClimb() {
         // Add Commands here:
@@ -61,7 +63,10 @@ public class AutoClimb extends CommandGroup {
 
         // Called repeatedly when this Command is scheduled to run
         protected void execute() {
-        	System.out.println(Robot.climberSubsystem.getCurrent());
+        	if (RobotMap.tuningMode) {
+        		SmartDashboard.putNumber("Voltage Graph ClimbWithJoystick", Robot.climberSubsystem.getVoltage());
+        		SmartDashboard.putNumber("Current Graph ClimbWithJoystick", Robot.climberSubsystem.getCurrent());
+        	}
         }
 
         // Make this return true when this Command no longer needs to run execute()

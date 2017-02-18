@@ -155,7 +155,7 @@ public class Robot extends IterativeRobot {
         Scheduler.getInstance().run();
         //System.out.println(driveSubsystem.getCurrent());
         //System.out.println(oi.getSniperLevel());
-        System.out.println("Right: " + driveSubsystem.getRotationsRight() + " Left: " + driveSubsystem.getRotationsLeft());
+        //System.out.println("Right: " + driveSubsystem.getRotationsRight() + " Left: " + driveSubsystem.getRotationsLeft());
     }
     
     /**
