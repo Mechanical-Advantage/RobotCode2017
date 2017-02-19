@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class RunShooter extends Command {
 	
-	private final int targetSpeed = 5000;
+	private final int targetSpeed = 58; // 83 is 5000 rpm
 
     public RunShooter() {
         // Use requires() here to declare subsystem dependencies
@@ -29,6 +29,7 @@ public class RunShooter extends Command {
     	} else {
     		Robot.shooterSubsystem.run();
     	}
+    	//Robot.shooterSubsystem.run();
     }
 
     // Make this return true when this Command no longer needs to run execute()

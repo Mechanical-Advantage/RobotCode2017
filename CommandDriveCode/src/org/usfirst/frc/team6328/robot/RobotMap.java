@@ -42,7 +42,7 @@ public class RobotMap {
 	public static int minVelocity = 40; // lower values will be treated as this value
 	public static int maxVelocity = 950; // maximum velocity when sticks are fully forward (value of 1)
 	public static final boolean practiceRobot = false;
-	public static final boolean tuningMode = true;
+	public static final boolean tuningMode = false;
 	public RobotMap(){
 		if (practiceRobot) {
 				rightMaster = 1;

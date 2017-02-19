@@ -47,7 +47,8 @@ public class ClimbWithJoystick extends Command {
     protected void interrupted() {
     }
     
-    private String genGraphStr(double...data) {
+    @SuppressWarnings("unused")
+	private String genGraphStr(double...data) {
 		StringJoiner sj = new StringJoiner(":");
 		for (double item : data) {
 			sj.add(String.valueOf(item));

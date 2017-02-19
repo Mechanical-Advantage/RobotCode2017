@@ -187,8 +187,8 @@ public class DriveTrain extends Subsystem {
     		velocityRight/=-RobotMap.maxVelocity; // reverse needed for open loop only
     		velocityLeft/=RobotMap.maxVelocity;
     	}
-    	rightTalonMaster.set(velocityRight);
-    	leftTalonMaster.set(velocityLeft);
+    	//rightTalonMaster.set(velocityRight); // temporarily disabled
+    	//leftTalonMaster.set(velocityLeft);
     	//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
     }
     

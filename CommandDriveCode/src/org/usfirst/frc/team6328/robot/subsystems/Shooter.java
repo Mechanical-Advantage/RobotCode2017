@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
+import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
 import com.ctre.CANTalon;
@@ -18,6 +19,8 @@ public class Shooter extends Subsystem {
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
 	private final boolean brakeMode = false;
+	private final double shooterSpeed = 1;
+	private final boolean lockShooterSpeed = false;
 	
 	private CANTalon shooterMaster;
 	private CANTalon shooterSlave;
@@ -38,7 +41,10 @@ public class Shooter extends Subsystem {
 			shooterSlave.setCurrentLimit(currentLimit);
 			shooterSlave.enableBrakeMode(brakeMode);
 			
-			sensorCounter = new Counter(0);
+			sensorCounter = new Counter(9);
+			sensorCounter.setSemiPeriodMode(false);
+			sensorCounter.setSamplesToAverage(2);
+			sensorCounter.setDistancePerPulse(1.0);
 			
 		}
 	}
@@ -49,7 +55,11 @@ public class Shooter extends Subsystem {
     }
     
     public void run() {
-    	shooterMaster.set(-0.35); // should be 1
+    	if (lockShooterSpeed) {
+    		shooterMaster.set(shooterSpeed*-1);
+    	} else {
+    		shooterMaster.set(Robot.oi.getShooterSpeed()*-1);
+    	}
     }
     
     public void stop() {
@@ -57,7 +67,8 @@ public class Shooter extends Subsystem {
     }
     
     public double getSpeed() {
-    	return 1/sensorCounter.getPeriod()/3;
+    	//return 1/sensorCounter.getPeriod()/3;
+    	return sensorCounter.getRate();
     }
     
     public int getCount() {

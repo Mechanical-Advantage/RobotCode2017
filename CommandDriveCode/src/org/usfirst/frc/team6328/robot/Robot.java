@@ -8,9 +8,15 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 //import edu.wpi.first.wpilibj.CameraServer;
 
+import org.usfirst.frc.team6328.robot.commands.CrossLineBehindAirship;
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
+import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBalls;
+import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
+import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsPlaceGear;
+import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship;
+import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirshipCrossLine;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 import org.usfirst.frc.team6328.robot.subsystems.BallTrigger;
@@ -62,23 +68,40 @@ public class Robot extends IterativeRobot {
         chooser = new SendableChooser<Command>();
         //chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
-        chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
-        chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
-        chooser.addObject("Rotate 24 degrees", new TurnToAngle(24));
-        chooser.addObject("Drive 24 inches", new DriveDistance(24));
-        chooser.addObject("Drive 6 inches", new DriveDistance(6));
-        chooser.addObject("Drive 10 feet", new DriveDistance(120));
-        chooser.addObject("Drive backwards 10 feet", new DriveDistance(-120));
-        chooser.addObject("Drive backwards 24 inches", new DriveDistance(-24));
-        chooser.addObject("Drive 60 inches", new DriveDistance(60));
-        chooser.addObject("Drive backwards 60 inches", new DriveDistance(-60));
-        chooser.addObject("Drive 6 feet with gyro correction", new DriveDistanceOnHeading(72));
-        chooser.addObject("Drive 10 feet with gyro correction", new DriveDistanceOnHeading(120));
-        chooser.addObject("Turn around and drive 5 feet", new TurnAndDriveDistance(60, 180));
-        chooser.addObject("Turn 45 degrees and drive 2 feet", new TurnAndDriveDistance(24, 45));
-        chooser.addObject("Drive square 5 feet length", new DriveSquare(60, true));
-        chooser.addObject("Drive square 5 feet length backwards", new DriveSquare(-60, true));
-        chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
+        if (org.usfirst.frc.team6328.robot.RobotMap.tuningMode) {
+        	chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
+            chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
+            chooser.addObject("Rotate 24 degrees", new TurnToAngle(24));
+            chooser.addObject("Drive 24 inches", new DriveDistance(24));
+            chooser.addObject("Drive 6 inches", new DriveDistance(6));
+            chooser.addObject("Drive 10 feet", new DriveDistance(120));
+            chooser.addObject("Drive backwards 10 feet", new DriveDistance(-120));
+            chooser.addObject("Drive backwards 24 inches", new DriveDistance(-24));
+            chooser.addObject("Drive 60 inches", new DriveDistance(60));
+            chooser.addObject("Drive backwards 60 inches", new DriveDistance(-60));
+            chooser.addObject("Drive 6 feet with gyro correction", new DriveDistanceOnHeading(72));
+            chooser.addObject("Drive 10 feet with gyro correction", new DriveDistanceOnHeading(120));
+            chooser.addObject("Turn around and drive 5 feet", new TurnAndDriveDistance(60, 180));
+            chooser.addObject("Turn 45 degrees and drive 2 feet", new TurnAndDriveDistance(24, 45));
+            chooser.addObject("Drive square 5 feet length", new DriveSquare(60, true));
+            chooser.addObject("Drive square 5 feet length backwards", new DriveSquare(-60, true));
+            chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
+        } else {
+        	chooser.addDefault("Do Nothing", null);
+        	chooser.addObject("Cross Line not behind airship", new DriveDistanceOnHeading(1)); // define distance
+        	chooser.addObject("Cross Line behind airship", new CrossLineBehindAirship());
+        	chooser.addObject("Place gear centered behind airship", new DriveDistanceOnHeading(1)); // define distance to drive
+        	chooser.addObject("Place gear left of airship", new PlaceGearSideOfAirship(false));
+        	chooser.addObject("Place gear right of airship", new PlaceGearSideOfAirship(true));
+        	chooser.addObject("Place gear left of airship and cross line", new PlaceGearSideOfAirshipCrossLine(false));
+        	chooser.addObject("Place gear right of airship and cross line", new PlaceGearSideOfAirshipCrossLine(true));
+        	chooser.addObject("Shoot balls red", new DriveToBoilerShootBalls(false));
+        	chooser.addObject("Shoot balls blue", new DriveToBoilerShootBalls(true));
+        	chooser.addObject("Shoot balls and cross line red", new DriveToBoilerShootBallsCrossLine(false));
+        	chooser.addObject("Shoot balls and cross line blue", new DriveToBoilerShootBallsCrossLine(true));
+        	chooser.addObject("Shoot balls and place gear red", new DriveToBoilerShootBallsPlaceGear(false));
+        	chooser.addObject("Shoot balls and place gear blue", new DriveToBoilerShootBallsPlaceGear(true));
+        }
         SmartDashboard.putData("Auto mode", chooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
     }
@@ -153,6 +176,7 @@ public class Robot extends IterativeRobot {
      */
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
+        //System.out.println("Count: " + shooterSubsystem.getCount() + " Period: " + shooterSubsystem.getPeriod() + " Speed: " + shooterSubsystem.getSpeed());
         //System.out.println(driveSubsystem.getCurrent());
         //System.out.println(oi.getSniperLevel());
         //System.out.println("Right: " + driveSubsystem.getRotationsRight() + " Left: " + driveSubsystem.getRotationsLeft());
