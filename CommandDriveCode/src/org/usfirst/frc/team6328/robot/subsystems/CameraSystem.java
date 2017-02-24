@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class CameraSystem extends Subsystem {
 
-	private UsbCamera frontCamera = new UsbCamera("Front Camera", 0);
-	private UsbCamera rearCamera = new UsbCamera("Rear Camera", 2);
+	private UsbCamera frontCamera = new UsbCamera("Front Camera", 2);
+	private UsbCamera rearCamera = new UsbCamera("Rear Camera", 0);
 	private MjpegServer mjpegServer;
 	private boolean serverCreated = false;
 

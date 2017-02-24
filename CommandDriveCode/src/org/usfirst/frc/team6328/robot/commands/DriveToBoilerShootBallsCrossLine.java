@@ -3,12 +3,13 @@ package org.usfirst.frc.team6328.robot.commands;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
- * Drives to the boiler, shoots balls, and crosses line
- * Needs distance
+ * Drives to the boiler and shoots preloaded balls, start backwards
+ * Needs distances, angles defined
  */
 public class DriveToBoilerShootBallsCrossLine extends CommandGroup {
 	
-	private DriveToBoilerShootBalls driveAndShoot;
+	public double turnAmount = -45; // define for red alliance, remember robot starts backwards
+	private final double shootTime = 4; // in seconds
 
     public DriveToBoilerShootBallsCrossLine(boolean blueAlliance) {
         // Add Commands here:
@@ -27,9 +28,19 @@ public class DriveToBoilerShootBallsCrossLine extends CommandGroup {
         // e.g. if Command1 requires chassis, and Command2 requires arm,
         // a CommandGroup containing them would require both the chassis and the
         // arm.
-    	driveAndShoot = new DriveToBoilerShootBalls(blueAlliance);
-    	addSequential(driveAndShoot);
-    	addSequential(new DriveDistanceOnHeading(-1)); // back up from boiler
-    	addSequential(new TurnAndDriveDistance(-1, driveAndShoot.turnAmount*-1)); // turn back and drive backwards across line
+    	if (blueAlliance) {
+    		turnAmount*=-1;
+    	}
+    	addParallel(new RunShooter());
+    	addSequential(new DriveDistanceOnHeading(-26)); // drive away from wall
+    	//addSequential(new TurnAndDriveDistance(-1, turnAmount));
+    	addSequential(new TurnToAngle(turnAmount)); // face boiler
+    	addSequential(new DriveForTime(0.2, 1.5)); // quickly just run into the boiler, don't worry about precision
+    	//addSequential(new SpinCenterOffsetForTime(0.2, 0.2, 3)); // rotate to boiler
+    	//addParallel(new RunCommandForTime(new RunShooter(), shootTime));
+    	addSequential(new Delay(0.5));
+    	addParallel(new RunCommandForTime(new RunLoader(false), shootTime));
+    	addSequential(new RunCommandForTime(new RunTrigger(false), shootTime));
+    	addSequential(new DriveDistanceOnHeading(-100, 0)); // back up from boiler
     }
 }

@@ -23,10 +23,10 @@ public class DriveTrain extends Subsystem {
 	private static final double kDPractice = 40;
 	private static final double kFPractice = 1.07;
 	
-	private static final double kPCompetition = 2;
-	private static final double kICompetition = 0;
-	private static final double kDCompetition = 40;
-	private static final double kFCompetition = 1.07;
+	private static final double kPCompetition = 0.6;
+	private static final double kICompetition = 0.0007;
+	private static final double kDCompetition = 6;
+	private static final double kFCompetition = 0.2842;
 	
 	private static final double safetyExpiration = 2;
 	private static final double sniperMode = 0.25; // multiplied by velocity in sniper mode
@@ -56,7 +56,7 @@ public class DriveTrain extends Subsystem {
 			ticksPerRotation = 1440;
 			wheelDiameter = 6;
 			reverseSensorRight = true;
-			reverseSensorLeft = true;
+			reverseSensorLeft = false;
 			rightTalonMaster.reverseSensor(reverseSensorRight);
 			rightTalonMaster.reverseOutput(true);
 			leftTalonMaster.reverseSensor(reverseSensorLeft);
@@ -65,8 +65,8 @@ public class DriveTrain extends Subsystem {
 			rightTalonSlave2 = new CANTalon(RobotMap.rightSlave2);
 			leftTalonSlave2 = new CANTalon(RobotMap.leftSlave2);
 			encoderType = FeedbackDevice.CtreMagEncoder_Relative;
-			ticksPerRotation = 1024;
-			wheelDiameter = 4.25;
+			ticksPerRotation = 4096;
+			wheelDiameter = 4.1791666667;
 			reverseSensorRight = false;
 			reverseSensorLeft = true;
 			rightTalonMaster.reverseSensor(reverseSensorRight);
@@ -168,28 +168,32 @@ public class DriveTrain extends Subsystem {
     }
     
     public void drive(double right, double left) {
-    	double velocityRight;
-    	double velocityLeft;
-    	enable();
-    	if (Robot.oi.getSniperMode()) {
-    		if (sniperModeLocked) {
-    			velocityRight = calcActualVelocity(right*sniperMode);
-        		velocityLeft = calcActualVelocity(left*sniperMode);
+    	if (Robot.oi.getDriveEnabled()) {
+    		double velocityRight;
+    		double velocityLeft;
+    		enable();
+    		if (Robot.oi.getSniperMode()) {
+    			if (sniperModeLocked) {
+    				velocityRight = calcActualVelocity(right*sniperMode);
+    				velocityLeft = calcActualVelocity(left*sniperMode);
+    			} else {
+    				velocityRight = calcActualVelocity(right*Robot.oi.getSniperLevel());
+    				velocityLeft = calcActualVelocity(left*Robot.oi.getSniperLevel());
+    			}
     		} else {
-    			velocityRight = calcActualVelocity(right*Robot.oi.getSniperLevel());
-        		velocityLeft = calcActualVelocity(left*Robot.oi.getSniperLevel());
+    			velocityRight = calcActualVelocity(right);
+    			velocityLeft = calcActualVelocity(left);
     		}
+    		if (Robot.oi.getOpenLoop()) {
+    			velocityRight/=-RobotMap.maxVelocity; // reverse needed for open loop only
+    			velocityLeft/=RobotMap.maxVelocity;
+    		}
+    		rightTalonMaster.set(velocityRight);
+    		leftTalonMaster.set(velocityLeft);
+    		//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
     	} else {
-    		velocityRight = calcActualVelocity(right);
-        	velocityLeft = calcActualVelocity(left);
+    		disable();
     	}
-    	if (Robot.oi.getOpenLoop()) {
-    		velocityRight/=-RobotMap.maxVelocity; // reverse needed for open loop only
-    		velocityLeft/=RobotMap.maxVelocity;
-    	}
-    	//rightTalonMaster.set(velocityRight); // temporarily disabled
-    	//leftTalonMaster.set(velocityLeft);
-    	//System.out.println("Distance: Right: " + getDistanceRight() + " Left: " + getDistanceLeft());
     }
     
     public void stop() {

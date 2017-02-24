@@ -15,6 +15,7 @@ public class Intake extends Subsystem {
     // here. Call these from Commands.
 	
 	private final double speed = 0.6;
+	private final double shootSpeed = 1;
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
 	private final boolean brakeMode = false;
@@ -38,6 +39,11 @@ public class Intake extends Subsystem {
     public void run() {
     	intakeTalon.enable();
     	intakeTalon.set(speed);
+    }
+    
+    public void runForShoot() {
+    	intakeTalon.enable();
+    	intakeTalon.set(shootSpeed);
     }
     
     public void stop() {

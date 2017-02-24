@@ -19,19 +19,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveDistanceOnHeading extends Command {
 	
-	static final double kPDistance = 0.017;
-    static final double kIDistance = 0.0;
-    static final double kDDistance = 0.0;
-    static final double kFDistance = 0.5;
-    static final double kToleranceInches = 0.5f;
+	private double kPDistance;
+    private double kIDistance;
+    private double kDDistance;
+    private double kFDistance;
+    private double kToleranceInches;
     static final int kToleranceBufSamplesDistance = 10;
     static final double kUpdatePeriodDistance = 0.02;
     
-    static final double kPAngle = 0.07;
-    static final double kIAngle = 0.000;
-    static final double kDAngle = 0.0;
-    static final double kFAngle = 0.0;
-    static final double kToleranceDegrees = 0.5f;
+    private double kPAngle;
+    private double kIAngle;
+    private double kDAngle;
+    private double kFAngle;
+    private double kToleranceDegrees;
     static final int kToleranceBufSamplesAngle = 10;
     static final double kTurnCorrectionAmount = 0.2;
     
@@ -67,6 +67,29 @@ public class DriveDistanceOnHeading extends Command {
     	targetAngle = (heading>180) ? 180 : heading;
         targetAngle = (targetAngle<-180) ? -180 : targetAngle;
         useStartingYaw = false;
+        if (RobotMap.practiceRobot) {
+        	kPDistance = 0.017;
+        	kIDistance = 0;
+        	kDDistance = 0;
+        	kFDistance = 0.5;
+        	kToleranceInches = 0.5;
+        	kPAngle = 0.07;
+        	kIAngle = 0;
+        	kDAngle = 0;
+        	kFAngle = 0;
+        	kToleranceDegrees = 0.5;
+        } else {
+        	kPDistance = 0.032;
+        	kIDistance = 0.000000;
+        	kDDistance = 0;
+        	kFDistance = 0;
+        	kToleranceInches = 0.5;
+        	kPAngle = 0.05;
+        	kIAngle = 0;
+        	kDAngle = 0;
+        	kFAngle = 0;
+        	kToleranceDegrees = 1;
+        }
     }
 
 	// Called just before this Command runs the first time
@@ -81,7 +104,7 @@ public class DriveDistanceOnHeading extends Command {
     	turnController.setOutputRange(-1, 1);
     	distanceController.setAbsoluteTolerance(kToleranceInches);
         distanceController.setToleranceBuffer(kToleranceBufSamplesDistance);
-        distanceController.setContinuous(true);
+        distanceController.setContinuous(false);
         distanceController.setSetpoint(targetDistance);
         turnController.setInputRange(-180.0f,  180.0f);
         turnController.setOutputRange(-1.0, 1.0);
@@ -124,6 +147,7 @@ public class DriveDistanceOnHeading extends Command {
     		// subtract from right side, add to left side (drive left on positive)
     		Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
     		if (RobotMap.tuningMode) {
+    			SmartDashboard.putString("Distance Graph", genGraphStr(getAverageDistance(), targetDistance));
     			SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
         		SmartDashboard.putNumber("Turn controller output", pidOutputAngle.getPIDRate());
         		SmartDashboard.putString("Yaw Graph", genGraphStr(targetAngle, Robot.ahrs.getYaw()));

@@ -25,7 +25,7 @@ public class DriveToBoilerShootBallsPlaceGear extends CommandGroup {
         // e.g. if Command1 requires chassis, and Command2 requires arm,
         // a CommandGroup containing them would require both the chassis and the
         // arm.
-    	addSequential(new DriveToBoilerShootBalls(blueAlliance));
+    	addSequential(new DriveToBoilerShootBallsCrossLine(blueAlliance));
     	addSequential(new DriveDistanceOnHeading(-1)); // back up from boiler
     	addSequential(new TurnAndDriveDistance(1, 180)); // turn around and drive forward into lift, will not turn 180
     }

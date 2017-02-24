@@ -19,8 +19,9 @@ public class Shooter extends Subsystem {
 	private final int currentLimit = 50;
 	private final boolean enableCurrentLimit = false;
 	private final boolean brakeMode = false;
-	private final double shooterSpeed = 1;
+	private final double shooterSpeedNormal = -1;
 	private final boolean lockShooterSpeed = false;
+	private final double shooterSpeedOpenLoop = -0.45; // speed used when banner is disabled
 	
 	private CANTalon shooterMaster;
 	private CANTalon shooterSlave;
@@ -56,10 +57,14 @@ public class Shooter extends Subsystem {
     
     public void run() {
     	if (lockShooterSpeed) {
-    		shooterMaster.set(shooterSpeed*-1);
+    		shooterMaster.set(shooterSpeedNormal*-1);
     	} else {
     		shooterMaster.set(Robot.oi.getShooterSpeed()*-1);
     	}
+    }
+    
+    public void runOpenLoop() {
+    	shooterMaster.set(shooterSpeedOpenLoop);
     }
     
     public void stop() {

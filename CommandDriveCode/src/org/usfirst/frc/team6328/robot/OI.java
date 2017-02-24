@@ -7,11 +7,12 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
-import org.usfirst.frc.team6328.robot.commands.DriveVelocityOnHeading;
+import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
 import org.usfirst.frc.team6328.robot.commands.EnableClosedLoop;
 import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
-import org.usfirst.frc.team6328.robot.commands.RunClimberForIntake;
+import org.usfirst.frc.team6328.robot.commands.ReverseJoysticks;
 import org.usfirst.frc.team6328.robot.commands.RunIntake;
+import org.usfirst.frc.team6328.robot.commands.RunIntakeShoot;
 import org.usfirst.frc.team6328.robot.commands.RunLoader;
 import org.usfirst.frc.team6328.robot.commands.RunShooter;
 import org.usfirst.frc.team6328.robot.commands.RunTrigger;
@@ -60,10 +61,13 @@ public class OI {
 	private Button rightButton = new JoystickButton(controller, 1);
 	private Button leftButton = new JoystickButton(controller, 2);*/
 	
+	private boolean joysticksReversed = false;
+	
 	// map left stick to ID 0 and right to ID 1 in driver station
 	private Joystick leftController = new Joystick(0);
 	private Joystick rightController = new Joystick(1);
-	private Joystick oiController = new Joystick(2);
+	private Joystick oiController1 = new Joystick(2);
+	private Joystick oiController2 = new Joystick(3);
 	
 	private Button right90Button = new JoystickButton(leftController, 5);
 	private Button left90Button = new JoystickButton(leftController, 4);
@@ -71,45 +75,33 @@ public class OI {
 	private Button left45Button = new JoystickButton(rightController, 4);
 	private Button frontCameraButton = new JoystickButton(rightController, 3);
 	private Button rearCameraButton = new JoystickButton(rightController, 2);
-	//private Button intakeOn = new JoystickButton(oiController, 1);
-	private Button intakeOn = new JoystickButton(leftController, 8);
-	//private Button intakeOff = new JoystickButton(oiController, 1);
-	private Button intakeOff = new JoystickButton(leftController, 9);
-	//private Button shoot = new JoystickButton(oiController, 1);
-	private Button shoot = new JoystickButton(leftController, 6);
-	private Button gearOpen = new JoystickButton(oiController, 1);
-	private Button gearClose = new JoystickButton(oiController, 1);
-	private Button gearShake = new JoystickButton(oiController, 1);
-	//private Button shooterSwitch = new JoystickButton(oiController, 1);
-	private Button shooterSwitch = new JoystickButton(rightController, 9);
-	//private Button autoClimb = new JoystickButton(oiController, 1);
-	private Button autoClimb = new JoystickButton(oiController, 7);
-	//private Button autoClimb = new JoystickButton(leftController, 8); // test robot
-	private Button climberHold = new JoystickButton(oiController, 1);
-	//private Button climberHold = new JoystickButton(rightController, 8);
-	//private Button openLoopDrive = new JoystickButton(oiController, 1);
-	private Button openLoopDrive = new JoystickButton(leftController, 7);
+	private Button intakeOn = new JoystickButton(oiController2, 2);
+	private Button intakeOff = new JoystickButton(oiController2, 3);
+	private Button shoot = new JoystickButton(oiController2, 1);
+	private Button gearOpen = new JoystickButton(oiController2, 5);
+	private Button gearClose = new JoystickButton(oiController2, 6);
+	private Button gearShake = new JoystickButton(oiController2, 4);
+	private Button shooterDisableSwitch = new JoystickButton(oiController1, 7);
+	private Button driveDisableSwitch = new JoystickButton(oiController1, 9);
+	private Button openLoopShooter = new JoystickButton(oiController1, 8);
+	private Button autoClimb = new JoystickButton(oiController2, 7);
+	private Button climberHold = new JoystickButton(oiController2, 8);
+	private Button openLoopDrive = new JoystickButton(oiController1, 10);
 	private Button straightAssist = new JoystickButton(leftController, 1);
-	private Button driveForward = new JoystickButton(leftController, 3);
-	private Button driveBackward = new JoystickButton(leftController, 2);
+	private Button joysticksForward = new JoystickButton(leftController, 3);
+	private Button joysticksBackward = new JoystickButton(leftController, 2);
 	private Button sniperMode = new JoystickButton(rightController, 1);
-	//private Button shakeBalls = new JoystickButton(oiController, 1);
-	private Button shakeBalls = new JoystickButton(rightController, 8);
-	private Button ejectBalls = new JoystickButton(oiController, 1);
-	//private Button ejectBalls = new JoystickButton(leftController, 11);
+	private Button shakeBalls = new JoystickButton(oiController2, 9);
+	private Button ejectBalls = new JoystickButton(oiController2, 10);
 	
-	//private Button loaderForward = new JoystickButton(oiController, 1);
-	//private Button loaderBackward = new JoystickButton(oiController, 1);
-	private Button loaderForward = new JoystickButton(rightController, 11);
-	private Button loaderBackward = new JoystickButton(rightController, 10);
-	//private Button intakeForward = new JoystickButton(oiController, 1);
-	//private Button intakeBackward = new JoystickButton(oiController, 1);
-	private Button intakeForward = new JoystickButton(leftController, 11);
-	private Button intakeBackward = new JoystickButton(leftController, 10);
-	//private Button triggerForward = new JoystickButton(oiController, 1);
-	//private Button triggerBackward = new JoystickButton(oiController, 1);
-	private Button triggerForward = new JoystickButton(rightController, 6);
-	private Button triggerBackward = new JoystickButton(rightController, 7);
+	private Button loaderForward = new JoystickButton(oiController1, 3);
+	private Button loaderBackward = new JoystickButton(oiController1, 4);
+	private Button intakeForward = new JoystickButton(oiController1, 1);
+	private Button intakeBackward = new JoystickButton(oiController1, 2);
+	private Button triggerForward = new JoystickButton(oiController1, 5);
+	private Button triggerBackward = new JoystickButton(oiController1, 6);
+	
+	RunShooter runShooter = new RunShooter();
 	
 	public OI() {
 		right90Button.whenPressed(new TurnToAngle(90));
@@ -119,31 +111,27 @@ public class OI {
 		frontCameraButton.whenPressed(new SetCamera(true));
 		rearCameraButton.whenPressed(new SetCamera(false));
 		
-		//RunIntakeGroup intakeGroupNormal = new RunIntakeGroup(true);
-		//RunIntakeGroup intakeGroupShoot = new RunIntakeGroup(false);
-		RunIntake runIntake = new RunIntake(false);
+		RunIntake runIntakeNormal = new RunIntake(false);
+		RunIntakeShoot runIntakeShoot = new RunIntakeShoot();
 		RunLoader runLoader = new RunLoader(false);
 		RunTrigger runTriggerShoot = new RunTrigger(false);
-		RunTrigger runTriggerNormal = new RunTrigger(true);
-		RunClimberForIntake runClimberIntake = new RunClimberForIntake();
-		//intakeOn.whenPressed(intakeGroupNormal);
-		intakeOn.whenPressed(runClimberIntake);
-		intakeOn.whenPressed(runTriggerNormal);
-		intakeOn.whenPressed(runLoader);
-		intakeOn.whenPressed(runIntake);
-		//intakeOff.cancelWhenPressed(intakeGroupNormal);
-		//intakeOff.cancelWhenPressed(intakeGroupShoot);
-		intakeOff.cancelWhenPressed(runClimberIntake);
-		intakeOff.cancelWhenPressed(runTriggerNormal);
-		intakeOff.cancelWhenPressed(runTriggerShoot);
-		intakeOff.cancelWhenPressed(runLoader);
-		intakeOff.cancelWhenPressed(runIntake);
-		//shoot.whileHeld(intakeGroupShoot);
-		//shoot.whenReleased(intakeGroupNormal);
+		//RunTrigger runTriggerNormal = new RunTrigger(true);
+		//RunClimberForIntake runClimberIntake = new RunClimberForIntake();
+		//intakeOn.whenPressed(runClimberIntake);
+		//intakeOn.whenPressed(runTriggerNormal);
+		//intakeOn.whenPressed(runLoader);
+		intakeOn.whenPressed(runIntakeNormal);
+		//intakeOff.cancelWhenPressed(runClimberIntake);
+		//intakeOff.cancelWhenPressed(runTriggerNormal);
+		//intakeOff.cancelWhenPressed(runTriggerShoot);
+		//intakeOff.cancelWhenPressed(runLoader);
+		intakeOff.cancelWhenPressed(runIntakeNormal);
 		shoot.whileHeld(runTriggerShoot);
 		shoot.whileHeld(runLoader);
-		shoot.whenReleased(runTriggerNormal);
-		shoot.whenReleased(runLoader);
+		shoot.whileHeld(runIntakeShoot);
+		shoot.whenReleased(runIntakeNormal);
+		//shoot.whenReleased(runTriggerNormal);
+		//shoot.whenReleased(runLoader);
 		shakeBalls.whileHeld(new ShakeLoader());
 		ejectBalls.whileHeld(new RunIntake(true));
 		ejectBalls.whileHeld(new RunLoader(true));
@@ -151,14 +139,21 @@ public class OI {
 		gearOpen.whenPressed(new OpenGearHandler());
 		gearClose.whenPressed(new CloseGearHandler());
 		gearShake.whileHeld(new ShakeGearHandler());
-		shooterSwitch.whileHeld(new RunShooter());
+		
+		// there is no WhileNotHeld, so start when inactive and cancel when switch flipped on
+		// if flipped at start, run
+		shooterDisableSwitch.whenReleased(runShooter);
+		shooterDisableSwitch.cancelWhenPressed(runShooter);
+		
 		autoClimb.toggleWhenPressed(new AutoClimb());
 		climberHold.toggleWhenPressed(new ClimberHold());
 		openLoopDrive.whenPressed(new EnableClosedLoop(false));
 		openLoopDrive.whenReleased(new EnableClosedLoop(true));
-		straightAssist.whileHeld(new DriveVelocityOnHeading());
-		driveForward.whileHeld(new DriveVelocityOnHeading());
-		driveBackward.whileHeld(new DriveVelocityOnHeading());
+		straightAssist.whileHeld(new DriveWithJoystickOnHeading());
+		joysticksForward.whenPressed(new ReverseJoysticks(false));
+		joysticksBackward.whenPressed(new ReverseJoysticks(true));
+		joysticksForward.whenPressed(new SetCamera(true));
+		joysticksBackward.whenPressed(new SetCamera(false));
 		
 		loaderForward.whileHeld(new RunLoader(false));
 		loaderBackward.whileHeld(new RunLoader(true));
@@ -169,18 +164,45 @@ public class OI {
 	}
 	
 	public double getLeftAxis() {
-		return leftController.getRawAxis(1);
+		if (joysticksReversed) {
+			return rightController.getRawAxis(1)*-1;
+		} else {
+			return leftController.getRawAxis(1);
+		}
 	}
 	public double getRightAxis() {
-		return rightController.getRawAxis(1);
+		if (joysticksReversed) {
+			return leftController.getRawAxis(1)*-1;
+		} else {
+			return rightController.getRawAxis(1);
+		}
 	}
 	
+	// reversing the joysticks should not change which joystick to use for straight drive, use
+	// different function to make that correct
+	// Note: Brian is left-handed
+	public double getDriveStraightAxis() {
+		if (joysticksReversed) {
+			return leftController.getRawAxis(1)*-1;
+		} else {
+			return leftController.getRawAxis(1);
+		}
+	}
+
 	public double getClimbAxis() {
-		return oiController.getRawAxis(1);
+		return oiController1.getRawAxis(1);
 	}
 	
 	public boolean getOpenLoop() {
 		return openLoopDrive.get();
+	}
+	
+	public boolean getDriveEnabled() {
+		return !driveDisableSwitch.get();
+	}
+	
+	public boolean getOpenLoopShooter() {
+		return openLoopShooter.get();
 	}
 	
 	public boolean getSniperMode() {
@@ -196,15 +218,13 @@ public class OI {
 		return (1-((leftController.getRawAxis(2)+1)/2));
 	}
 	
-	// this function is used by DriveWithJoystickOnHeading to enable switching between joystick input and
-	// defined values
-	public double getSingleDriveAxis() {
-		if (driveForward.get()) {
-			return 300;
-		} else if (driveBackward.get()) {
-			return -50;
-		} else {
-			return Math.pow(getLeftAxis(), 3)*RobotMap.maxVelocity*-1; // Brian is left-handed, use as drive joystick
+	public void reverseJoysticks(boolean reverse) {
+		joysticksReversed = reverse;
+	}
+	
+	public void initShooter() {
+		if (!shooterDisableSwitch.get()) {
+			runShooter.start();
 		}
 	}
 }

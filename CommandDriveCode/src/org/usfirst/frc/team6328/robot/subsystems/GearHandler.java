@@ -28,10 +28,12 @@ public class GearHandler extends Subsystem {
     
     public void open() {
     	solenoid.set(DoubleSolenoid.Value.kForward);
+    	System.out.println("Gear Open");
     }
     
     public void close() {
     	solenoid.set(DoubleSolenoid.Value.kReverse);
+    	System.out.println("Gear Close");
     }
     
     public void disable() {

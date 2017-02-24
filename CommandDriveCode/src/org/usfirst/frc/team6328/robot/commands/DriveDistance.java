@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveDistance extends Command {
 
-	static final double kP = 0.017; // 0.023
-    static final double kI = 0.0; // 0.0
-    static final double kD = 0.0; // 0.005
-    static final double kF = 0.5; // 0.3
+	private double kP; // 0.023
+    private double kI; // 0.0
+    private double kD; // 0.005
+    private double kF; // 0.3
     static final double kToleranceInches = 0.5f;
     static final int kToleranceBufSamples = 10;
     // PID output will be limited to negative to positive this. Multiplied by RobotMap maxVelocity to get target
@@ -45,6 +45,17 @@ public class DriveDistance extends Command {
     	super("DriveDistance");
     	requires(Robot.driveSubsystem);
     	targetDistance = distance;
+    	if (RobotMap.practiceRobot) {
+    		kP = 0.017;
+    		kI = 0;
+    		kD = 0;
+    		kF = 0.5;
+    	} else {
+    		kP = 0.032;
+        	kI = 0.000000;
+        	kD = 0;
+        	kF = 0;
+    	}
     }
 
     // Called just before this Command runs the first time
@@ -62,7 +73,7 @@ public class DriveDistance extends Command {
 		distanceController.setOutputRange(kMaxOutput*-1, kMaxOutput);
         distanceController.setAbsoluteTolerance(kToleranceInches);
         distanceController.setToleranceBuffer(kToleranceBufSamples);
-        distanceController.setContinuous(true);
+        distanceController.setContinuous(false);
         distanceController.setSetpoint(targetDistance);
 	}
 
@@ -101,7 +112,7 @@ public class DriveDistance extends Command {
     	    	SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
     	    	SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
     	    	SmartDashboard.putString("DriveDistance Graph", genGraphStr(targetDistance, Robot.driveSubsystem.getDistanceLeft(), 
-    	    			Robot.driveSubsystem.getDistanceRight()));
+    	    			Robot.driveSubsystem.getDistanceRight(), distanceControllerLeft.getError(), distanceControllerRight.getError()));
     		}
     	}
     }

@@ -30,10 +30,13 @@ import java.util.StringJoiner;
  */
 public class Robot extends SampleRobot {
 	RobotDrive myRobot; // class that handles basic drive operations
+	boolean practiceRobot = false;
 	CANTalon right1;
 	CANTalon right2;
 	CANTalon left1;
 	CANTalon left2;
+	CANTalon right3;
+	CANTalon left3;
 	Joystick controller; // set to ID 0 in DriverStation
 	//Joystick leftStick; // set to ID 2 in DriverStation
 	
@@ -41,15 +44,31 @@ public class Robot extends SampleRobot {
 	public Robot() { 
 		// setupRobotDrive();
 		// setupSmartDashboard
-		right1 = new CANTalon(1); // Initialize the CanTalonSRX on device 1.
-		//right1.setSafetyEnabled(false);
-		right2 = new CANTalon(2);
-		//right2.setSafetyEnabled(false);
-		left1 = new CANTalon(3);
-		left2 = new CANTalon(4);
+		if (!practiceRobot) {
+			right1 = new CANTalon(14); // Initialize the CanTalonSRX on device 1.
+			//right1.setSafetyEnabled(false);
+			right2 = new CANTalon(12);
+			//right2.setSafetyEnabled(false);
+			left1 = new CANTalon(15);
+			left2 = new CANTalon(0);
+			right3 = new CANTalon(13);
+			left3 = new CANTalon(1);
+		} else {
+			right1 = new CANTalon(1); // Initialize the CanTalonSRX on device 1.
+			//right1.setSafetyEnabled(false);
+			right2 = new CANTalon(2);
+			//right2.setSafetyEnabled(false);
+			left1 = new CANTalon(3);
+			left2 = new CANTalon(4);
+		}
 		right1.changeControlMode(TalonControlMode.Speed);
-		right1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		right1.reverseSensor(false);
+		if (!practiceRobot) {
+			right1.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+			right1.reverseSensor(true);
+		} else {
+			right1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+			right1.reverseSensor(false);
+		}
 		right1.configNominalOutputVoltage(+0.0f, -0.0f);
 		right1.configPeakOutputVoltage(+12.0f, -12.0f);
 		//right1.setProfile(0);
@@ -59,8 +78,13 @@ public class Robot extends SampleRobot {
 		right1.setD(40);
 		right1.setVoltageRampRate(0);
 		left1.changeControlMode(TalonControlMode.Speed);
-		left1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		left1.reverseSensor(false);
+		if (!practiceRobot) {
+			left1.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+			left1.reverseSensor(true);
+		} else {
+			left1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+			left1.reverseSensor(false);
+		}
 		left1.configNominalOutputVoltage(+0.0f, -0.0f);
 		left1.configPeakOutputVoltage(+12.0f, -12.0f);
 		//left1.setProfile(0);
@@ -69,10 +93,21 @@ public class Robot extends SampleRobot {
 		left1.setI(0);
 		left1.setD(40);
 		left1.setVoltageRampRate(0);
-		right2.changeControlMode(CANTalon.TalonControlMode.Follower);
-		right2.set(1);
-		left2.changeControlMode(CANTalon.TalonControlMode.Follower);
-		left2.set(3);
+		if (!practiceRobot) {
+			right2.changeControlMode(CANTalon.TalonControlMode.Follower);
+			right2.set(14);
+			left2.changeControlMode(CANTalon.TalonControlMode.Follower);
+			left2.set(15);
+			right3.changeControlMode(CANTalon.TalonControlMode.Follower);
+			right3.set(14);
+			left3.changeControlMode(CANTalon.TalonControlMode.Follower);
+			left3.set(15);
+		} else {
+			right2.changeControlMode(CANTalon.TalonControlMode.Follower);
+			right2.set(1);
+			left2.changeControlMode(CANTalon.TalonControlMode.Follower);
+			left2.set(3);
+		}
 
 		//myRobot = new RobotDrive(right1, right2, left1, left2);
 		controller = new Joystick(0);
@@ -90,22 +125,22 @@ public class Robot extends SampleRobot {
 	 * 	 
 	 */
 	public void operatorControl() {
-		left1.enable();
+		/*left1.enable();
 		left2.enable();
 		right1.enable();
-		right2.enable();
+		right2.enable();*/
 		while (isOperatorControl() && isEnabled()) {
 			
 			//right1.set(Math.pow(controller.getRawAxis(3), 3));
 			//right2.set(Math.pow(controller.getRawAxis(3), 3));
 			//left1.set(-1 * Math.pow(controller.getRawAxis(1), 3));
 			//left2.set(-1 * Math.pow(controller.getRawAxis(1), 3));
-			int velocity = right1.getEncVelocity()*-1;
+			double velocity = right1.getEncVelocity();
 			//double targetvelocity = controller.getRawAxis(3)*-1500; // uncomment to use controller
 			//right1.set(controller.getRawAxis(3)*1500); // and this
 			//left1.set(controller.getRawAxis(1)*-1500); // and this
 			SmartDashboard.putNumber("Velocity", velocity );
-			SmartDashboard.putString("GraphData", genGraphStr((double)velocity,SmartDashboard.getNumber("PID/setpoint", 0))); // PID tuning mode
+			SmartDashboard.putString("GraphData", genGraphStr((double)velocity,SmartDashboard.getNumber("PID/setpoint", 0)*6.8266, right1.getClosedLoopError())); // PID tuning mode
 			//SmartDashboard.putString("GraphData", genGraphStr((double)velocity,targetvelocity)); // controller mode
 			SmartDashboard.putString("VoltageCurrentGraph", genGraphStr(right1.getOutputVoltage()*-1, right1.getOutputCurrent()));
 			SmartDashboard.putNumber("Output Voltage", right1.getOutputVoltage());
@@ -126,15 +161,35 @@ public class Robot extends SampleRobot {
 				right1.disable();
 				left2.disable();
 				right2.disable();
+				if (!practiceRobot) {
+					left3.disable();
+					right3.disable();
+				}
 			}
 			else {
 				left1.enable();
 				right1.enable();
 				left2.enable();
 				right2.enable();
-				right2.set(1); // talons lose their setting but NOT mode when disabled
-				left2.set(3);
-				left1.set(SmartDashboard.getNumber("PID/setpoint", 0)*-1);
+				if (!practiceRobot) {
+					left3.enable();
+					right3.enable();
+				}
+				if (practiceRobot) {
+					right2.set(1); // talons lose their setting but NOT mode when disabled
+					left2.set(3);
+				} else {
+					right2.set(14);
+					right3.set(14);
+					left2.set(15);
+					left3.set(15);
+				}
+				
+				/*left1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+				right1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+				left1.set(1);
+				right1.set(-1);*/
+				left1.set(SmartDashboard.getNumber("PID/setpoint", 0));
 				right1.set(SmartDashboard.getNumber("PID/setpoint", 0)*-1); // only multiply by -1 to drive in a straight line (sides are inverted). Remove top *-1
 				//right1.set(1);
 				//right2.set(1);

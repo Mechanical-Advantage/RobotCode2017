@@ -29,6 +29,7 @@ public class Climber extends Subsystem {
 			climberTalon.EnableCurrentLimit(enableCurrentLimit);
 			climberTalon.setCurrentLimit(currentLimit);
 			climberTalon.enableBrakeMode(brakeMode);
+			//climberTalon.reverseOutput(true); // not working
 		}
 	}
 
@@ -42,17 +43,17 @@ public class Climber extends Subsystem {
     
     public void run(double speed) {
     	climberTalon.enable();
-    	climberTalon.set(speed);
+    	climberTalon.set(speed*-1); // inverted
     }
     
     public void hold() {
     	climberTalon.enable();
-    	climberTalon.set(holdSpeed);
+    	climberTalon.set(holdSpeed*-1);
     }
     
     public void runAsIntake() {
     	climberTalon.enable();
-    	climberTalon.set(intakeSpeed);
+    	climberTalon.set(intakeSpeed*-1);
     }
     
     public void stop() {

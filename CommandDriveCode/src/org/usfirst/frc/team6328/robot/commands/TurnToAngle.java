@@ -10,16 +10,17 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- *
+ * Turns the specified number of degrees, -180 to 180. Resets the gyro at the beginning
  */
 public class TurnToAngle extends Command implements PIDOutput {
 	
-	static final double kP = 0.01;
-    static final double kI = 0.000;
-    static final double kD = 0.003;
-    static final double kF = 0.0;
-    static final double kToleranceDegrees = 1.0f;
-    static final int kToleranceBufSamples = 10;
+	private double kP;
+    private double kI;
+    private double kD;
+    private double kF;
+    private double kToleranceDegrees;
+    private int kToleranceBufSamples;
+    private double updatePeriod;
     private PIDController turnController;
     private double targetAngle;
     private boolean resetCompleted;
@@ -36,11 +37,28 @@ public class TurnToAngle extends Command implements PIDOutput {
         // limit input to -180 to 180
         targetAngle = (angle>180) ? 180 : angle;
         targetAngle = (targetAngle<-180) ? -180 : targetAngle;
+        if (RobotMap.practiceRobot) {
+        	kP = 0.01;
+        	kI = 0;
+        	kD = 0.003;
+        	kF = 0;
+        	kToleranceDegrees = 1.0;
+        	kToleranceBufSamples = 10;
+        	updatePeriod = 0.05;
+        } else {
+        	kP = 0.0077; // 0.008
+        	kI = 0;
+        	kD = 0.0137; // 0.014
+        	kF = 0;
+        	kToleranceDegrees = 1.0;
+        	kToleranceBufSamples = 10;
+        	updatePeriod = 0.02;
+        }
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	turnController = new PIDController(kP, kI, kD, kF, Robot.ahrs, this);
+    	turnController = new PIDController(kP, kI, kD, kF, Robot.ahrs, this, updatePeriod);
     	turnController.setInputRange(-180.0f,  180.0f);
         turnController.setOutputRange(-1.0, 1.0);
         turnController.setAbsoluteTolerance(kToleranceDegrees);

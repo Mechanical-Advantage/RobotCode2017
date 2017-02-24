@@ -1,15 +1,18 @@
 package org.usfirst.frc.team6328.robot.commands;
 
 import org.usfirst.frc.team6328.robot.Robot;
+import org.usfirst.frc.team6328.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Runs the shooter wheel
  */
 public class RunShooter extends Command {
 	
-	private final int targetSpeed = 58; // 83 is 5000 rpm
+	private final int targetSpeed = 83; // 83 is 5000 rpm
+	private final int maxSpeed = 200; // higher numbers are treated as noise and will be ignored
 
     public RunShooter() {
         // Use requires() here to declare subsystem dependencies
@@ -23,13 +26,24 @@ public class RunShooter extends Command {
     }
 
     // Called repeatedly when this Command is scheduled to run
-    protected void execute() {
-    	if (Robot.shooterSubsystem.getSpeed()>targetSpeed) {
-    		Robot.shooterSubsystem.stop();
-    	} else {
-    		Robot.shooterSubsystem.run();
+	@SuppressWarnings("unused")
+	protected void execute() {
+    	double speed = Robot.shooterSubsystem.getSpeed();
+    	if (speed < maxSpeed && !Robot.oi.getOpenLoopShooter()) {
+    		if (speed>targetSpeed) {
+    			Robot.shooterSubsystem.stop();
+    		} else {
+    			Robot.shooterSubsystem.run();
+    		}
+    		if (RobotMap.tuningMode) {
+    			SmartDashboard.putNumber("Shooter Speed", speed);
+    		}
+    	} else if (Robot.oi.getOpenLoopShooter()) {
+    		Robot.shooterSubsystem.runOpenLoop();
+    		if (RobotMap.tuningMode && speed < maxSpeed) {
+    			SmartDashboard.putNumber("Shooter Speed", speed);
+    		}
     	}
-    	//Robot.shooterSubsystem.run();
     }
 
     // Make this return true when this Command no longer needs to run execute()
