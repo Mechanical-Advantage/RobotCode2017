@@ -3,6 +3,7 @@ package org.usfirst.frc.team6328.robot.commands;
 import org.usfirst.frc.team6328.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Sets the current camera
@@ -27,6 +28,7 @@ public class SetCamera extends InstantCommand {
     	else {
     		Robot.cameraSubsystem.useRearCamera();
     	}
+    	SmartDashboard.putString("Current Camera", frontCamera ? "Front" : "Rear");
     }
 
 }

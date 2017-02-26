@@ -12,7 +12,6 @@ import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
-import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsPlaceGear;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
@@ -40,7 +39,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	public static final RobotMap RobotMap = new RobotMap();
+	public static final RobotMap robotMap = new RobotMap();
+	
 	public static final DriveTrain driveSubsystem = new DriveTrain();
 	public static final Intake intakeSubsystem = new Intake();
 	public static final Loader loaderSubsystem = new Loader();
@@ -65,7 +65,7 @@ public class Robot extends IterativeRobot {
         chooser = new SendableChooser<Command>();
         //chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
-        if (org.usfirst.frc.team6328.robot.RobotMap.tuningMode) {
+        if (RobotMap.tuningMode) {
         	chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
             chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
             chooser.addObject("Rotate 24 degrees", new TurnToAngle(24));
@@ -86,14 +86,14 @@ public class Robot extends IterativeRobot {
             chooser.addObject("Drive 20 feet with gyro correction", new DriveDistanceOnHeading(240));
         } else {
         	chooser.addDefault("Do Nothing", null);
-        	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110)); // define distance
+        	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110));
         	chooser.addObject("Place gear centered behind airship", new PlaceGearCenter());
         	chooser.addObject("Place gear left of airship", new PlaceGearSideOfAirship(false));
         	chooser.addObject("Place gear right of airship", new PlaceGearSideOfAirship(true));
         	chooser.addObject("Shoot balls cross line red", new DriveToBoilerShootBallsCrossLine(false));
         	chooser.addObject("Shoot balls cross line blue", new DriveToBoilerShootBallsCrossLine(true));
-        	chooser.addObject("Shoot balls and place gear red", new DriveToBoilerShootBallsPlaceGear(false));
-        	chooser.addObject("Shoot balls and place gear blue", new DriveToBoilerShootBallsPlaceGear(true));
+        	//chooser.addObject("Shoot balls and place gear red", new DriveToBoilerShootBallsPlaceGear(false)); // not fully implemented
+        	//chooser.addObject("Shoot balls and place gear blue", new DriveToBoilerShootBallsPlaceGear(true));
         }
         SmartDashboard.putData("Auto mode", chooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
@@ -106,7 +106,7 @@ public class Robot extends IterativeRobot {
      */
     public void disabledInit(){
     	driveSubsystem.enableBrakeMode(false);
-    	if (org.usfirst.frc.team6328.robot.RobotMap.tuningMode) {
+    	if (RobotMap.tuningMode) {
     		SmartDashboard.putNumber("Final Yaw", ahrs.getYaw());
         	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
         	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
@@ -153,7 +153,7 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopInit() {
-    	if (org.usfirst.frc.team6328.robot.RobotMap.practiceRobot) {
+    	if (RobotMap.practiceRobot) {
     		driveSubsystem.enableBrakeMode(true);
     	}
 		// This makes sure that the autonomous stops running when
