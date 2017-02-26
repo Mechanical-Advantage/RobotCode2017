@@ -140,10 +140,13 @@ public class OI {
 		gearClose.whenPressed(new CloseGearHandler());
 		gearShake.whileHeld(new ShakeGearHandler());
 		
-		// there is no WhileNotHeld, so start when inactive and cancel when switch flipped on
-		// if flipped at start, run
-		shooterDisableSwitch.whenReleased(runShooter);
-		shooterDisableSwitch.cancelWhenPressed(runShooter);
+		// trying to enable practice robot will not work
+		if (!RobotMap.practiceRobot) {
+			// there is no WhileNotHeld, so start when inactive and cancel when switch flipped on
+			// if flipped at start, run
+			shooterDisableSwitch.whenReleased(runShooter);
+			shooterDisableSwitch.cancelWhenPressed(runShooter);
+		}
 		
 		autoClimb.toggleWhenPressed(new AutoClimb());
 		climberHold.toggleWhenPressed(new ClimberHold());
@@ -222,8 +225,9 @@ public class OI {
 		joysticksReversed = reverse;
 	}
 	
+	@SuppressWarnings("unused")
 	public void initShooter() {
-		if (!shooterDisableSwitch.get()) {
+		if (!shooterDisableSwitch.get() && !RobotMap.practiceRobot) {
 			runShooter.start();
 		}
 	}

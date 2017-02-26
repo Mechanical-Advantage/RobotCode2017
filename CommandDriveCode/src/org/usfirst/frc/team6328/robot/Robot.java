@@ -51,7 +51,6 @@ public class Robot extends IterativeRobot {
 	
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
-	//public static CameraServer cameraServer = CameraServer.getInstance();
 	public static final CameraSystem cameraSubsystem = new CameraSystem();
 
     Command autonomousCommand;
@@ -154,7 +153,9 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopInit() {
-    	//driveSubsystem.enableBrakeMode(true);
+    	if (org.usfirst.frc.team6328.robot.RobotMap.practiceRobot) {
+    		driveSubsystem.enableBrakeMode(true);
+    	}
 		// This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to 
         // continue until interrupted by another command, remove

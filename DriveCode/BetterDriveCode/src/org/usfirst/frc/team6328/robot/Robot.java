@@ -17,6 +17,8 @@ package org.usfirst.frc.team6328.robot;
 //import edu.wpi.first.wpilibj.SpeedController;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.*;
+
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
@@ -111,6 +113,8 @@ public class Robot extends SampleRobot {
 
 		//myRobot = new RobotDrive(right1, right2, left1, left2);
 		controller = new Joystick(0);
+		
+		CameraServer.getInstance().startAutomaticCapture(0);
 	}
 
 	private String genGraphStr(double...data) {
