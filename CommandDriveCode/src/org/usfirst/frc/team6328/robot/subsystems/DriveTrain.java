@@ -11,22 +11,47 @@ import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- *
+ * Robot Drive Train
  */
 public class DriveTrain extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
+	/*
+	 * Talon SRX Unit Notes:
+	 * 
+	 * CTRE Mag Encoder Relative: 4096 ticks/native units per rotation
+	 * Meets talon requirements for scaling to rotations/rpm without telling talon number of ticks
+	 * Conversion factor: 6.8266 native units/100ms = 1rpm (for encoder with 4096 ticks only)
+	 * 
+	 * Quad encoder needs talon to be told number of ticks (1440 for test bot)
+	 * Current code does not tell talon, so everything uses native units
+	 * 
+	 * Some functions use native units even when scaling available
+	 * get() and set() functions use scaling if available
+	 * getEncVelocity(), getEncPosition(), getClosedLoopError() use native units
+	 * This code uses getEncVelocity(), not get()
+	 * 
+	 * This code does its own getEncPosition() to rotations scaling using the ticksPerRotation variable
+	 * 
+	 * Native units are ticks, native units in velocity is ticks per 100ms
+	 * 
+	 * See Talon SRX Software Reference Manual sections 17.1, 17.2
+	 */
+	
 	private static final double kPPractice = 2;
 	private static final double kIPractice = 0;
 	private static final double kDPractice = 40;
 	private static final double kFPractice = 1.07;
+	private static final int kIZonePractice = 0;
 	
 	private static final double kPCompetition = 0.6;
 	private static final double kICompetition = 0.0007;
 	private static final double kDCompetition = 6;
 	private static final double kFCompetition = 0.2842;
+	private static final int kIZoneCompetition = 0; // disable i zone for now since it is not tested
+	//private static final int kIZoneCompetition = 4096*25/600; // 4096: encoder ticks per rotation; 25: rpm, set this; 600: converting minute to 100ms
 	
 	private static final double safetyExpiration = 2;
 	private static final double sniperMode = 0.25; // multiplied by velocity in sniper mode
@@ -114,7 +139,7 @@ public class DriveTrain extends Subsystem {
 		leftTalonSlave.setSafetyEnabled(false);*/
 	}
 	
-	private void setupVelocityClosedLoop(double p, double i, double d, double f) {
+	private void setupVelocityClosedLoop(double p, double i, double d, double f, int iZone) {
 		rightTalonMaster.changeControlMode(TalonControlMode.Speed);
 		leftTalonMaster.changeControlMode(TalonControlMode.Speed);
 		//rightTalonMaster.setProfile(0);
@@ -122,18 +147,20 @@ public class DriveTrain extends Subsystem {
 		rightTalonMaster.setP(p);
 		rightTalonMaster.setI(i);
 		rightTalonMaster.setD(d);
+		rightTalonMaster.setIZone(iZone);
 		//leftTalonMaster.setProfile(0);
 		leftTalonMaster.setF(f);
 		leftTalonMaster.setP(p);
 		leftTalonMaster.setI(i);
 		leftTalonMaster.setD(d);
+		leftTalonMaster.setIZone(iZone);
 	}
 	
 	public void useClosedLoop() {
 		if (RobotMap.practiceRobot) {
-			setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice);
+			setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice, kIZonePractice);
 		} else {
-			setupVelocityClosedLoop(kPCompetition, kICompetition, kDCompetition, kFCompetition);
+			setupVelocityClosedLoop(kPCompetition, kICompetition, kDCompetition, kFCompetition, kIZoneCompetition);
 		}
 	}
 	

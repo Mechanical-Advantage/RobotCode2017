@@ -37,6 +37,7 @@ public class DriveDistance extends Command {
 	private DistancePIDOutput pidOutputLeft = new DistancePIDOutput();
 	private DistancePIDOutput pidOutputRight = new DistancePIDOutput();
 	private boolean resetCompleted;
+	private boolean resetStarted;
 	private double lastOutputLeft, lastOutputRight;
 
     public DriveDistance(double distance) { // in inches
@@ -91,6 +92,10 @@ public class DriveDistance extends Command {
 	
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	if (!resetStarted && Math.abs(Robot.driveSubsystem.getVelocityLeft())<1 && Math.abs(Robot.driveSubsystem.getVelocityRight())<1) {
+    		Robot.driveSubsystem.resetPosition();
+    		resetStarted = true;
+    	}
     	if (Math.abs(Robot.driveSubsystem.getDistanceLeft())<0.1 && Math.abs(Robot.driveSubsystem.getDistanceRight())<0.1) {
     		resetCompleted = true;
     		distanceControllerLeft.enable();
