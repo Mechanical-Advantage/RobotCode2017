@@ -41,7 +41,7 @@ public class RobotMap {
 	public static int gearSolenoid2;
 	public static int minVelocity; // lower values will be treated as this value
 	public static int maxVelocity; // maximum velocity when sticks are fully forward (value of 1)
-	public static final boolean practiceRobot = true;
+	public static final boolean practiceRobot = false;
 	public static final boolean tuningMode = false;
 	public RobotMap(){
 		if (practiceRobot) {

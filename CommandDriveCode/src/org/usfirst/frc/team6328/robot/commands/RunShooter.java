@@ -26,7 +26,6 @@ public class RunShooter extends Command {
     }
 
     // Called repeatedly when this Command is scheduled to run
-	@SuppressWarnings("unused")
 	protected void execute() {
     	double speed = Robot.shooterSubsystem.getSpeed();
     	if (speed < maxSpeed && !Robot.oi.getOpenLoopShooter()) {

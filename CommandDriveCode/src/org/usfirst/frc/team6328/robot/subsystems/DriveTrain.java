@@ -50,8 +50,8 @@ public class DriveTrain extends Subsystem {
 	private static final double kICompetition = 0.0007;
 	private static final double kDCompetition = 6;
 	private static final double kFCompetition = 0.2842;
-	private static final int kIZoneCompetition = 0; // disable i zone for now since it is not tested
-	//private static final int kIZoneCompetition = 4096*25/600; // 4096: encoder ticks per rotation; 25: rpm, set this; 600: converting minute to 100ms
+	//private static final int kIZoneCompetition = 0; // disable i zone for now since it is not tested
+	private static final int kIZoneCompetition = 4096*50/600; // 4096: encoder ticks per rotation; 25: rpm, set this; 600: converting minute to 100ms
 	
 	private static final double safetyExpiration = 2;
 	private static final double sniperMode = 0.25; // multiplied by velocity in sniper mode

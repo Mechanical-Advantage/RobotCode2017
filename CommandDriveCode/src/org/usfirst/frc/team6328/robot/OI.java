@@ -15,6 +15,7 @@ import org.usfirst.frc.team6328.robot.commands.RunIntake;
 import org.usfirst.frc.team6328.robot.commands.RunIntakeShoot;
 import org.usfirst.frc.team6328.robot.commands.RunLoader;
 import org.usfirst.frc.team6328.robot.commands.RunShooter;
+import org.usfirst.frc.team6328.robot.commands.RunShooterPID;
 import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
 import org.usfirst.frc.team6328.robot.commands.ShakeGearHandler;
@@ -101,7 +102,7 @@ public class OI {
 	private Button triggerForward = new JoystickButton(oiController1, 5);
 	private Button triggerBackward = new JoystickButton(oiController1, 6);
 	
-	RunShooter runShooter = new RunShooter();
+	RunShooterPID runShooter = new RunShooterPID();
 	
 	public OI() {
 		right90Button.whenPressed(new TurnToAngle(90));
