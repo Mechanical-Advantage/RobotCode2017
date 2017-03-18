@@ -49,8 +49,8 @@ public class RobotMap {
 				rightSlave = 2;
 				leftMaster = 3;
 				leftSlave = 4;
-				maxVelocity = 950;
-				minVelocity = 40;
+				maxVelocity = 396; // 950 native units per 100ms
+				minVelocity = 17; // 40 native units per 100ms
 		}
 		else {
 			rightMaster = 14;

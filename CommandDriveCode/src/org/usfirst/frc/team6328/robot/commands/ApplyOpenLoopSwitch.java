@@ -6,22 +6,25 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 
 /**
  * Enables or disables closed loop drive
+ * 
+ * Should only be called from OI because the switch on the operator console is switched,
+ * calling and setting a state different than the switch will not work correctly
  */
-public class EnableClosedLoop extends InstantCommand {
+public class ApplyOpenLoopSwitch extends InstantCommand {
 
-	private boolean enableClosedDrive;
+	private boolean enableClosedLoopDrive;
 	
-    public EnableClosedLoop(boolean enable) {
-        super("EnableClosedLoop");
+    public ApplyOpenLoopSwitch(boolean enable) {
+        super("ApplyOpenLoopSwitch");
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
         requires(Robot.driveSubsystem);
-        enableClosedDrive = enable;
+        enableClosedLoopDrive = enable;
     }
 
     // Called once when the command executes
     protected void initialize() {
-    	if (enableClosedDrive) {
+    	if (enableClosedLoopDrive) {
     		Robot.driveSubsystem.useClosedLoop();
     	} else {
     		Robot.driveSubsystem.useOpenLoop();

@@ -8,13 +8,12 @@ import org.usfirst.frc.team6328.robot.commands.AutoClimb;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
-import org.usfirst.frc.team6328.robot.commands.EnableClosedLoop;
+import org.usfirst.frc.team6328.robot.commands.ApplyOpenLoopSwitch;
 import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
 import org.usfirst.frc.team6328.robot.commands.ReverseJoysticks;
 import org.usfirst.frc.team6328.robot.commands.RunIntake;
 import org.usfirst.frc.team6328.robot.commands.RunIntakeShoot;
 import org.usfirst.frc.team6328.robot.commands.RunLoader;
-import org.usfirst.frc.team6328.robot.commands.RunShooter;
 import org.usfirst.frc.team6328.robot.commands.RunShooterPID;
 import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
@@ -151,8 +150,8 @@ public class OI {
 		
 		autoClimb.toggleWhenPressed(new AutoClimb());
 		climberHold.toggleWhenPressed(new ClimberHold());
-		openLoopDrive.whenPressed(new EnableClosedLoop(false));
-		openLoopDrive.whenReleased(new EnableClosedLoop(true));
+		openLoopDrive.whenPressed(new ApplyOpenLoopSwitch(false));
+		openLoopDrive.whenReleased(new ApplyOpenLoopSwitch(true));
 		straightAssist.whileHeld(new DriveWithJoystickOnHeading());
 		joysticksForward.whenPressed(new ReverseJoysticks(false));
 		joysticksBackward.whenPressed(new ReverseJoysticks(true));

@@ -12,6 +12,7 @@ import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
+import org.usfirst.frc.team6328.robot.commands.MotionProfileTest;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
@@ -84,6 +85,7 @@ public class Robot extends IterativeRobot {
             chooser.addObject("Drive square 5 feet length backwards", new DriveSquare(-60, true));
             chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
             chooser.addObject("Drive 20 feet with gyro correction", new DriveDistanceOnHeading(240));
+            chooser.addObject("Motion Profile Test", new MotionProfileTest());
         } else {
         	chooser.addDefault("Do Nothing", null);
         	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110));
@@ -111,6 +113,7 @@ public class Robot extends IterativeRobot {
         	SmartDashboard.putNumber("Right Distance", driveSubsystem.getDistanceRight());
         	SmartDashboard.putNumber("Left Distance", driveSubsystem.getDistanceLeft());
     	}
+    	driveSubsystem.stopMotionProfile();
     }
 	
 	public void disabledPeriodic() {
