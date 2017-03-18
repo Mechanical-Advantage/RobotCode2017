@@ -25,8 +25,8 @@ public class MotionProfileTest extends Command {
     protected void initialize() {
     	Waypoint[] points = new Waypoint[] {
         		new Waypoint(0, 0, 0),
-        		new Waypoint(60, -24, Pathfinder.d2r(-45)),
-        		new Waypoint(72, -36, Pathfinder.d2r(-45)),
+        		new Waypoint(91.52, -57.26, Pathfinder.d2r(-60)),
+        		new Waypoint(100.02, -71.98, Pathfinder.d2r(-60)),
         };
         
         Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, 124.4, 62.2, 1866);

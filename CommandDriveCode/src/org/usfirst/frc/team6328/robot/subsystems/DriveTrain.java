@@ -348,12 +348,12 @@ public class DriveTrain extends Subsystem {
     	
     	TankModifier modifier = new TankModifier(trajectory);
     	modifier.modify(wheelBaseWidth);
-    	TrajectoryPoint[] leftTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
-    	TrajectoryPoint[] rightTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false);
+    	TrajectoryPoint[] leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
+    	TrajectoryPoint[] rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
     	File leftFile = new File("/tmp/traj-left.csv");
     	File rightFile = new File("/tmp/traj-right.csv");
-    	Pathfinder.writeToCSV(leftFile, modifier.getLeftTrajectory());
-    	Pathfinder.writeToCSV(rightFile, modifier.getRightTrajectory());
+    	Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
+    	Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
     	motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
     	//processTalonMotionProfile.reset();
     	processTalonMotionProfile = new ProcessTalonMotionProfileBuffer(); // could be changed back to resetting one Runnable
