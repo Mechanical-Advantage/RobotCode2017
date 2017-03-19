@@ -5,11 +5,13 @@ import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
+import org.usfirst.frc.team6328.robot.commands.CancelCommand;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
-import org.usfirst.frc.team6328.robot.commands.CloseGearHandler;
+import org.usfirst.frc.team6328.robot.commands.CloseTopGear;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
+import org.usfirst.frc.team6328.robot.commands.ExpelGear;
 import org.usfirst.frc.team6328.robot.commands.ApplyOpenLoopSwitch;
-import org.usfirst.frc.team6328.robot.commands.OpenGearHandler;
+import org.usfirst.frc.team6328.robot.commands.OpenTopGear;
 import org.usfirst.frc.team6328.robot.commands.ReverseJoysticks;
 import org.usfirst.frc.team6328.robot.commands.RunIntake;
 import org.usfirst.frc.team6328.robot.commands.RunIntakeShoot;
@@ -17,7 +19,6 @@ import org.usfirst.frc.team6328.robot.commands.RunLoader;
 import org.usfirst.frc.team6328.robot.commands.RunShooterPID;
 import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
-import org.usfirst.frc.team6328.robot.commands.ShakeGearHandler;
 import org.usfirst.frc.team6328.robot.commands.ShakeLoader;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 
@@ -78,9 +79,9 @@ public class OI {
 	private Button intakeOn = new JoystickButton(oiController2, 2);
 	private Button intakeOff = new JoystickButton(oiController2, 3);
 	private Button shoot = new JoystickButton(oiController2, 1);
-	private Button gearOpen = new JoystickButton(oiController2, 5);
-	private Button gearClose = new JoystickButton(oiController2, 6);
-	private Button gearShake = new JoystickButton(oiController2, 4);
+	private Button topGearOpen = new JoystickButton(oiController2, 5);
+	private Button topGearClose = new JoystickButton(oiController2, 6);
+	private Button expelGear = new JoystickButton(oiController2, 4);
 	private Button shooterDisableSwitch = new JoystickButton(oiController1, 7);
 	private Button driveDisableSwitch = new JoystickButton(oiController1, 9);
 	private Button openLoopShooter = new JoystickButton(oiController1, 8);
@@ -104,10 +105,21 @@ public class OI {
 	RunShooterPID runShooter = new RunShooterPID();
 	
 	public OI() {
-		right90Button.whenPressed(new TurnToAngle(90));
-		left90Button.whenPressed(new TurnToAngle(-90));
-		right45Button.whenPressed(new TurnToAngle(45));
-		left45Button.whenPressed(new TurnToAngle(-45));
+		// turn only while the button is held
+		// note: can't just use whileHeld because that will repeatedly run the command
+		TurnToAngle right90 = new TurnToAngle(90);
+		TurnToAngle left90 = new TurnToAngle(-90);
+		TurnToAngle right45 = new TurnToAngle(45);
+		TurnToAngle left45 = new TurnToAngle(-45);
+		right90Button.whenPressed(right90);
+		right90Button.whenReleased(new CancelCommand(right90));
+		left90Button.whenPressed(left90);
+		left90Button.whenReleased(new CancelCommand(left90));
+		right45Button.whenPressed(right45);
+		right45Button.whenReleased(new CancelCommand(right45));
+		left45Button.whenPressed(left45);
+		left45Button.whenReleased(new CancelCommand(left45));
+		
 		frontCameraButton.whenPressed(new SetCamera(true));
 		rearCameraButton.whenPressed(new SetCamera(false));
 		
@@ -136,9 +148,9 @@ public class OI {
 		ejectBalls.whileHeld(new RunIntake(true));
 		ejectBalls.whileHeld(new RunLoader(true));
 		ejectBalls.whileHeld(new RunTrigger(true));
-		gearOpen.whenPressed(new OpenGearHandler());
-		gearClose.whenPressed(new CloseGearHandler());
-		gearShake.whileHeld(new ShakeGearHandler());
+		topGearOpen.whenPressed(new OpenTopGear());
+		topGearClose.whenPressed(new CloseTopGear());
+		expelGear.whileHeld(new ExpelGear());
 		
 		// trying to enable practice robot will not work
 		if (!RobotMap.practiceRobot) {

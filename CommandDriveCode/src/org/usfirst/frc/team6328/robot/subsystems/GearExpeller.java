@@ -6,18 +6,18 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * Operates gear system
+ * Operates lower gear system that places the gear
  */
-public class GearHandler extends Subsystem {
+public class GearExpeller extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 	
 	DoubleSolenoid solenoid;
 	
-	public GearHandler() {
+	public GearExpeller() {
 		if (!RobotMap.practiceRobot) {
-			solenoid = new DoubleSolenoid(RobotMap.gearSolenoid1, RobotMap.gearSolenoid2);
+			solenoid = new DoubleSolenoid(RobotMap.gearExpellerSolenoid1, RobotMap.gearExpellerSolenoid2);
 		}
 	}
 
@@ -26,7 +26,7 @@ public class GearHandler extends Subsystem {
         //setDefaultCommand(new MySpecialCommand());
     }
     
-    public void open() {
+    public void eject() {
     	solenoid.set(DoubleSolenoid.Value.kForward);
     }
     

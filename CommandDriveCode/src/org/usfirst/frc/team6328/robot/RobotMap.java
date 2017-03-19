@@ -37,8 +37,10 @@ public class RobotMap {
 	public static int climber;
 	public static int shooterMaster;
 	public static int shooterSlave;
-	public static int gearSolenoid1;
-	public static int gearSolenoid2;
+	public static int topGearSolenoid1;
+	public static int topGearSolenoid2;
+	public static int gearExpellerSolenoid1;
+	public static int gearExpellerSolenoid2;
 	public static int minVelocity; // lower values will be treated as this value
 	public static int maxVelocity; // maximum velocity when sticks are fully forward (value of 1)
 	public static final boolean practiceRobot = false;
@@ -65,8 +67,10 @@ public class RobotMap {
 			climber = 2;
 			shooterMaster = 10;
 			shooterSlave = 11;
-			gearSolenoid1 = 0;
-			gearSolenoid2 = 1;
+			topGearSolenoid1 = 0;
+			topGearSolenoid2 = 1;
+			gearExpellerSolenoid1 = 2;
+			gearExpellerSolenoid2 = 3;
 			maxVelocity = 525;
 			minVelocity = 20;
 		}

@@ -5,41 +5,24 @@ import org.usfirst.frc.team6328.robot.Robot;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
- * Vibrate the gear handler to unstick gears
+ * Ejects the gear onto the airship peg
  */
-public class ShakeGearHandler extends Command {
-	
-	private final int cyclesPerSwitch = 25;
-	
-	private int cycleCounter;
-	private boolean toggleTracker;
+public class ExpelGear extends Command {
 
-    public ShakeGearHandler() {
-    	super("ShakeGearHandler");
+    public ExpelGear() {
+    	super("ExpelGear");
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(Robot.gearHandlerSubsystem);
+    	requires(Robot.expelGearSubsystem);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	cycleCounter = cyclesPerSwitch; // cause it to run immediately
+    	Robot.expelGearSubsystem.eject();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	cycleCounter+=1;
-    	if (cycleCounter>=cyclesPerSwitch) {
-    		if (toggleTracker) {
-    			Robot.gearHandlerSubsystem.open();
-    			toggleTracker = false;
-    		} else {
-    			Robot.gearHandlerSubsystem.close();
-    			toggleTracker = true;
-    		}
-    		cycleCounter = 0;
-    	}
-    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -54,6 +37,6 @@ public class ShakeGearHandler extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	Robot.gearHandlerSubsystem.open();
+    	Robot.expelGearSubsystem.close();
     }
 }

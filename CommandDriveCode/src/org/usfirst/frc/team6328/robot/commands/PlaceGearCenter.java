@@ -28,7 +28,7 @@ public class PlaceGearCenter extends CommandGroup {
         // a CommandGroup containing them would require both the chassis and the
         // arm.
     	addSequential(new DriveDistanceOnHeading(71.5));
-    	addSequential(new OpenGearHandler());
+    	addSequential(new OpenTopGear());
     	addSequential(new DriveDistanceOnHeading(5)); // slowly drive the rest of the way
     	addSequential(new Delay(2)); // wait for human player to lift if possible
     	addSequential(new SpinCenterOffsetForTime(shakeSpeed, offset, 0.1));

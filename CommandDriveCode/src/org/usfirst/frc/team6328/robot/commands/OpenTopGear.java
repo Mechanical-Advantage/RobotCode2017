@@ -5,20 +5,20 @@ import org.usfirst.frc.team6328.robot.Robot;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
 /**
- * Opens the gear handler
+ * Opens the top gear handler
  */
-public class OpenGearHandler extends InstantCommand {
+public class OpenTopGear extends InstantCommand {
 
-    public OpenGearHandler() {
-        super("OpenGearHandler");
+    public OpenTopGear() {
+        super("OpenTopGear");
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-        requires(Robot.gearHandlerSubsystem);
+        requires(Robot.topGearSubsystem);
     }
 
     // Called once when the command executes
     protected void initialize() {
-    	Robot.gearHandlerSubsystem.open();
+    	Robot.topGearSubsystem.open();
     }
 
 }

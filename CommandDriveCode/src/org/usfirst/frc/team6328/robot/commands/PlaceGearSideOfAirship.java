@@ -34,7 +34,7 @@ public class PlaceGearSideOfAirship extends CommandGroup {
     	}
     	addSequential(new DriveDistanceOnHeading(66.98)); // drive forward away from wall
     	addSequential(new TurnAndDriveDistance(66.8, turnAmount)); // turn and drive into airship, define distance
-    	addSequential(new OpenGearHandler());
+    	addSequential(new OpenTopGear());
     	addSequential(new DriveDistanceOnHeading(5, turnAmount)); // slow drive coming in, align to heading
     	addSequential(new Delay(0.5)); // wait for human player to lift if possible
     	addSequential(new SpinCenterOffsetForTime(shakeSpeed, offset, 0.1));
