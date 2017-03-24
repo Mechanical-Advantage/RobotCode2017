@@ -4,13 +4,10 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
  * Places the gear when to the left on right of airship on left or right pegs
- * Needs starting location, distances, angles defined
  */
 public class PlaceGearSideOfAirship extends CommandGroup {
 	
 	private double turnAmount = 60; // define for right side, flipped for left side
-	private double shakeSpeed = -0.1; // used when shaking back and forth
-	private double offset = 0.1; // added to speed on both sides
 
     public PlaceGearSideOfAirship(boolean rightSide) {
         // Add Commands here:
@@ -33,14 +30,12 @@ public class PlaceGearSideOfAirship extends CommandGroup {
     		turnAmount*=-1;
     	}
     	addSequential(new DriveDistanceOnHeading(66.98)); // drive forward away from wall
-    	addSequential(new TurnAndDriveDistance(66.8, turnAmount)); // turn and drive into airship, define distance
-    	addSequential(new OpenTopGear());
-    	addSequential(new DriveDistanceOnHeading(5, turnAmount)); // slow drive coming in, align to heading
-    	addSequential(new Delay(0.5)); // wait for human player to lift if possible
-    	addSequential(new SpinCenterOffsetForTime(shakeSpeed, offset, 0.1));
-    	addSequential(new Delay(1)); // if previous shake fixed, allow lifting
-    	addSequential(new SpinCenterOffsetForTime(shakeSpeed*-1, offset, 0.2)); // turn the other way
-    	addSequential(new Delay(1)); // time to possibly lift
-    	addSequential(new SpinCenterOffsetForTime(shakeSpeed, offset, 0.1)); // re-center
+    	addSequential(new TurnAndDriveDistance(70.8, turnAmount)); // turn and drive into airship
+//    	addSequential(new DriveUntilGearSpring(turnAmount)); // slowly drive into the spring
+    	addSequential(new WiggleUntilGearSpring());
+    	addSequential(new Delay(0.5)); // allow the robot to stop moving
+    	addParallel(new ExpelGear()); // place gear
+    	addSequential(new Delay(1)); // allow the gear to leave before backing up
+    	addSequential(new DriveForTime(-0.25, 1)); // back up to allow the gear to be lifted
     }
 }

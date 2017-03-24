@@ -155,6 +155,9 @@ public class Robot extends IterativeRobot {
      */
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
+        if (!RobotMap.practiceRobot) {
+        	SmartDashboard.putBoolean("Gear Spring Sensor", expelGearSubsystem.getSpringSensor());
+        }
     }
 
     public void teleopInit() {
@@ -170,6 +173,12 @@ public class Robot extends IterativeRobot {
         ahrs.reset();
         driveSubsystem.resetPosition();
         oi.initShooter();
+        if (!RobotMap.practiceRobot) {
+        	if (expelGearSubsystem.getCurrentCommand() != null) {
+        		expelGearSubsystem.getCurrentCommand().cancel(); // make sure the system is closed and ExpelGear is not running
+        	}
+        	expelGearSubsystem.close();
+        }
     }
 
     /**
@@ -177,6 +186,9 @@ public class Robot extends IterativeRobot {
      */
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
+        if (!RobotMap.practiceRobot) {
+        	SmartDashboard.putBoolean("Gear Spring Sensor", expelGearSubsystem.getSpringSensor());
+        }
         //System.out.println("Count: " + shooterSubsystem.getCount() + " Period: " + shooterSubsystem.getPeriod() + " Speed: " + shooterSubsystem.getSpeed());
         //System.out.println(driveSubsystem.getCurrent());
         //System.out.println(oi.getSniperLevel());

@@ -47,7 +47,7 @@ public class Shooter extends Subsystem implements PIDSource {
 			shooterSlave.setCurrentLimit(currentLimit);
 			shooterSlave.enableBrakeMode(brakeMode);
 			
-			sensorCounter = new Counter(9);
+			sensorCounter = new Counter(RobotMap.shooterSensor);
 			sensorCounter.setSemiPeriodMode(false);
 			sensorCounter.setSamplesToAverage(2);
 			sensorCounter.setDistancePerPulse(1.0);

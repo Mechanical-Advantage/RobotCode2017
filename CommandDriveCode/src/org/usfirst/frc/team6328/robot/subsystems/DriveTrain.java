@@ -82,8 +82,8 @@ public class DriveTrain extends Subsystem {
 	private boolean reverseSensorLeft;
 	private boolean reverseSensorRight;
 	private boolean motionProfilingActive = false; // true when motion profile mode is loaded, even if not running
-	private ProcessTalonMotionProfileBuffer processTalonMotionProfile/* = new ProcessTalonMotionProfileBuffer()*/;
-	private Notifier processMotionProfileNotifier/* = new Notifier(processTalonMotionProfile)*/;
+	private ProcessTalonMotionProfileBuffer processTalonMotionProfile = new ProcessTalonMotionProfileBuffer();
+	private Notifier processMotionProfileNotifier = new Notifier(processTalonMotionProfile);
 	private double motionProfileNotifierUpdateTime;
 	
 	public DriveTrain() {
@@ -95,7 +95,7 @@ public class DriveTrain extends Subsystem {
 			encoderType = FeedbackDevice.QuadEncoder;
 			ticksPerRotation = 1440;
 			wheelDiameter = 6;
-			wheelBaseWidth = 27.75;
+			wheelBaseWidth = 27.875; // 27.75
 			reverseSensorRight = true;
 			reverseSensorLeft = false;
 			rightTalonMaster.configEncoderCodesPerRev(ticksPerRotation/4); // For quad encoders, talon codes are 4 ticks
@@ -119,12 +119,12 @@ public class DriveTrain extends Subsystem {
 			leftTalonMaster.reverseOutput(false);
 		}
 		rightTalonMaster.setFeedbackDevice(encoderType);
-		rightTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
+//		rightTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f); // currently set in useClosedLoop so that motion profiling can change this
 		rightTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
 		rightTalonMaster.EnableCurrentLimit(enableCurrentLimit);
 		rightTalonMaster.setCurrentLimit(currentLimit);
 		leftTalonMaster.setFeedbackDevice(encoderType);
-		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
+//		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
 		leftTalonMaster.EnableCurrentLimit(enableCurrentLimit);
 		leftTalonMaster.setCurrentLimit(currentLimit);
@@ -186,7 +186,9 @@ public class DriveTrain extends Subsystem {
 				setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice, kIZonePractice);
 			} else {
 				setupVelocityClosedLoop(kPCompetition, kICompetition, kDCompetition, kFCompetition, kIZoneCompetition);
-			}	
+			}
+			rightTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f); // this is changed in motion profiling mode, and ignored by talon in open loop
+			leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		}
 	}
 	
@@ -345,6 +347,9 @@ public class DriveTrain extends Subsystem {
     	leftTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
     	rightTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
     	leftTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
+    	rightTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
+    	leftTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
+    	System.out.println(rightTalonMaster.GetNominalClosedLoopVoltage());
     	
     	TankModifier modifier = new TankModifier(trajectory);
     	modifier.modify(wheelBaseWidth);
@@ -355,9 +360,8 @@ public class DriveTrain extends Subsystem {
     	Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
     	Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
     	motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
-    	//processTalonMotionProfile.reset();
-    	processTalonMotionProfile = new ProcessTalonMotionProfileBuffer(); // could be changed back to resetting one Runnable
-    	processMotionProfileNotifier = new Notifier(processTalonMotionProfile);
+    	processMotionProfileNotifier.stop();
+    	processTalonMotionProfile.reset();
     	rightTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
     	leftTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
     	rightTalonMaster.clearMotionProfileTrajectories();
@@ -401,7 +405,10 @@ public class DriveTrain extends Subsystem {
     	if (motionProfilingActive) {
     		rightTalonMaster.getMotionProfileStatus(rightStatus);
     		leftTalonMaster.getMotionProfileStatus(leftStatus);
-    		return leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint;
+    		System.out.println("isMotionProfileComplete " + (leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
+    				&& processTalonMotionProfile.isProfileStarted()));
+    		return leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
+    				&& processTalonMotionProfile.isProfileStarted();
     	}
     	return false; // if motion profiling not active
     }
@@ -436,8 +443,7 @@ public class DriveTrain extends Subsystem {
     	private CANTalon.MotionProfileStatus leftStatus = new CANTalon.MotionProfileStatus();
     	private CANTalon.MotionProfileStatus rightStatus = new CANTalon.MotionProfileStatus();
     	
-    	@SuppressWarnings("unused")
-		public void reset() { // right now a new thread is created each time so this is not used
+    	public void reset() {
     		System.out.println("Thread reset, previous clearCompleted: " + clearCompleted);
     		profileStarted = false;
     		clearCompleted = false;
@@ -471,6 +477,10 @@ public class DriveTrain extends Subsystem {
     			}
     		}
     	}
+
+		public boolean isProfileStarted() {
+			return profileStarted;
+		}
     }
 }
 
