@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RunShooter extends Command {
 	
-	private final int targetSpeed = 83; // 83 is 5000 rpm
+	private final int targetSpeed = 85; // 83 is 5000 rpm
 	private final int maxSpeed = 200; // higher numbers are treated as noise and will be ignored
 
     public RunShooter() {
