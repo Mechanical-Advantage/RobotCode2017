@@ -10,6 +10,7 @@ import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseTopGear;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
 import org.usfirst.frc.team6328.robot.commands.ExpelGear;
+import org.usfirst.frc.team6328.robot.commands.ExpelGearOnSensor;
 import org.usfirst.frc.team6328.robot.commands.ApplyOpenLoopSwitch;
 import org.usfirst.frc.team6328.robot.commands.OpenTopGear;
 import org.usfirst.frc.team6328.robot.commands.ReverseJoysticks;
@@ -85,7 +86,8 @@ public class OI {
 	private Button expelGear = new JoystickButton(oiController2, 4);
 	private Button shooterDisableSwitch = new JoystickButton(oiController1, 7);
 	private Button driveDisableSwitch = new JoystickButton(oiController1, 9);
-	private Button openLoopShooter = new JoystickButton(oiController1, 8);
+//	private Button openLoopShooter = new JoystickButton(oiController1, 8);
+	private Button smartGearExpel = new JoystickButton(oiController1, 8);
 	private Button autoClimb = new JoystickButton(oiController2, 7);
 	private Button climberHold = new JoystickButton(oiController2, 8);
 	private Button openLoopDrive = new JoystickButton(oiController1, 10);
@@ -151,7 +153,7 @@ public class OI {
 		ejectBalls.whileHeld(new RunTrigger(true));
 		topGearOpen.whenPressed(new OpenTopGear());
 		topGearClose.whenPressed(new CloseTopGear());
-		expelGear.whileHeld(new ExpelGear());
+		expelGear.whileHeld(new ExpelGearOnSensor());
 		
 		// trying to enable practice robot will not work
 		if (!RobotMap.practiceRobot) {
@@ -218,7 +220,8 @@ public class OI {
 	}
 	
 	public boolean getOpenLoopShooter() {
-		return openLoopShooter.get();
+//		return openLoopShooter.get(); // TODO still used in commands
+		return false;
 	}
 	
 	public boolean getSniperMode() {
@@ -236,6 +239,10 @@ public class OI {
 	
 	public void reverseJoysticks(boolean reverse) {
 		joysticksReversed = reverse;
+	}
+	
+	public boolean getSmartGearExpel() {
+		return !smartGearExpel.get();
 	}
 	
 	@SuppressWarnings("unused")

@@ -4,6 +4,7 @@ import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Drives with the joystick from OI
@@ -21,6 +22,7 @@ public class DriveWithJoystick extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	SmartDashboard.putBoolean("Driver Control", true);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -49,5 +51,6 @@ public class DriveWithJoystick extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	SmartDashboard.putBoolean("Driver Control", false);
     }
 }

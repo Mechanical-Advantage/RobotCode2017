@@ -6,6 +6,7 @@ import org.usfirst.frc.team6328.robot.RobotMap;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Drives straight using the current single drive velocity from OI and gyro correction
@@ -43,6 +44,7 @@ public class DriveWithJoystickOnHeading extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	SmartDashboard.putBoolean("Driver Control", true);
     	if (useStartingYaw) {
     		targetAngle = Robot.ahrs.getYaw();
     	}
@@ -79,6 +81,7 @@ public class DriveWithJoystickOnHeading extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	SmartDashboard.putBoolean("Driver Control", false);
     	turnController.disable();
     }
     
