@@ -1,15 +1,19 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.RobotMap;
+
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
  * Drives to the boiler and shoots preloaded balls, start backwards
- * Needs distances, angles defined
  */
 public class DriveToBoilerShootBallsCrossLine extends CommandGroup {
 	
 	public double turnAmount = -45; // define for red alliance, remember robot starts backwards
 	private final double shootTime = 4; // in seconds
+	
+	private Command runShooter;
 
     public DriveToBoilerShootBallsCrossLine(boolean blueAlliance) {
         // Add Commands here:
@@ -28,10 +32,23 @@ public class DriveToBoilerShootBallsCrossLine extends CommandGroup {
         // e.g. if Command1 requires chassis, and Command2 requires arm,
         // a CommandGroup containing them would require both the chassis and the
         // arm.
+    	switch (RobotMap.shooterControlType) {
+		case PID:
+			runShooter = new RunShooterPID();
+			break;
+		case SIMPLE_BANG_BANG:
+			runShooter = new RunShooterSimpleBangBang();
+			break;
+		case FAST_BANG_BANG:
+		default:
+			runShooter = new RunShooterFastBangBang();
+			break;
+		}
+    	
     	if (blueAlliance) {
     		turnAmount*=-1;
     	}
-    	addParallel(new RunShooter());
+    	addParallel(runShooter);
     	addSequential(new DriveDistanceOnHeading(-26)); // drive away from wall
     	//addSequential(new TurnAndDriveDistance(-1, turnAmount));
     	addSequential(new TurnToAngle(turnAmount)); // face boiler

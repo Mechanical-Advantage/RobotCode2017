@@ -172,7 +172,7 @@ public class Robot extends IterativeRobot {
         
         ahrs.reset();
         driveSubsystem.resetPosition();
-        oi.initShooter();
+        oi.initSwitches();
         if (!RobotMap.practiceRobot) {
         	if (expelGearSubsystem.getCurrentCommand() != null) {
         		expelGearSubsystem.getCurrentCommand().cancel(); // make sure the system is closed and ExpelGear is not running

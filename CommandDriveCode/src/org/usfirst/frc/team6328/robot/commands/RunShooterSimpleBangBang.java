@@ -7,17 +7,16 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Runs the shooter wheel
+ * Runs the shooter wheel using bang-bang control in the execute function
  */
-public class RunShooter extends Command {
-	
+public class RunShooterSimpleBangBang extends Command {
+		
 	private final int targetSpeed = 85; // 83 is 5000 rpm
-	private final int maxSpeed = 200; // higher numbers are treated as noise and will be ignored
 
-    public RunShooter() {
+    public RunShooterSimpleBangBang() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	super("RunShooter");
+    	super("RunShooterSimpleBangBang");
     	requires(Robot.shooterSubsystem);
     }
 
@@ -28,8 +27,10 @@ public class RunShooter extends Command {
     // Called repeatedly when this Command is scheduled to run
 	protected void execute() {
     	double speed = Robot.shooterSubsystem.getSpeed();
-    	if (speed < maxSpeed && !Robot.oi.getOpenLoopShooter()) {
-    		if (speed>targetSpeed) {
+    	// if in tuning mode, get target from dashboard if it exists
+    	int finalTargetSpeed = RobotMap.tuningMode ? (int)SmartDashboard.getNumber("Shooter Target RPS", targetSpeed) : targetSpeed;
+    	if (!Robot.oi.getOpenLoopShooter()) {
+    		if (speed>finalTargetSpeed) {
     			Robot.shooterSubsystem.stop();
     		} else {
     			Robot.shooterSubsystem.run();
@@ -39,7 +40,7 @@ public class RunShooter extends Command {
     		}
     	} else if (Robot.oi.getOpenLoopShooter()) {
     		Robot.shooterSubsystem.runOpenLoop();
-    		if (RobotMap.tuningMode && speed < maxSpeed) {
+    		if (RobotMap.tuningMode) {
     			SmartDashboard.putNumber("Shooter Speed", speed);
     		}
     	}

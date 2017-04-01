@@ -454,6 +454,7 @@ public class DriveTrain extends Subsystem {
     		leftTalonMaster.set(CANTalon.SetValueMotionProfile.Enable.value);
     	}
 
+    	@Override
     	public void run() {
     		rightTalonMaster.getMotionProfileStatus(rightStatus);
     		leftTalonMaster.getMotionProfileStatus(leftStatus);

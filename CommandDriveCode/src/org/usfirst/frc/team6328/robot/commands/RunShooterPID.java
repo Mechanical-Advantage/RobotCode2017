@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RunShooterPID extends Command implements PIDOutput {
 	
-	private double kP = 0.001;
-	private double kI = 0;
-	private double kD = 0;
-	private double kF = 0;
-	private double updatePeriod = 0.05;
-	private double targetSpeed = 83;
+	private final double kP = 0.001;
+	private final double kI = 0;
+	private final double kD = 0;
+	private final double kF = 0;
+	private final double updatePeriod = 0.05;
+	private final double targetSpeed = 85;
 	
 	private double shooterPIDSpeed;
 	private PIDController shooterSpeedController;
@@ -40,7 +40,14 @@ public class RunShooterPID extends Command implements PIDOutput {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	shooterSpeedController.enable();
-    	Robot.shooterSubsystem.run(shooterPIDSpeed);
+    	if (RobotMap.tuningMode) {
+    		shooterSpeedController.setSetpoint(SmartDashboard.getNumber("Shooter Target RPS", targetSpeed));
+    	}
+    	if (Robot.oi.getOpenLoopShooter()) {
+    		Robot.shooterSubsystem.runOpenLoop();
+    	} else {
+    		Robot.shooterSubsystem.run(shooterPIDSpeed);
+    	}
     	if (RobotMap.tuningMode) {
     		SmartDashboard.putNumber("Shooter Speed", Robot.shooterSubsystem.getSpeed());
     	}

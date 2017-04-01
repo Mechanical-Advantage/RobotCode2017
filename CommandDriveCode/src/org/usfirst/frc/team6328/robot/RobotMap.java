@@ -48,6 +48,7 @@ public class RobotMap {
 	public static int maxVelocity; // maximum velocity when sticks are fully forward (value of 1)
 	public static final boolean practiceRobot = false;
 	public static final boolean tuningMode = false;
+	public static ShooterControlType shooterControlType;
 	public RobotMap(){
 		if (practiceRobot) {
 				rightMaster = 1;
@@ -79,14 +80,14 @@ public class RobotMap {
 			gearExpellerSensor2 = 8; // DIO
 			maxVelocity = 525;
 			minVelocity = 20;
+			shooterControlType = ShooterControlType.FAST_BANG_BANG;
 		}
 	}
-	
-	
-	//RobotType robot = RobotType.PRACTICE;
 
-	
-	
-	
+	public enum ShooterControlType {
+		SIMPLE_BANG_BANG, // bang-bang control in the 20ms execute period
+		FAST_BANG_BANG, // bang-bang in a separate thread with a definable speed
+		PID // PID wheel control in the 20ms execute period with adjustable PID thread speed
+	}
 }
 

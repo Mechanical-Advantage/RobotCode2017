@@ -3,13 +3,14 @@ package org.usfirst.frc.team6328.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
 import org.usfirst.frc.team6328.robot.commands.CancelCommand;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseTopGear;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
-import org.usfirst.frc.team6328.robot.commands.ExpelGear;
 import org.usfirst.frc.team6328.robot.commands.ExpelGearOnSensor;
 import org.usfirst.frc.team6328.robot.commands.ApplyOpenLoopSwitch;
 import org.usfirst.frc.team6328.robot.commands.OpenTopGear;
@@ -17,8 +18,9 @@ import org.usfirst.frc.team6328.robot.commands.ReverseJoysticks;
 import org.usfirst.frc.team6328.robot.commands.RunIntake;
 import org.usfirst.frc.team6328.robot.commands.RunIntakeShoot;
 import org.usfirst.frc.team6328.robot.commands.RunLoader;
-import org.usfirst.frc.team6328.robot.commands.RunShooter;
+import org.usfirst.frc.team6328.robot.commands.RunShooterFastBangBang;
 import org.usfirst.frc.team6328.robot.commands.RunShooterPID;
+import org.usfirst.frc.team6328.robot.commands.RunShooterSimpleBangBang;
 import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
 import org.usfirst.frc.team6328.robot.commands.ShakeLoader;
@@ -55,14 +57,6 @@ public class OI {
     // Start the command when the button is released  and let it run the command
     // until it is finished as determined by it's isFinished method.
     // button.whenReleased(new ExampleCommand());
-	
-	// for gamepad f310
-	/*private int controllerID = 0;
-	private static int rightAxis = 5; // 5 for Xinput, 3 for Directinput (X/D switch on controller)
-	private static int leftAxis = 1; // 1 for both Xinput and Directinput
-	private Joystick controller = new Joystick(controllerID);
-	private Button rightButton = new JoystickButton(controller, 1);
-	private Button leftButton = new JoystickButton(controller, 2);*/
 	
 	private boolean joysticksReversed = false;
 	
@@ -105,9 +99,24 @@ public class OI {
 	private Button triggerForward = new JoystickButton(oiController1, 5);
 	private Button triggerBackward = new JoystickButton(oiController1, 6);
 	
-	RunShooter runShooter = new RunShooter();
-	
+	Command runShooter;
+
 	public OI() {
+		if (!RobotMap.practiceRobot) {
+			switch (RobotMap.shooterControlType) {
+			case PID:
+				runShooter = new RunShooterPID();
+				break;
+			case SIMPLE_BANG_BANG:
+				runShooter = new RunShooterSimpleBangBang();
+				break;
+			case FAST_BANG_BANG:
+			default:
+				runShooter = new RunShooterFastBangBang();
+				break;
+			}
+		}
+		
 		// turn only while the button is held
 		// note: can't just use whileHeld because that will repeatedly run the command
 		TurnToAngle right90 = new TurnToAngle(90);
@@ -220,8 +229,10 @@ public class OI {
 	}
 	
 	public boolean getOpenLoopShooter() {
-//		return openLoopShooter.get(); // TODO still used in commands
-		return false;
+		// the switch for this was replaced with gear expel override, so use
+		// a switch on the dashboard
+//		return openLoopShooter.get();
+		return SmartDashboard.getBoolean("Open Loop Shooter", false);
 	}
 	
 	public boolean getSniperMode() {
@@ -246,9 +257,14 @@ public class OI {
 	}
 	
 	@SuppressWarnings("unused")
-	public void initShooter() {
+	public void initSwitches() {
 		if (!shooterDisableSwitch.get() && !RobotMap.practiceRobot) {
 			runShooter.start();
+		}
+		if (openLoopDrive.get()) {
+			Robot.driveSubsystem.useOpenLoop();
+		} else {
+			Robot.driveSubsystem.useClosedLoop();
 		}
 	}
 }

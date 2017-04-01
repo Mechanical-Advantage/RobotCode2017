@@ -1,0 +1,22 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="Shooter Speed" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="13" y="220"/>
+		<width>1140</width>
+		<height>448</height>
+	</widget>
+	<widget field="Shooter Throttle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="305" y="61"/>
+	</widget>
+	<widget field="Shooter Target RPS" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="289" y="34"/>
+	</widget>
+</dashboard>
+<live-window>
+</live-window>
+	<hidden field="Right Distance"/>
+	<hidden field="Left Distance"/>
+	<hidden field="Final Yaw"/>
+	<hidden field="Driver Control"/>
+	<hidden field="Auto mode"/>
+</xml>
