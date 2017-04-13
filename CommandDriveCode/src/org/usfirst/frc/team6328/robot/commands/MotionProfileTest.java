@@ -25,15 +25,15 @@ public class MotionProfileTest extends Command {
     protected void initialize() {
     	Waypoint[] points = new Waypoint[] {
         		new Waypoint(0, 0, 0),
-        		new Waypoint(91.52, -57.26, Pathfinder.d2r(-60)),
-        		new Waypoint(100.02, -71.98, Pathfinder.d2r(-60)),
+        		new Waypoint(91.52+4/*+1*/+2, -57.26+9+3, Pathfinder.d2r(-60)),
+//        		new Waypoint(100.02, -71.98, Pathfinder.d2r(-60)),
         };
     	/*Waypoint[] points = new Waypoint[] {
     			new Waypoint(0, 0, 0),
     			new Waypoint(24, 0, Pathfinder.d2r(5)),
     	};*/
         
-        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, 124.4, 62.2, 1866);
+        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*/100, /*62.2*/31.1, 1866);
 //    	Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, 60, 15, 1866);
         Trajectory trajectory = Pathfinder.generate(points, config);
         /*for (int i = 0; i < trajectory.length(); i++) {

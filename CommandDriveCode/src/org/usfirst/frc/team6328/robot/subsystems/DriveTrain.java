@@ -54,13 +54,22 @@ public class DriveTrain extends Subsystem {
 	private static final double kDPractice = 40;
 	private static final double kFPractice = 1.07;
 	private static final int kIZonePractice = 0;
+	private static final double kPPracticeMP = 2;
+	private static final double kIPracticeMP = 0;
+	private static final double kDPracticeMP = 40;
+	private static final double kFPracticeMP = 1.01;
+	private static final int kIZonePracticeMP = 0;
 	
 	private static final double kPCompetition = 0.6;
 	private static final double kICompetition = 0.0007;
 	private static final double kDCompetition = 6;
 	private static final double kFCompetition = 0.2842;
-	//private static final int kIZoneCompetition = 0; // disable i zone for now since it is not tested
 	private static final int kIZoneCompetition = 4096*50/600; // 4096: encoder ticks per rotation; 25: rpm, set this; 600: converting minute to 100ms
+	private static final double kPCompetitionMP = 0.6;
+	private static final double kICompetitionMP = 0.0007;
+	private static final double kDCompetitionMP = 6;
+	private static final double kFCompetitionMP = 0.2842;
+	private static final int kIZoneCompetitionMP = 4096*50/600;
 	
 	private static final double safetyExpiration = 2;
 	private static final double sniperMode = 0.25; // multiplied by velocity in sniper mode
@@ -104,6 +113,7 @@ public class DriveTrain extends Subsystem {
 			rightTalonMaster.reverseOutput(true);
 			leftTalonMaster.reverseSensor(reverseSensorLeft);
 			leftTalonMaster.reverseOutput(false);
+			setupMotionProfilePID(kPPracticeMP, kIPracticeMP, kDPracticeMP, kFPracticeMP, kIZonePracticeMP);
 		} else {
 			rightTalonSlave2 = new CANTalon(RobotMap.rightSlave2);
 			leftTalonSlave2 = new CANTalon(RobotMap.leftSlave2);
@@ -112,11 +122,12 @@ public class DriveTrain extends Subsystem {
 			wheelDiameter = 4.1791666667;
 			reverseSensorRight = false;
 			reverseSensorLeft = true;
-			wheelBaseWidth = 0; // TODO set this
+			wheelBaseWidth = 18;
 			rightTalonMaster.reverseSensor(reverseSensorRight);
 			rightTalonMaster.reverseOutput(true);
 			leftTalonMaster.reverseSensor(reverseSensorLeft);
 			leftTalonMaster.reverseOutput(false);
+			setupMotionProfilePID(kPCompetitionMP, kICompetitionMP, kDCompetitionMP, kFCompetitionMP, kIZoneCompetitionMP);
 		}
 		rightTalonMaster.setFeedbackDevice(encoderType);
 //		rightTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f); // currently set in useClosedLoop so that motion profiling can change this
@@ -158,16 +169,37 @@ public class DriveTrain extends Subsystem {
 		leftTalonSlave.setSafetyEnabled(false);*/
 	}
 	
-	private void setupVelocityClosedLoop(double p, double i, double d, double f, int iZone) {
-		rightTalonMaster.changeControlMode(TalonControlMode.Speed);
-		leftTalonMaster.changeControlMode(TalonControlMode.Speed);
-		//rightTalonMaster.setProfile(0);
+	private void setupMotionProfilePID(double p, double i, double d, double f, int iZone) {
+		// motion profiling PID is stored in slot 1, main PID is slot 0
+		rightTalonMaster.setProfile(1);
+		leftTalonMaster.setProfile(1);
+//		rightTalonMaster.setPID(p, i, d, f, iZone, 0, 1);
+//		leftTalonMaster.setPID(p, i, d, f, iZone, 0, 1);
 		rightTalonMaster.setF(f);
 		rightTalonMaster.setP(p);
 		rightTalonMaster.setI(i);
 		rightTalonMaster.setD(d);
 		rightTalonMaster.setIZone(iZone);
-		//leftTalonMaster.setProfile(0);
+		leftTalonMaster.setF(f);
+		leftTalonMaster.setP(p);
+		leftTalonMaster.setI(i);
+		leftTalonMaster.setD(d);
+		leftTalonMaster.setIZone(iZone);
+		// make sure profile gets set back, it does not select it and just uses it
+		rightTalonMaster.setProfile(0);
+		leftTalonMaster.setProfile(0);
+	}
+	
+	private void setupVelocityClosedLoop(double p, double i, double d, double f, int iZone) {
+		rightTalonMaster.changeControlMode(TalonControlMode.Speed);
+		leftTalonMaster.changeControlMode(TalonControlMode.Speed);
+		rightTalonMaster.setProfile(0);
+		rightTalonMaster.setF(f);
+		rightTalonMaster.setP(p);
+		rightTalonMaster.setI(i);
+		rightTalonMaster.setD(d);
+		rightTalonMaster.setIZone(iZone);
+		leftTalonMaster.setProfile(0);
 		leftTalonMaster.setF(f);
 		leftTalonMaster.setP(p);
 		leftTalonMaster.setI(i);
@@ -342,6 +374,13 @@ public class DriveTrain extends Subsystem {
      * @param trajectory
      */
     public void loadMotionProfile(Trajectory trajectory) {
+    	loadMotionProfile(trajectory, false);
+    }
+    /**
+     * Loads the passed trajectory, and activates motion profiling mode
+     * @param trajectory
+     */
+    public void loadMotionProfile(Trajectory trajectory, boolean flipLeftRight) {
     	motionProfilingActive = true;
     	rightTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
     	leftTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
@@ -352,13 +391,22 @@ public class DriveTrain extends Subsystem {
     	System.out.println(rightTalonMaster.GetNominalClosedLoopVoltage());
     	
     	TankModifier modifier = new TankModifier(trajectory);
+    	TrajectoryPoint[] leftTrajectory;
+    	TrajectoryPoint[] rightTrajectory;
     	modifier.modify(wheelBaseWidth);
-    	TrajectoryPoint[] leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
-    	TrajectoryPoint[] rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
-    	File leftFile = new File("/tmp/traj-left.csv");
-    	File rightFile = new File("/tmp/traj-right.csv");
+    	if (flipLeftRight) {
+    		leftTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
+    		rightTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false);
+    	} else {
+    		leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
+    		rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
+    	}
+    	File leftFile = new File("/home/lvuser/lastMP/traj-left.csv");
+    	File rightFile = new File("/home/lvuser/lastMP/traj-right.csv");
     	Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
     	Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
+    	File csvFile = new File("/home/lvuser/lastMP/trajectory.csv");
+        Pathfinder.writeToCSV(csvFile, trajectory);
     	motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
     	processMotionProfileNotifier.stop();
     	processTalonMotionProfile.reset();
@@ -396,7 +444,7 @@ public class DriveTrain extends Subsystem {
     }
     
     /**
-     * Returns true if both sides have reacher their last trajectory point
+     * Returns true if both sides have reached their last trajectory point
      * @return
      */
     public boolean isMotionProfileComplete() {
@@ -405,8 +453,8 @@ public class DriveTrain extends Subsystem {
     	if (motionProfilingActive) {
     		rightTalonMaster.getMotionProfileStatus(rightStatus);
     		leftTalonMaster.getMotionProfileStatus(leftStatus);
-    		System.out.println("isMotionProfileComplete " + (leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
-    				&& processTalonMotionProfile.isProfileStarted()));
+//    		System.out.println("isMotionProfileComplete " + (leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
+//    				&& processTalonMotionProfile.isProfileStarted()));
     		return leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
     				&& processTalonMotionProfile.isProfileStarted();
     	}
@@ -421,7 +469,7 @@ public class DriveTrain extends Subsystem {
     		point.position = s.position/(wheelDiameter*Math.PI);
     		point.velocity = (s.velocity/(wheelDiameter*Math.PI)) * 60;
     		point.timeDurMs = (int) (s.dt * 1000.0);
-    		point.profileSlotSelect = 0;
+    		point.profileSlotSelect = 1;
     		point.velocityOnly = false;
     		point.zeroPos = i == 0;
     		point.isLastPoint = i == t.length() - 1;

@@ -46,9 +46,9 @@ public class Shooter extends Subsystem implements PIDSource {
 			shooterMaster.reverseOutput(false); // setting this to true does nothing, because this only works in closed loop
 			shooterMaster.enableBrakeMode(brakeMode);
 			if (RobotMap.shooterControlType == RobotMap.ShooterControlType.FAST_BANG_BANG) {
-				shooterMaster = new CANTalon(RobotMap.shooterSlave, controlFramePeriodFastBangBang);
+				shooterSlave = new CANTalon(RobotMap.shooterSlave, controlFramePeriodFastBangBang);
 			} else {
-				shooterMaster = new CANTalon(RobotMap.shooterSlave);
+				shooterSlave = new CANTalon(RobotMap.shooterSlave);
 			}
 			shooterSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
 			shooterSlave.set(RobotMap.shooterMaster);

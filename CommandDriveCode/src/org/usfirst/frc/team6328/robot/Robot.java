@@ -8,15 +8,20 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 //import edu.wpi.first.wpilibj.CameraServer;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
 import org.usfirst.frc.team6328.robot.commands.MotionProfileTest;
-import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter;
-import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship;
+import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter2;
+import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship2;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
+import org.usfirst.frc.team6328.robot.commands.GenerateMotionProfiles;
 import org.usfirst.frc.team6328.robot.subsystems.BallTrigger;
 import org.usfirst.frc.team6328.robot.subsystems.CameraSystem;
 import org.usfirst.frc.team6328.robot.subsystems.Climber;
@@ -51,13 +56,20 @@ public class Robot extends IterativeRobot {
 	public static final BallTrigger triggerSubsystem = new BallTrigger();
 	public static final Climber climberSubsystem = new Climber();
 	public static final Shooter shooterSubsystem = new Shooter();
-	
+		
 	public static OI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
 	public static final CameraSystem cameraSubsystem = new CameraSystem();
 
     Command autonomousCommand;
     SendableChooser<Command> chooser;
+    SendableChooser<String> secondStageSideChooser;
+    SendableChooser<String> secondStageCenterChooser;
+    SendableChooser<Boolean> leftRightChooser;
+    
+    public static boolean rightSideSelected;
+    public static String secondStageSide;
+    public static String secondStageCenter;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -66,8 +78,13 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
 		oi = new OI();
         chooser = new SendableChooser<Command>();
+        secondStageSideChooser = new SendableChooser<String>();
+        secondStageCenterChooser = new SendableChooser<String>();
+        leftRightChooser = new SendableChooser<Boolean>();
         //chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
+        leftRightChooser.addDefault("Left", false);
+        leftRightChooser.addObject("Right", true);
         if (RobotMap.tuningMode) {
         	chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
             chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
@@ -91,18 +108,56 @@ public class Robot extends IterativeRobot {
         } else {
         	chooser.addDefault("Do Nothing", null);
         	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110));
-        	chooser.addObject("Place gear centered behind airship", new PlaceGearCenter());
-        	chooser.addObject("Place gear left of airship", new PlaceGearSideOfAirship(false));
-        	chooser.addObject("Place gear right of airship", new PlaceGearSideOfAirship(true));
+        	// next 3 commented-out lines are for old auto, still work
+//        	chooser.addObject("Place gear centered behind airship", new PlaceGearCenter());
+//        	chooser.addObject("Place gear left of airship", new PlaceGearSideOfAirship(false));
+//        	chooser.addObject("Place gear right of airship", new PlaceGearSideOfAirship(true));
+        	chooser.addObject("Place gear centered behind airship", new PlaceGearCenter2());
+        	chooser.addObject("Place gear side of airship motion profile", new PlaceGearSideOfAirship2(true));
+        	chooser.addObject("Place gear side of airship no MP", new PlaceGearSideOfAirship2(false));
         	chooser.addObject("Shoot balls cross line red", new DriveToBoilerShootBallsCrossLine(false));
         	chooser.addObject("Shoot balls cross line blue", new DriveToBoilerShootBallsCrossLine(true));
         	//chooser.addObject("Shoot balls and place gear red", new DriveToBoilerShootBallsPlaceGear(false)); // not fully implemented
         	//chooser.addObject("Shoot balls and place gear blue", new DriveToBoilerShootBallsPlaceGear(true));
+        	secondStageSideChooser.addDefault("None", null);
+        	secondStageSideChooser.addObject("Cross field along edge", "sideCrossFieldEdge");
+        	secondStageSideChooser.addObject("Cross field through center", "sideCrossFieldCenter");
+        	secondStageSideChooser.addObject("Cross white line", "sideCrossWhiteLine");
+        	secondStageSideChooser.addObject("Cross white line non-MP edge", "sideCrossWhiteLine:edge");
+        	secondStageSideChooser.addObject("Cross white line non-MP center", "sideCrossWhiteLine:center");
+        	secondStageCenterChooser.addDefault("None", null);
+        	// these profiles are not correct with the starting at an angle
+//        	secondStageCenterChooser.addObject("Go around airship close cross field along edge", "aroundAirshipCloseEdge");
+//        	secondStageCenterChooser.addObject("Go around airship close cross field through center", "aroundAirshipCloseCenter");
+//        	secondStageCenterChooser.addObject("Go around airship far cross field along edge", "aroundAirshipFarEdge");
+//        	secondStageCenterChooser.addObject("Go around airship far cross field through center", "aroundAirshipFarCenter");
+        	secondStageCenterChooser.addObject("Cross white line", "centerCrossWhiteLine");
+        	secondStageCenterChooser.addObject("Cross white line run along edge", "centerCrossWhiteLine:edge");
+        	secondStageCenterChooser.addObject("Cross white line run through center", "centerCrossWhiteLine:center");
         }
         SmartDashboard.putData("Auto mode", chooser);
+        SmartDashboard.putData("Second Stage Side Gear", secondStageSideChooser);
+        SmartDashboard.putData("Second Stage Center Gear", secondStageCenterChooser);
+        SmartDashboard.putData("Left-Right", leftRightChooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
+        
+        // if the current waypoint version is old, re-generate profiles
+        BufferedReader waypointVersionReader;
+        int lastWaypointVersion = 0;
+		try {
+			waypointVersionReader = new BufferedReader(new FileReader("/home/lvuser/lastWaypointVersion"));
+			lastWaypointVersion = Integer.parseInt(waypointVersionReader.readLine());
+			waypointVersionReader.close();
+		} catch (NumberFormatException | IOException e) {
+			// do nothing
+		}
+		if (org.usfirst.frc.team6328.robot.commands.GenerateMotionProfiles.waypointVersion > lastWaypointVersion) {
+			GenerateMotionProfiles generateCommand = new GenerateMotionProfiles();
+			generateCommand.setRunWhenDisabled(true);
+			generateCommand.start();
+		}
     }
-	
+    
 	/**
      * This function is called once each time the robot enters Disabled mode.
      * You can use it to reset any subsystem information you want to clear when
@@ -132,6 +187,7 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
+    	ahrs.zeroYaw();
     	driveSubsystem.enableBrakeMode(true);
         autonomousCommand = (Command) chooser.getSelected();
         
@@ -147,6 +203,9 @@ public class Robot extends IterativeRobot {
 		} */
     	
     	// schedule the autonomous command (example)
+        rightSideSelected = leftRightChooser.getSelected();
+        secondStageSide = secondStageSideChooser.getSelected();
+        secondStageCenter = secondStageCenterChooser.getSelected();
         if (autonomousCommand != null) autonomousCommand.start();
     }
 
