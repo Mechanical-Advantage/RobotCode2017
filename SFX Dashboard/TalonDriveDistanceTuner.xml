@@ -1,0 +1,38 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="Distance PID/P" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="502" y="8"/>
+	</widget>
+	<widget field="Distance PID/I" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="505" y="32"/>
+	</widget>
+	<widget field="Distance PID/D" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="499" y="56"/>
+	</widget>
+	<widget field="Distance PID/F" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="502" y="81"/>
+	</widget>
+	<widget field="Right Distance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="559" y="202"/>
+		<width>598</width>
+		<height>470</height>
+	</widget>
+	<widget field="Left Distance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.LinePlot">
+		<location x="12" y="202"/>
+		<width>539</width>
+		<height>470</height>
+	</widget>
+	<widget field="Auto mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="-8" y="-6"/>
+		<property name="Use Radio Buttons" value="false"/>
+	</widget>
+</dashboard>
+<live-window>
+</live-window>
+	<hidden field="Left-Right"/>
+	<hidden field="Final Yaw"/>
+	<hidden field="Shooter Target RPS"/>
+	<hidden field="Shooter Throttle"/>
+	<hidden field="Driver Control"/>
+	<hidden field="Shooter Speed"/>
+</xml>

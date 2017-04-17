@@ -19,6 +19,7 @@ import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
 import org.usfirst.frc.team6328.robot.commands.MotionProfileTest;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter2;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship2;
+import org.usfirst.frc.team6328.robot.commands.TalonDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 import org.usfirst.frc.team6328.robot.commands.GenerateMotionProfiles;
@@ -105,6 +106,9 @@ public class Robot extends IterativeRobot {
             chooser.addObject("Drive backwards 5 feet with gyro correction", new DriveDistanceOnHeading(-60));
             chooser.addObject("Drive 20 feet with gyro correction", new DriveDistanceOnHeading(240));
             chooser.addObject("Motion Profile Test", new MotionProfileTest());
+            chooser.addObject("Talon distance 5 feet", new TalonDriveDistance(60));
+            chooser.addObject("Talon distance 2 feet", new TalonDriveDistance(24));
+            chooser.addObject("Talon distance 10 feet", new TalonDriveDistance(120));
         } else {
         	chooser.addDefault("Do Nothing", null);
         	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110));

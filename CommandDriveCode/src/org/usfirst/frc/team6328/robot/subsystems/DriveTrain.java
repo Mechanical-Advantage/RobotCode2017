@@ -54,11 +54,12 @@ public class DriveTrain extends Subsystem {
 	private static final double kDPractice = 40;
 	private static final double kFPractice = 1.07;
 	private static final int kIZonePractice = 0;
-	private static final double kPPracticeMP = 2;
+	private static final double kPPracticeMP = 2; // the MP settings are also used for distance close loop
 	private static final double kIPracticeMP = 0;
 	private static final double kDPracticeMP = 40;
-	private static final double kFPracticeMP = 1.01;
+	private static final double kFPracticeMP = 1.0768;
 	private static final int kIZonePracticeMP = 0;
+	private static final int kAllowableErrorPracticeDistance = 8; // ticks sent to talon as allowable error for distance close loop
 	
 	private static final double kPCompetition = 0.6;
 	private static final double kICompetition = 0.0007;
@@ -70,6 +71,7 @@ public class DriveTrain extends Subsystem {
 	private static final double kDCompetitionMP = 6;
 	private static final double kFCompetitionMP = 0.2842;
 	private static final int kIZoneCompetitionMP = 4096*50/600;
+	private static final int kAllowableErrorCompetitionDistance = 24; // ticks sent to talon as allowable error for distance close loop
 	
 	private static final double safetyExpiration = 2;
 	private static final double sniperMode = 0.25; // multiplied by velocity in sniper mode
@@ -90,7 +92,7 @@ public class DriveTrain extends Subsystem {
 	private double wheelBaseWidth; // inches, distance between left and right wheels
 	private boolean reverseSensorLeft;
 	private boolean reverseSensorRight;
-	private boolean motionProfilingActive = false; // true when motion profile mode is loaded, even if not running
+	private DriveControlMode currentControlMode = DriveControlMode.STANDARD_DRIVE; // enum defined at end of file
 	private ProcessTalonMotionProfileBuffer processTalonMotionProfile = new ProcessTalonMotionProfileBuffer();
 	private Notifier processMotionProfileNotifier = new Notifier(processTalonMotionProfile);
 	private double motionProfileNotifierUpdateTime;
@@ -134,11 +136,15 @@ public class DriveTrain extends Subsystem {
 		rightTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
 		rightTalonMaster.EnableCurrentLimit(enableCurrentLimit);
 		rightTalonMaster.setCurrentLimit(currentLimit);
+		rightTalonMaster.setMotionMagicCruiseVelocity(RobotMap.maxVelocity);
+		rightTalonMaster.setMotionMagicAcceleration(RobotMap.maxAcceleration);
 		leftTalonMaster.setFeedbackDevice(encoderType);
 //		leftTalonMaster.configNominalOutputVoltage(+0.0f, -0.0f);
 		leftTalonMaster.configPeakOutputVoltage(+12.0f, -12.0f);
 		leftTalonMaster.EnableCurrentLimit(enableCurrentLimit);
 		leftTalonMaster.setCurrentLimit(currentLimit);
+		leftTalonMaster.setMotionMagicCruiseVelocity(RobotMap.maxVelocity);
+		leftTalonMaster.setMotionMagicAcceleration(RobotMap.maxAcceleration);
 		useClosedLoop();
 		resetPosition();
 		rightTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
@@ -213,7 +219,7 @@ public class DriveTrain extends Subsystem {
 	 * Should only ever be called by ApplyOpenLoopSwitch or stopMotionProfile
 	 */
 	public void useClosedLoop() {
-		if (!motionProfilingActive) {
+		if (currentControlMode == DriveControlMode.STANDARD_DRIVE) {
 			if (RobotMap.practiceRobot) {
 				setupVelocityClosedLoop(kPPractice, kIPractice, kDPractice, kFPractice, kIZonePractice);
 			} else {
@@ -230,7 +236,7 @@ public class DriveTrain extends Subsystem {
 	 * Should only ever be called by ApplyOpenLoopSwitch or stopMotionProfile
 	 */
 	public void useOpenLoop() {
-		if (!motionProfilingActive) {
+		if (currentControlMode == DriveControlMode.STANDARD_DRIVE) {
 			rightTalonMaster.changeControlMode(TalonControlMode.PercentVbus);
 			leftTalonMaster.changeControlMode(TalonControlMode.PercentVbus);
 		}
@@ -262,7 +268,7 @@ public class DriveTrain extends Subsystem {
     }
     
     public void drive(double right, double left) {
-    	if (Robot.oi.getDriveEnabled() && !motionProfilingActive) {
+    	if (Robot.oi.getDriveEnabled() && currentControlMode == DriveControlMode.STANDARD_DRIVE) {
     		double velocityRight;
     		double velocityLeft;
     		enable();
@@ -291,7 +297,7 @@ public class DriveTrain extends Subsystem {
     }
     
     public void stop() {
-    	if (!motionProfilingActive) {
+    	if (currentControlMode == DriveControlMode.STANDARD_DRIVE) {
     		rightTalonMaster.set(0);
     		leftTalonMaster.set(0);
     	}
@@ -368,6 +374,67 @@ public class DriveTrain extends Subsystem {
     	return (rightTalonMaster.getOutputCurrent()+leftTalonMaster.getOutputCurrent())/2;
     }
     
+    /**
+     * Sets the PID parameters for the current control mode, useful for tuning.
+     * Calling this effects everything using the subsystem, use with care.
+     * @param p
+     * @param i
+     * @param d
+     * @param f
+     * @param iZone
+     */
+    public void setPID(double p, double i, double d, double f, int iZone) {
+    	int profile = currentControlMode == DriveControlMode.STANDARD_DRIVE ? 0 : 1;
+    	rightTalonMaster.setPID(p, i, d, f, iZone, 0, profile);
+    	leftTalonMaster.setPID(p, i, d, f, iZone, 0, profile);
+    }
+    
+    
+    /**
+     * Uses the talon native distance close loop to drive a distance.
+     * @param inches
+     */
+    public void driveDistance(double inches, boolean motionMagic) {
+    	if (currentControlMode == DriveControlMode.STANDARD_DRIVE && Robot.oi.getDriveEnabled()) {
+    		currentControlMode = DriveControlMode.DISTANCE_CLOSE_LOOP;
+    		rightTalonMaster.setProfile(1);
+    		leftTalonMaster.setProfile(1);
+    		rightTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
+    		leftTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
+    		if (RobotMap.practiceRobot) {
+    			rightTalonMaster.setAllowableClosedLoopErr(kAllowableErrorPracticeDistance);
+    			leftTalonMaster.setAllowableClosedLoopErr(kAllowableErrorPracticeDistance);
+    		} else {
+    			rightTalonMaster.setAllowableClosedLoopErr(kAllowableErrorCompetitionDistance);
+    			leftTalonMaster.setAllowableClosedLoopErr(kAllowableErrorCompetitionDistance);
+    		}
+    		if (motionMagic) {
+    			rightTalonMaster.changeControlMode(TalonControlMode.MotionMagic);
+    			leftTalonMaster.changeControlMode(TalonControlMode.MotionMagic);
+    		} else {
+    			rightTalonMaster.changeControlMode(TalonControlMode.Position);
+    			leftTalonMaster.changeControlMode(TalonControlMode.Position);
+    		}
+    		rightTalonMaster.set(inches/(Math.PI*wheelDiameter));
+    		leftTalonMaster.set(inches/(Math.PI*wheelDiameter));
+    	}
+    }
+
+    public void stopDistanceDrive() {
+    	if (currentControlMode == DriveControlMode.DISTANCE_CLOSE_LOOP) {
+    		rightTalonMaster.set(0);
+    		leftTalonMaster.set(0);
+    		rightTalonMaster.setAllowableClosedLoopErr(0); // motion profiling does not use this
+    		leftTalonMaster.setAllowableClosedLoopErr(0);
+    		currentControlMode = DriveControlMode.STANDARD_DRIVE; // this needs to be changed before calling useClosed/OpenLoop so that they work
+    		if (Robot.oi.getOpenLoop()) {
+    			useOpenLoop();
+    		} else {
+    			useClosedLoop();
+    		}
+    	}
+    }
+
     
     /**
      * Loads the passed trajectory, and activates motion profiling mode
@@ -381,47 +448,49 @@ public class DriveTrain extends Subsystem {
      * @param trajectory
      */
     public void loadMotionProfile(Trajectory trajectory, boolean flipLeftRight) {
-    	motionProfilingActive = true;
-    	rightTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
-    	leftTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
-    	rightTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    	leftTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    	rightTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
-    	leftTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
-    	System.out.println(rightTalonMaster.GetNominalClosedLoopVoltage());
-    	
-    	TankModifier modifier = new TankModifier(trajectory);
-    	TrajectoryPoint[] leftTrajectory;
-    	TrajectoryPoint[] rightTrajectory;
-    	modifier.modify(wheelBaseWidth);
-    	if (flipLeftRight) {
-    		leftTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
-    		rightTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false);
-    	} else {
-    		leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
-    		rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
-    	}
-    	File leftFile = new File("/home/lvuser/lastMP/traj-left.csv");
-    	File rightFile = new File("/home/lvuser/lastMP/traj-right.csv");
-    	Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
-    	Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
-    	File csvFile = new File("/home/lvuser/lastMP/trajectory.csv");
-        Pathfinder.writeToCSV(csvFile, trajectory);
-    	motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
-    	processMotionProfileNotifier.stop();
-    	processTalonMotionProfile.reset();
-    	rightTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
-    	leftTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
-    	rightTalonMaster.clearMotionProfileTrajectories();
-    	leftTalonMaster.clearMotionProfileTrajectories();
-    	for (int i = 0; i < trajectory.length(); i++) {
-    		rightTalonMaster.pushMotionProfileTrajectory(rightTrajectory[i]);
-    		leftTalonMaster.pushMotionProfileTrajectory(leftTrajectory[i]);
+    	if (currentControlMode == DriveControlMode.STANDARD_DRIVE) {
+    		currentControlMode = DriveControlMode.MOTION_PROFILE;
+    		rightTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
+    		leftTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
+    		rightTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
+    		leftTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
+    		rightTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
+    		leftTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
+    		System.out.println(rightTalonMaster.GetNominalClosedLoopVoltage());
+
+    		TankModifier modifier = new TankModifier(trajectory);
+    		TrajectoryPoint[] leftTrajectory;
+    		TrajectoryPoint[] rightTrajectory;
+    		modifier.modify(wheelBaseWidth);
+    		if (flipLeftRight) {
+    			leftTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
+    			rightTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false);
+    		} else {
+    			leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
+    			rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
+    		}
+    		File leftFile = new File("/home/lvuser/lastMP/traj-left.csv");
+    		File rightFile = new File("/home/lvuser/lastMP/traj-right.csv");
+    		Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
+    		Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
+    		File csvFile = new File("/home/lvuser/lastMP/trajectory.csv");
+    		Pathfinder.writeToCSV(csvFile, trajectory);
+    		motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
+    		processMotionProfileNotifier.stop();
+    		processTalonMotionProfile.reset();
+    		rightTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
+    		leftTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
+    		rightTalonMaster.clearMotionProfileTrajectories();
+    		leftTalonMaster.clearMotionProfileTrajectories();
+    		for (int i = 0; i < trajectory.length(); i++) {
+    			rightTalonMaster.pushMotionProfileTrajectory(rightTrajectory[i]);
+    			leftTalonMaster.pushMotionProfileTrajectory(leftTrajectory[i]);
+    		}
     	}
     }
     
     public void startMotionProfile() {
-    	if (motionProfilingActive && Robot.oi.getDriveEnabled()) {
+    	if (currentControlMode == DriveControlMode.MOTION_PROFILE && Robot.oi.getDriveEnabled()) {
     		enable();
     		processMotionProfileNotifier.startPeriodic(motionProfileNotifierUpdateTime);
     	} else if (!Robot.oi.getDriveEnabled()) {
@@ -430,11 +499,11 @@ public class DriveTrain extends Subsystem {
     }
 
     public void stopMotionProfile() {
-    	if (motionProfilingActive) {
+    	if (currentControlMode == DriveControlMode.MOTION_PROFILE) {
     		processMotionProfileNotifier.stop();
     		rightTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
     		leftTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    		motionProfilingActive = false; // this needs to be changed before calling useClosed/OpenLoop so that they work
+    		currentControlMode = DriveControlMode.STANDARD_DRIVE; // this needs to be changed before calling useClosed/OpenLoop so that they work
     		if (Robot.oi.getOpenLoop()) {
     			useOpenLoop();
     		} else {
@@ -450,7 +519,7 @@ public class DriveTrain extends Subsystem {
     public boolean isMotionProfileComplete() {
     	CANTalon.MotionProfileStatus leftStatus = new CANTalon.MotionProfileStatus();
     	CANTalon.MotionProfileStatus rightStatus = new CANTalon.MotionProfileStatus();
-    	if (motionProfilingActive) {
+    	if (currentControlMode == DriveControlMode.MOTION_PROFILE) {
     		rightTalonMaster.getMotionProfileStatus(rightStatus);
     		leftTalonMaster.getMotionProfileStatus(leftStatus);
 //    		System.out.println("isMotionProfileComplete " + (leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
@@ -530,6 +599,11 @@ public class DriveTrain extends Subsystem {
 		public boolean isProfileStarted() {
 			return profileStarted;
 		}
+    }
+    
+    
+    private enum DriveControlMode {
+    	STANDARD_DRIVE, MOTION_PROFILE, DISTANCE_CLOSE_LOOP
     }
 }
 
