@@ -21,5 +21,4 @@ public class CancelCommand extends InstantCommand {
     protected void initialize() {
     	commandToCancel.cancel();
     }
-
 }

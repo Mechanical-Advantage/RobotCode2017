@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
+import org.usfirst.frc.team6328.robot.commands.BackUpFromBoiler;
 import org.usfirst.frc.team6328.robot.commands.CancelCommand;
 import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseTopGear;
@@ -72,6 +73,7 @@ public class OI {
 	private Button left45Button = new JoystickButton(rightController, 4);
 	private Button frontCameraButton = new JoystickButton(rightController, 3);
 	private Button rearCameraButton = new JoystickButton(rightController, 2);
+	private Button backupFromBoiler = new JoystickButton(leftController, 6);
 	private Button intakeOn = new JoystickButton(oiController2, 2);
 	private Button intakeOff = new JoystickButton(oiController2, 3);
 	private Button shoot = new JoystickButton(oiController2, 1);
@@ -181,6 +183,9 @@ public class OI {
 		joysticksBackward.whenPressed(new ReverseJoysticks(true));
 		joysticksForward.whenPressed(new SetCamera(true));
 		joysticksBackward.whenPressed(new SetCamera(false));
+		BackUpFromBoiler backupFromBoilerCommand = new BackUpFromBoiler();
+		backupFromBoiler.whenPressed(backupFromBoilerCommand);
+		backupFromBoiler.whenReleased(new CancelCommand(backupFromBoilerCommand));
 		
 		loaderForward.whileHeld(new RunLoader(false));
 		loaderBackward.whileHeld(new RunLoader(true));
@@ -268,4 +273,3 @@ public class OI {
 		}
 	}
 }
-
