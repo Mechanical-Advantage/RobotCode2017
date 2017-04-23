@@ -1,5 +1,7 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
+import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
 import com.ctre.CANTalon;
@@ -28,6 +30,8 @@ public class Intake extends Subsystem {
 			intakeTalon.EnableCurrentLimit(enableCurrentLimit);
 			intakeTalon.setCurrentLimit(currentLimit);
 			intakeTalon.enableBrakeMode(brakeMode);
+			Robot.oi.updateLED(OILED.INTAKE_OFF, true);
+			Robot.oi.updateLED(OILED.INTAKE_ON, false);
 		}
 	}
 	
@@ -39,20 +43,28 @@ public class Intake extends Subsystem {
     public void run() {
     	intakeTalon.enable();
     	intakeTalon.set(speed);
+    	Robot.oi.updateLED(OILED.INTAKE_OFF, false);
+		Robot.oi.updateLED(OILED.INTAKE_ON, true);
     }
     
     public void runForShoot() {
     	intakeTalon.enable();
     	intakeTalon.set(shootSpeed);
+    	Robot.oi.updateLED(OILED.INTAKE_OFF, false);
+		Robot.oi.updateLED(OILED.INTAKE_ON, true);
     }
     
     public void stop() {
     	intakeTalon.disable();
+    	Robot.oi.updateLED(OILED.INTAKE_OFF, true);
+		Robot.oi.updateLED(OILED.INTAKE_ON, false);
     }
     
     public void reverse() {
     	intakeTalon.enable();
     	intakeTalon.set(speed*-1);
+    	Robot.oi.updateLED(OILED.INTAKE_OFF, false);
+		Robot.oi.updateLED(OILED.INTAKE_ON, true);
     }
     
     public double getCurrent() {

@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
@@ -18,10 +19,11 @@ public class RunShooterPID extends Command implements PIDOutput {
 	private final double kD = 0;
 	private final double kF = 0;
 	private final double updatePeriod = 0.05;
-	private final double targetSpeed = 85;
+	private final int targetSpeed = 85;
 	
 	private double shooterPIDSpeed;
 	private PIDController shooterSpeedController;
+	private boolean reachedSpeed = false;
 
     public RunShooterPID() {
     	super("RunShooterPID");
@@ -35,6 +37,7 @@ public class RunShooterPID extends Command implements PIDOutput {
     	shooterSpeedController = new PIDController(kP, kI, kD, kF, Robot.shooterSubsystem, this, updatePeriod);
     	shooterSpeedController.setSetpoint(targetSpeed);
     	shooterSpeedController.setOutputRange(0, 1);
+    	reachedSpeed = false;
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -50,6 +53,11 @@ public class RunShooterPID extends Command implements PIDOutput {
     	}
     	if (RobotMap.tuningMode) {
     		SmartDashboard.putNumber("Shooter Speed", Robot.shooterSubsystem.getSpeed());
+    	}
+    	int finalTargetSpeed = RobotMap.tuningMode ? (int)SmartDashboard.getNumber("Shooter Target RPS", targetSpeed) : targetSpeed;
+    	if (!reachedSpeed && Robot.shooterSubsystem.getSpeed() >= finalTargetSpeed) {
+    		Robot.oi.updateLED(OILED.SHOOT_BUTTON, true);
+			reachedSpeed = true;
     	}
     }
 
@@ -68,6 +76,7 @@ public class RunShooterPID extends Command implements PIDOutput {
     	shooterSpeedController.disable();
     	shooterPIDSpeed = 0;
     	Robot.shooterSubsystem.stop();
+    	Robot.oi.updateLED(OILED.SHOOT_BUTTON, false);
     }
     
     @Override

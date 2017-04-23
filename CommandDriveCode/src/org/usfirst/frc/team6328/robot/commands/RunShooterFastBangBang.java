@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
@@ -17,6 +18,7 @@ public class RunShooterFastBangBang extends Command {
 	
 	private BangBangController bangBangController = new BangBangController();
 	private Notifier bangBangControllerNotifier = new Notifier(bangBangController);
+	private boolean reachedSpeed = false;
 
     public RunShooterFastBangBang() {
     	super("RunShooterFastBangBang");
@@ -29,10 +31,16 @@ public class RunShooterFastBangBang extends Command {
     protected void initialize() {
     	bangBangController.enable();
     	bangBangControllerNotifier.startPeriodic(controllerPeriod);
+    	reachedSpeed = false;
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	int finalTargetSpeed = RobotMap.tuningMode ? (int)SmartDashboard.getNumber("Shooter Target RPS", targetSpeed) : targetSpeed;
+    	if (!reachedSpeed && Robot.shooterSubsystem.getSpeed() >= finalTargetSpeed) {
+			Robot.oi.updateLED(OILED.SHOOT_BUTTON, true);
+			reachedSpeed = true;
+		}
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -54,6 +62,7 @@ public class RunShooterFastBangBang extends Command {
     	bangBangControllerNotifier.startSingle(0);
     	bangBangControllerNotifier.stop();
     	Robot.shooterSubsystem.stop();
+    	Robot.oi.updateLED(OILED.SHOOT_BUTTON, false);
     }
     
     private class BangBangController implements Runnable {

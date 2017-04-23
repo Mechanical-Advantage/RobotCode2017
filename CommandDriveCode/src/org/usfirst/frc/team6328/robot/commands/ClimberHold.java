@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
@@ -21,6 +22,7 @@ public class ClimberHold extends Command {
     // Called just before this Command runs the first time
     protected void initialize() {
     	Robot.climberSubsystem.hold();
+    	Robot.oi.updateLED(OILED.AUTOHOLD, true);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -44,5 +46,6 @@ public class ClimberHold extends Command {
     // subsystems is scheduled to run
     protected void interrupted() {
     	Robot.climberSubsystem.stop();
+    	Robot.oi.updateLED(OILED.AUTOHOLD, false);
     }
 }

@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
@@ -37,6 +38,21 @@ public class AutoClimb extends CommandGroup {
         // arm.
     	addSequential(new AutoClimbRunMotor(wrapSpeed, wrapCurrent, false));
     	addSequential(new AutoClimbRunMotor(climbSpeed, climbCurrent, true));
+    }
+    
+    @Override
+    protected void initialize() {
+    	Robot.oi.updateLED(OILED.AUTOCLIMB, true);
+    }
+    
+    @Override
+    protected void end() {
+    	Robot.oi.updateLED(OILED.AUTOCLIMB, false);
+    }
+    
+    @Override
+    protected void interrupted() {
+    	end();
     }
     
     private class AutoClimbRunMotor extends Command {

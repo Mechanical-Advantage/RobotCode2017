@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
@@ -220,6 +221,10 @@ public class Robot extends IterativeRobot {
         Scheduler.getInstance().run();
         if (!RobotMap.practiceRobot) {
         	SmartDashboard.putBoolean("Gear Spring Sensor", expelGearSubsystem.getSpringSensor());
+        	oi.updateLED(OILED.MISC_LED, expelGearSubsystem.getSpringSensor());
+        } else {
+        	oi.updateLED(OILED.MISC_LED, Math.abs(driveSubsystem.getVelocityLeft()) >=10 ||
+        			Math.abs(driveSubsystem.getVelocityRight()) >=10);
         }
     }
 
@@ -251,6 +256,10 @@ public class Robot extends IterativeRobot {
         Scheduler.getInstance().run();
         if (!RobotMap.practiceRobot) {
         	SmartDashboard.putBoolean("Gear Spring Sensor", expelGearSubsystem.getSpringSensor());
+        	oi.updateLED(OILED.MISC_LED, expelGearSubsystem.getSpringSensor());
+        } else {
+        	oi.updateLED(OILED.MISC_LED, Math.abs(driveSubsystem.getVelocityLeft()) >=10 ||
+        			Math.abs(driveSubsystem.getVelocityRight()) >=10);
         }
         //System.out.println("Count: " + shooterSubsystem.getCount() + " Period: " + shooterSubsystem.getPeriod() + " Speed: " + shooterSubsystem.getSpeed());
         //System.out.println(driveSubsystem.getCurrent());

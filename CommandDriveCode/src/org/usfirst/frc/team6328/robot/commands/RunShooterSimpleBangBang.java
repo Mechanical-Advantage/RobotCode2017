@@ -1,5 +1,6 @@
 package org.usfirst.frc.team6328.robot.commands;
 
+import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
@@ -12,6 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RunShooterSimpleBangBang extends Command {
 		
 	private final int targetSpeed = 85; // 83 is 5000 rpm
+	
+	private boolean reachedSpeed = false;
 
     public RunShooterSimpleBangBang() {
         // Use requires() here to declare subsystem dependencies
@@ -22,6 +25,7 @@ public class RunShooterSimpleBangBang extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	reachedSpeed = false;
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -44,6 +48,10 @@ public class RunShooterSimpleBangBang extends Command {
     			SmartDashboard.putNumber("Shooter Speed", speed);
     		}
     	}
+    	if (!reachedSpeed && speed >= finalTargetSpeed) {
+    		Robot.oi.updateLED(OILED.SHOOT_BUTTON, true);
+			reachedSpeed = true;
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -60,5 +68,6 @@ public class RunShooterSimpleBangBang extends Command {
     // subsystems is scheduled to run
     protected void interrupted() {
     	Robot.shooterSubsystem.stop();
+    	Robot.oi.updateLED(OILED.SHOOT_BUTTON, false);
     }
 }

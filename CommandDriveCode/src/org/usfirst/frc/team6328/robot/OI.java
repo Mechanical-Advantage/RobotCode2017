@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team6328.robot.commands.AutoClimb;
@@ -102,8 +103,10 @@ public class OI {
 	private Button triggerBackward = new JoystickButton(oiController1, 6);
 	
 	Command runShooter;
+	NetworkTable table;
 
 	public OI() {
+		table = NetworkTable.getTable("LEDs");
 		if (!RobotMap.practiceRobot) {
 			switch (RobotMap.shooterControlType) {
 			case PID:
@@ -271,5 +274,16 @@ public class OI {
 		} else {
 			Robot.driveSubsystem.useClosedLoop();
 		}
+	}
+	
+	
+	public void updateLED(OILED led, boolean state) {
+		boolean[] array = table.getBooleanArray("OI LEDs", new  boolean[]{false, false, false, false, false, false, false, false});
+		array[led.ordinal()] = state;
+		table.putBooleanArray("OI LEDs", array);
+	}
+	
+	public enum OILED {
+		TOP_GEAR_OPEN, TOP_GEAR_CLOSE, INTAKE_ON, INTAKE_OFF, SHOOT_BUTTON, AUTOCLIMB, AUTOHOLD, MISC_LED
 	}
 }
