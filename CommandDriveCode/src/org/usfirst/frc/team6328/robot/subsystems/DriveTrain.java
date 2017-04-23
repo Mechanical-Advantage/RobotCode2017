@@ -1,7 +1,5 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
-import java.io.File;
-
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
@@ -13,7 +11,6 @@ import com.ctre.CANTalon.TrajectoryPoint;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Trajectory.Segment;
 import jaci.pathfinder.modifiers.TankModifier;
@@ -105,8 +102,8 @@ public class DriveTrain extends Subsystem {
 		if (RobotMap.practiceRobot) {
 			encoderType = FeedbackDevice.QuadEncoder;
 			ticksPerRotation = 1440;
-			wheelDiameter = 6;
-			wheelBaseWidth = 27.875; // 27.75
+			wheelDiameter = 5.9000000002; // 6
+			wheelBaseWidth = 26.3; // 27.875
 			reverseSensorRight = true;
 			reverseSensorLeft = false;
 			rightTalonMaster.configEncoderCodesPerRev(ticksPerRotation/4); // For quad encoders, talon codes are 4 ticks
@@ -469,12 +466,12 @@ public class DriveTrain extends Subsystem {
     			leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
     			rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
     		}
-    		File leftFile = new File("/home/lvuser/lastMP/traj-left.csv");
+    		/*File leftFile = new File("/home/lvuser/lastMP/traj-left.csv");
     		File rightFile = new File("/home/lvuser/lastMP/traj-right.csv");
     		Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
     		Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
     		File csvFile = new File("/home/lvuser/lastMP/trajectory.csv");
-    		Pathfinder.writeToCSV(csvFile, trajectory);
+    		Pathfinder.writeToCSV(csvFile, trajectory);*/
     		motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
     		processMotionProfileNotifier.stop();
     		processTalonMotionProfile.reset();
