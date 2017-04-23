@@ -44,10 +44,11 @@ public class RobotMap {
 	public static int gearExpellerSolenoid2;
 	public static int gearExpellerSensor1;
 	public static int gearExpellerSensor2;
-	public static int minVelocity; // lower values will be treated as this value
-	public static int maxVelocity; // maximum velocity when sticks are fully forward (value of 1)
 	public static final boolean practiceRobot = false;
 	public static final boolean tuningMode = false;
+	public static int minVelocity; // lower values will be treated as this value, RPM
+	public static int maxVelocity; // maximum velocity when sticks are fully forward (value of 1), RPM
+	public static double maxAcceleration; // RPM/sec
 	public static ShooterControlType shooterControlType;
 	public RobotMap(){
 		if (practiceRobot) {
@@ -56,6 +57,7 @@ public class RobotMap {
 				leftMaster = 3;
 				leftSlave = 4;
 				maxVelocity = 396; // 950 native units per 100ms
+				maxAcceleration = 300;
 				minVelocity = 17; // 40 native units per 100ms
 		}
 		else {
