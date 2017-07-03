@@ -26,7 +26,11 @@ public class WiggleUntilGearSpring extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	cycleCounter = cyclesPerSwitch; // cause it to run immediately
+//    	cycleCounter = cyclesPerSwitch; // cause it to run immediately, do not use with half wiggle
+    	toggleTracker = false;
+    	// do a half wiggle first so we are centered
+    	Robot.driveSubsystem.drive(sideSpeed*RobotMap.maxVelocity, 0);
+    	cycleCounter = cyclesPerSwitch/2; // this creates a half-cycle
     }
 
     // Called repeatedly when this Command is scheduled to run

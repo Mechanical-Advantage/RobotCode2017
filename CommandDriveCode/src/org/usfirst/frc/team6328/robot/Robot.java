@@ -162,6 +162,9 @@ public class Robot extends IterativeRobot {
 			generateCommand.setRunWhenDisabled(true);
 			generateCommand.start();
 		}
+		
+		intakeSubsystem.initLED();
+		topGearSubsystem.initLED();
     }
     
 	/**

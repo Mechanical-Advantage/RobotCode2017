@@ -20,14 +20,20 @@ public class TopGear extends Subsystem {
 	public TopGear() {
 		if (!RobotMap.practiceRobot) {
 			solenoid = new DoubleSolenoid(RobotMap.topGearSolenoid1, RobotMap.topGearSolenoid2);
-			Robot.oi.updateLED(OILED.TOP_GEAR_OPEN, false);
-			Robot.oi.updateLED(OILED.TOP_GEAR_CLOSE, true);
 		}
 	}
 
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
+    }
+    
+ // this is done separately because the constructor can't refer to the non-static OI method, since subsystems are static
+    public void initLED() {
+    	if (!RobotMap.practiceRobot) {
+    		Robot.oi.updateLED(OILED.TOP_GEAR_OPEN, false);
+			Robot.oi.updateLED(OILED.TOP_GEAR_CLOSE, true);
+    	}
     }
     
     public void open() {

@@ -18,10 +18,10 @@ public class GenerateMotionProfiles extends InstantCommand {
 	// IMPORTANT!
 	// increment this by 1 every time the waypoints are changed
 	// the robot will re-generate profiles if this is greater than saved
-	public static final int waypointVersion = 28;
+	public static final int waypointVersion = 35;
 	
 	private final Trajectory.Config stdConfig = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
-			Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*/120, /*62.2,41.4*/55, /*1866*/2700);
+			Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*//*40*/120, /*62.2,41.4*/55, /*1866*/2700);
 	private Trajectory.Config config; // this can be defined for specific profiles
 	private final String MPDir = "/home/lvuser/motionprofiles/"; // make sure to have slash at end
 
@@ -42,6 +42,7 @@ public class GenerateMotionProfiles extends InstantCommand {
     	points = new Waypoint[] {
     			new Waypoint(0, 0, 0),
     			new Waypoint(96.02, 77.26, Pathfinder.d2r(60))
+//    			new Waypoint(99, 56.5, Pathfinder.d2r(60))
     	};
     	generateProfile(points, "sideAuto");
     	
@@ -61,12 +62,14 @@ public class GenerateMotionProfiles extends InstantCommand {
     	};
     	generateProfile(points, "sideCrossFieldCenter");
     	
+    	config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
+    			Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*/120, /*62.2,41.4*/55, /*1866*/2700);
     	points = new Waypoint[] {
     			new Waypoint(0, 0, 0),
     			new Waypoint(24, -48, Pathfinder.d2r(-60)),
     			new Waypoint(48, -96, Pathfinder.d2r(-60)),
     	};
-    	generateProfile(points, "sideCrossWhiteLine");
+    	generateProfile(points, config, "sideCrossWhiteLine");
     	
     	/*points = new Waypoint[] {
     			new Waypoint(0, 0, 0),

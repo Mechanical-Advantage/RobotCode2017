@@ -28,24 +28,31 @@ public class MotionProfileTest extends Command {
 //        		new Waypoint(91.52/*+1+2*/, -57.26/*+9+3*/, Pathfinder.d2r(-60)),
 //        		new Waypoint(100.02, -71.98, Pathfinder.d2r(-60)),
 //        };
-//    	Waypoint[] points = new Waypoint[] {
-//    			new Waypoint(0, 0, 0),
-//    			new Waypoint(36+18, 0, 0),
-//    			new Waypoint(90+18, -54+18, Pathfinder.d2r(-90)),
-//    			new Waypoint(90+18, -96+18, Pathfinder.d2r(-90))
-//    	};
     	Waypoint[] points = new Waypoint[] {
-        		new Waypoint(0, 0, 0),
-        		new Waypoint(100, -40, Pathfinder.d2r(-60)),
-        };
+    			new Waypoint(0, 0, 0),
+//    			new Waypoint(60, 0, 0),
+//    			new Waypoint(108, -50, Pathfinder.d2r(-60)),
+    			new Waypoint(108, -77.5, Pathfinder.d2r(-60))
+    	};
+//    	Waypoint[] points = new Waypoint[] {
+//        		new Waypoint(0, 0, 0),
+//        		new Waypoint(100, -40, Pathfinder.d2r(-60)),
+//        };
     	/*Waypoint[] points = new Waypoint[] {
     			new Waypoint(0, 0, 0),
     			new Waypoint(24, 0, Pathfinder.d2r(5)),
     	};*/
+//    	points = new Waypoint[] {
+//    			new Waypoint(0, 0, 0),
+//    			new Waypoint(96.02, 77.26, Pathfinder.d2r(60))
+//    	};
         
-        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*/62.2, /*62.2*/40, 1866);
+    	// practice robot
+//        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*/62.2, /*62.2*/40, 1866);
 //    	Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, 60, 15, 1866);
-        Trajectory trajectory = Pathfinder.generate(points, config);
+    	final Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
+    			Trajectory.Config.SAMPLES_HIGH, 0.05, /*124.4*/40, /*62.2,41.4*/55, /*1866*/2700);
+    	Trajectory trajectory = Pathfinder.generate(points, config);
         /*for (int i = 0; i < trajectory.length(); i++) {
             Trajectory.Segment seg = trajectory.get(i);
 

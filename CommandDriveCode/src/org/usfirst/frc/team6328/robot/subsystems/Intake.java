@@ -30,14 +30,20 @@ public class Intake extends Subsystem {
 			intakeTalon.EnableCurrentLimit(enableCurrentLimit);
 			intakeTalon.setCurrentLimit(currentLimit);
 			intakeTalon.enableBrakeMode(brakeMode);
-			Robot.oi.updateLED(OILED.INTAKE_OFF, true);
-			Robot.oi.updateLED(OILED.INTAKE_ON, false);
 		}
 	}
 	
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
+    }
+    
+    // this is done separately because the constructor can't refer to the non-static OI method, since subsystems are static
+    public void initLED() {
+    	if (!RobotMap.practiceRobot) {
+    		Robot.oi.updateLED(OILED.INTAKE_OFF, true);
+    		Robot.oi.updateLED(OILED.INTAKE_ON, false);
+    	}
     }
     
     public void run() {

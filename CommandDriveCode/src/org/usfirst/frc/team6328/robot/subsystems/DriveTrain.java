@@ -63,9 +63,11 @@ public class DriveTrain extends Subsystem {
 	private static final double kDCompetition = 6;
 	private static final double kFCompetition = 0.2842;
 	private static final int kIZoneCompetition = 4096*50/600; // 4096: encoder ticks per rotation; 25: rpm, set this; 600: converting minute to 100ms
-	private static final double kPCompetitionMP = 0.6;
+	private static final double kPCompetitionMP = 2;
+//	private static final double kPCompetitionMP = 0.6;
 	private static final double kICompetitionMP = 0.0007;
-	private static final double kDCompetitionMP = 6;
+	private static final double kDCompetitionMP = 45;
+//	private static final double kDCompetitionMP = 6;
 	private static final double kFCompetitionMP = 0.2842;
 	private static final int kIZoneCompetitionMP = 4096*50/600;
 	private static final int kAllowableErrorCompetitionDistance = 24; // ticks sent to talon as allowable error for distance close loop
@@ -118,9 +120,11 @@ public class DriveTrain extends Subsystem {
 			leftTalonSlave2 = new CANTalon(RobotMap.leftSlave2);
 			encoderType = FeedbackDevice.CtreMagEncoder_Relative;
 			ticksPerRotation = 4096;
-			wheelDiameter = 4.1791666667;
+			wheelDiameter = 4.1791666667; // before worlds
+//			wheelDiameter = 4.24881941; // 7:48 AM worlds
 			reverseSensorRight = false;
 			reverseSensorLeft = true;
+//			wheelBaseWidth = 22.5; // 18
 			wheelBaseWidth = 18;
 			rightTalonMaster.reverseSensor(reverseSensorRight);
 			rightTalonMaster.reverseOutput(true);
@@ -412,7 +416,7 @@ public class DriveTrain extends Subsystem {
     			rightTalonMaster.changeControlMode(TalonControlMode.Position);
     			leftTalonMaster.changeControlMode(TalonControlMode.Position);
     		}
-    		rightTalonMaster.set(inches/(Math.PI*wheelDiameter));
+    		rightTalonMaster.set(inches/(Math.PI*wheelDiameter)*-1);
     		leftTalonMaster.set(inches/(Math.PI*wheelDiameter));
     	}
     }
