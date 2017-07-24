@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.usfirst.frc.team6328.robot.OI.OILED;
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
+import org.usfirst.frc.team6328.robot.commands.DriveDistanceTwice;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
 import org.usfirst.frc.team6328.robot.commands.MotionProfileTest;
@@ -111,6 +112,8 @@ public class Robot extends IterativeRobot {
             chooser.addObject("Talon distance 2 feet", new TalonDriveDistance(24));
             chooser.addObject("Talon distance 10 feet", new TalonDriveDistance(120));
             chooser.addObject("Talon distance 100 inches", new TalonDriveDistance(100));
+            chooser.addObject("Turn around and talon 2 ft", new TurnAndDriveDistance(24, 180, false, true));
+            chooser.addObject("Distance 2 ft + talon distance 2 ft", new DriveDistanceTwice());
         } else {
         	chooser.addDefault("Do Nothing", null);
         	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110));
@@ -257,6 +260,12 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    		driveSubsystem.updatePosition();
+    		SmartDashboard.putNumber("Position Tracking X", driveSubsystem.getPositionX());
+    		SmartDashboard.putNumber("Position Tracking Y", driveSubsystem.getPositionY());
+    		SmartDashboard.putNumber("Gyro Yaw", ahrs.getYaw());
+    		SmartDashboard.putNumber("NavX X", ahrs.getDisplacementX() * 39.37);
+    		SmartDashboard.putNumber("NavX Y", ahrs.getDisplacementY() * 39.37);
         Scheduler.getInstance().run();
         if (!RobotMap.practiceRobot) {
         	SmartDashboard.putBoolean("Gear Spring Sensor", expelGearSubsystem.getSpringSensor());

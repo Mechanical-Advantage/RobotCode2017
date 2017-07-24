@@ -49,8 +49,8 @@ public class DriveDistanceOnHeading extends Command {
 	private DistancePIDSource pidSourceDistance = new DistancePIDSource();
 	private PIDOutputter pidOutputDistance = new PIDOutputter();
 	private PIDOutputter pidOutputAngle = new PIDOutputter();
-	private boolean resetCompletedDistance;
-	private boolean resetStartedDistance;
+	private double startDistanceLeft;
+	private double startDistanceRight;
 	private double lastOutputDistance;
     
     public DriveDistanceOnHeading(double distance) {
@@ -113,8 +113,10 @@ public class DriveDistanceOnHeading extends Command {
         turnController.setContinuous(true);
         turnController.setSetpoint(targetAngle);
         lastOutputDistance = 0;
-        resetCompletedDistance = false;
-        resetStartedDistance = false;
+        startDistanceLeft = Robot.driveSubsystem.getDistanceLeft();
+        startDistanceRight = Robot.driveSubsystem.getDistanceRight();
+        distanceController.enable();
+        turnController.enable();
     }
     
     private double calcNewVelocity(PIDOutputter pidOut, double lastOutput) {
@@ -131,33 +133,22 @@ public class DriveDistanceOnHeading extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	if (!resetStartedDistance && Math.abs(Robot.driveSubsystem.getVelocityLeft())<1 && Math.abs(Robot.driveSubsystem.getVelocityRight())<1) {
-    		Robot.driveSubsystem.resetPosition();
-    		resetStartedDistance = true;
-    	}
-    	if (resetStartedDistance && Math.abs(Robot.driveSubsystem.getDistanceLeft())<0.1 && Math.abs(Robot.driveSubsystem.getDistanceRight())<0.1) {
-    		resetCompletedDistance = true;
-    		distanceController.enable();
-            turnController.enable();
-    	}
-    	if (resetCompletedDistance) {
-    		double outputVelocity = calcNewVelocity(pidOutputDistance, lastOutputDistance);
-    		lastOutputDistance = outputVelocity;
-    		double outputTurnVelocity = pidOutputAngle.getPIDRate()*RobotMap.maxVelocity*kTurnCorrectionAmount;
-    		// subtract from right side, add to left side (drive left on positive)
-    		Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
-    		if (RobotMap.tuningMode) {
-    			SmartDashboard.putString("Distance Graph", genGraphStr(getAverageDistance(), targetDistance));
-    			SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
-        		SmartDashboard.putNumber("Turn controller output", pidOutputAngle.getPIDRate());
-        		SmartDashboard.putString("Yaw Graph", genGraphStr(targetAngle, Robot.ahrs.getYaw()));
-    		}
+    	double outputVelocity = calcNewVelocity(pidOutputDistance, lastOutputDistance);
+    	lastOutputDistance = outputVelocity;
+    	double outputTurnVelocity = pidOutputAngle.getPIDRate()*RobotMap.maxVelocity*kTurnCorrectionAmount;
+    	// subtract from right side, add to left side (drive left on positive)
+    	Robot.driveSubsystem.drive(outputVelocity-outputTurnVelocity, outputVelocity+outputTurnVelocity);
+    	if (RobotMap.tuningMode) {
+    		SmartDashboard.putString("Distance Graph", genGraphStr(getAverageDistance(), targetDistance));
+    		SmartDashboard.putString("Velocity Graph", genGraphStr(outputVelocity, outputVelocity+outputTurnVelocity, outputVelocity-outputTurnVelocity));
+    		SmartDashboard.putNumber("Turn controller output", pidOutputAngle.getPIDRate());
+    		SmartDashboard.putString("Yaw Graph", genGraphStr(targetAngle, Robot.ahrs.getYaw()));
     	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return resetCompletedDistance && distanceController.onTarget() && turnController.onTarget() && 
+        return distanceController.onTarget() && turnController.onTarget() && 
         		(Math.abs(getAverageDistance() - targetDistance) < kToleranceInches) &&
         		(Math.abs(Robot.ahrs.getYaw() - targetAngle) < kToleranceDegrees);
     }
@@ -175,7 +166,7 @@ public class DriveDistanceOnHeading extends Command {
     }
     
     private double getAverageDistance() {
-    	return (Robot.driveSubsystem.getDistanceLeft()+Robot.driveSubsystem.getDistanceRight())/2;
+    	return ((Robot.driveSubsystem.getDistanceLeft()-startDistanceLeft)+(Robot.driveSubsystem.getDistanceRight()-startDistanceRight))/2;
     }
     
     private class DistancePIDSource implements PIDSource {

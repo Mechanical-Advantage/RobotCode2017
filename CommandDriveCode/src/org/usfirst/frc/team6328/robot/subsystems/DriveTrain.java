@@ -95,6 +95,11 @@ public class DriveTrain extends Subsystem {
 	private ProcessTalonMotionProfileBuffer processTalonMotionProfile = new ProcessTalonMotionProfileBuffer();
 	private Notifier processMotionProfileNotifier = new Notifier(processTalonMotionProfile);
 	private double motionProfileNotifierUpdateTime;
+	private double currentPositionX;
+	private double currentPositionY;
+	private double positionLastDistanceLeft;
+	private double positionLastDistanceRight;
+	private double positionLastYaw;
 	
 	public DriveTrain() {
 		rightTalonMaster = new CANTalon(RobotMap.rightMaster);
@@ -170,10 +175,10 @@ public class DriveTrain extends Subsystem {
 		}
 		enableBrakeMode(true);
 		
-		/*rightTalonMaster.setSafetyEnabled(false);
+		rightTalonMaster.setSafetyEnabled(false);
 		rightTalonSlave.setSafetyEnabled(false);
 		leftTalonMaster.setSafetyEnabled(false);
-		leftTalonSlave.setSafetyEnabled(false);*/
+		leftTalonSlave.setSafetyEnabled(false);
 	}
 	
 	private void setupMotionProfilePID(double p, double i, double d, double f, int iZone) {
@@ -393,7 +398,7 @@ public class DriveTrain extends Subsystem {
     
     /**
      * Uses the talon native distance close loop to drive a distance.
-     * @param inches
+     * @param inches the distance to drive
      */
     public void driveDistance(double inches, boolean motionMagic) {
     	if (currentControlMode == DriveControlMode.STANDARD_DRIVE && Robot.oi.getDriveEnabled()) {
@@ -416,8 +421,8 @@ public class DriveTrain extends Subsystem {
     			rightTalonMaster.changeControlMode(TalonControlMode.Position);
     			leftTalonMaster.changeControlMode(TalonControlMode.Position);
     		}
-    		rightTalonMaster.set(inches/(Math.PI*wheelDiameter)*-1);
-    		leftTalonMaster.set(inches/(Math.PI*wheelDiameter));
+    		rightTalonMaster.set((getDistanceRight()+inches)/(Math.PI*wheelDiameter));
+    		leftTalonMaster.set((getDistanceLeft()+inches)/(Math.PI*wheelDiameter));
     	}
     }
 
@@ -600,6 +605,50 @@ public class DriveTrain extends Subsystem {
 		public boolean isProfileStarted() {
 			return profileStarted;
 		}
+    }
+    
+    /**
+     * Updates the position tracking data, should be called regularly
+     */
+    public void updatePosition() {
+    		double curDistanceLeft = getDistanceLeft();
+    		double curDistanceRight = getDistanceRight();
+    		double distance = ((curDistanceLeft - positionLastDistanceLeft)
+    				+ (curDistanceRight - positionLastDistanceRight)) / 2;
+    		double curAngle = Robot.ahrs.getYaw();
+    		// averaging the previous and last yaw values gives the average angle during the last segment
+    			// instead of assuming it was at the angle at the end of the segment
+    		double angle = (curAngle + positionLastYaw) / 2;
+    		positionLastYaw = curAngle;
+    		positionLastDistanceLeft = curDistanceLeft;
+    		positionLastDistanceRight = curDistanceRight;
+    		double dX = Math.sin(Math.toRadians(angle)) * distance;
+    		double dY = Math.cos(Math.toRadians(angle)) * distance;
+    		currentPositionX += dX;
+    		currentPositionY += dY;
+    }
+    
+    /**
+     * Returns the current x value from the last time updatePosition was called
+     * @return The current x position (distance right of starting point)
+     */
+    public double getPositionX() {
+    		return currentPositionX;
+    }
+    /**
+     * Returns the current y value from the last time updatePosition was called
+     * @return The current y position (distance in front of starting point)
+     */
+    public double getPositionY() {
+    		return currentPositionY;
+    }
+    
+    /**
+     * Resets the position tracking to (0, 0)
+     */
+    public void resetPositionTracking() {
+    		currentPositionX = 0;
+    		currentPositionY = 0;
     }
     
     

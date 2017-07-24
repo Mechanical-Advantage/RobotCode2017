@@ -15,6 +15,7 @@ public class TalonDriveDistance extends Command {
 	
 	double targetDistance;
 	boolean motionStarted;
+	boolean driveStarted;
 
     public TalonDriveDistance(double distance) {
     	super("TalonDriveDistance");
@@ -26,10 +27,10 @@ public class TalonDriveDistance extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.driveSubsystem.resetPosition();
-    	execute(); // read values from networktables first
-    	Robot.driveSubsystem.driveDistance(targetDistance, true);
     	motionStarted = false;
+    	driveStarted = false;
+    	execute(); // read values from networktables first
+    	System.out.println("TalonDriveDistance Start");
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -44,9 +45,14 @@ public class TalonDriveDistance extends Command {
     		SmartDashboard.putNumber("Left Distance", Robot.driveSubsystem.getDistanceLeft());
     		SmartDashboard.putNumber("Right Distance", Robot.driveSubsystem.getDistanceRight());
     	}
-    	if (Robot.driveSubsystem.getVelocityLeft() != 0 && Robot.driveSubsystem.getVelocityRight() != 0) {
+    	if (!driveStarted && Math.abs(Robot.driveSubsystem.getVelocityLeft()) <= 0.1 && Math.abs(Robot.driveSubsystem.getVelocityRight()) <= 0.1) {
+    		Robot.driveSubsystem.driveDistance(targetDistance, true);
+    		driveStarted = true;
+    	}
+    	if (driveStarted && Robot.driveSubsystem.getVelocityLeft() != 0 && Robot.driveSubsystem.getVelocityRight() != 0) {
     		motionStarted = true;
     	}
+    	System.out.println("driveStarted: " + driveStarted + " motionStarted: " + motionStarted);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -60,6 +66,7 @@ public class TalonDriveDistance extends Command {
     // Called once after isFinished returns true
     protected void end() {
     	Robot.driveSubsystem.stopDistanceDrive();
+    	System.out.println("TalonDriveDistance Stop");
     }
 
     // Called when another command which requires one or more of the same

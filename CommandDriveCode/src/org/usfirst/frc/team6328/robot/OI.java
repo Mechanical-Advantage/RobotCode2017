@@ -14,8 +14,10 @@ import org.usfirst.frc.team6328.robot.commands.ClimberHold;
 import org.usfirst.frc.team6328.robot.commands.CloseTopGear;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystickOnHeading;
 import org.usfirst.frc.team6328.robot.commands.ExpelGearOnSensor;
+import org.usfirst.frc.team6328.robot.commands.GoToPosition;
 import org.usfirst.frc.team6328.robot.commands.ApplyOpenLoopSwitch;
 import org.usfirst.frc.team6328.robot.commands.OpenTopGear;
+import org.usfirst.frc.team6328.robot.commands.ResetPositionTracking;
 import org.usfirst.frc.team6328.robot.commands.ReverseJoysticks;
 import org.usfirst.frc.team6328.robot.commands.RunIntake;
 import org.usfirst.frc.team6328.robot.commands.RunIntakeShoot;
@@ -94,6 +96,8 @@ public class OI {
 	private Button sniperMode = new JoystickButton(rightController, 1);
 	private Button shakeBalls = new JoystickButton(oiController2, 9);
 	private Button ejectBalls = new JoystickButton(oiController2, 10);
+	private Button resetPositionTracking = new JoystickButton(leftController, 7);
+	private Button returnToStart = new JoystickButton(leftController, 10);
 	
 	private Button loaderForward = new JoystickButton(oiController1, 3);
 	private Button loaderBackward = new JoystickButton(oiController1, 4);
@@ -189,6 +193,8 @@ public class OI {
 		BackUpFromBoiler backupFromBoilerCommand = new BackUpFromBoiler();
 		backupFromBoiler.whenPressed(backupFromBoilerCommand);
 		backupFromBoiler.whenReleased(new CancelCommand(backupFromBoilerCommand));
+		resetPositionTracking.whenPressed(new ResetPositionTracking());
+		returnToStart.whenPressed(new GoToPosition(0, 0));
 		
 		loaderForward.whileHeld(new RunLoader(false));
 		loaderBackward.whileHeld(new RunLoader(true));

@@ -10,7 +10,8 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Turns the specified number of degrees, -180 to 180. Resets the gyro at the beginning
+ * Turns the specified number of degrees, -180 to 180. Resets the gyro at the beginning by default
+ * If not resetting the gyro, angle is a target, so passing 90 may not turn 90 degrees
  */
 public class TurnToAngle extends Command implements PIDOutput {
 	
@@ -23,20 +24,21 @@ public class TurnToAngle extends Command implements PIDOutput {
     private double updatePeriod;
     private PIDController turnController;
     private double targetAngle;
-    private boolean resetCompleted;
-    private double startingUpdateCount;
+    private boolean absoluteAngle;
     
     private double rotateToAngleRate;
-
+    
     public TurnToAngle(double angle) {
+    		this(angle, false);
+    }
+
+	public TurnToAngle(double angle, boolean absoluteAngle) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	super("TurnToAngle");
     	requires(Robot.driveSubsystem);
 
-        // limit input to -180 to 180
-        targetAngle = (angle>180) ? 180 : angle;
-        targetAngle = (targetAngle<-180) ? -180 : targetAngle;
+        targetAngle = angle;
         if (RobotMap.practiceRobot) {
         	kP = 0.01;
         	kI = 0;
@@ -54,6 +56,7 @@ public class TurnToAngle extends Command implements PIDOutput {
         	kToleranceBufSamples = 10;
         	updatePeriod = 0.02;
         }
+     this.absoluteAngle = absoluteAngle;
     }
 
     // Called just before this Command runs the first time
@@ -66,38 +69,30 @@ public class TurnToAngle extends Command implements PIDOutput {
         turnController.setContinuous(true);
         LiveWindow.addActuator("DriveSystem", "RotateController", turnController);
         
+        targetAngle = absoluteAngle ? targetAngle : Robot.ahrs.getYaw()+targetAngle;
+        // limit input to -180 to 180
+        targetAngle = (targetAngle>180) ? -180+(targetAngle-180) : targetAngle;
+        targetAngle = (targetAngle<-180) ? 180+(targetAngle+180) : targetAngle;
         turnController.setSetpoint(targetAngle);
-    	Robot.ahrs.zeroYaw();
-    	startingUpdateCount = Robot.ahrs.getUpdateCount();
-    	resetCompleted = false;
+    	turnController.enable();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	/*if (Robot.ahrs.getRate() < 0.3 && !resetStarted) {
-    		Robot.ahrs.zeroYaw();
-    		resetStarted = true;
-    	}*/
-    	if (Robot.ahrs.getUpdateCount() >= startingUpdateCount+2) {
-    		resetCompleted = true;
-    		turnController.enable();
+    	double outputVelocity = rotateToAngleRate*RobotMap.maxVelocity;
+    	if (RobotMap.tuningMode) {
+    		SmartDashboard.putNumber("Angle", Robot.ahrs.getAngle());
+    		SmartDashboard.putNumber("Rate", Robot.ahrs.getRate());
+    		SmartDashboard.putNumber("Yaw", Robot.ahrs.getYaw());
+    		SmartDashboard.putNumber("Turn to angle rate", rotateToAngleRate);
+    		SmartDashboard.putNumber("Velocity", outputVelocity);
     	}
-    	if (resetCompleted) {
-	    	double outputVelocity = rotateToAngleRate*RobotMap.maxVelocity;
-	    	if (RobotMap.tuningMode) {
-	    		SmartDashboard.putNumber("Angle", Robot.ahrs.getAngle());
-		    	SmartDashboard.putNumber("Rate", Robot.ahrs.getRate());
-		    	SmartDashboard.putNumber("Yaw", Robot.ahrs.getYaw());
-		    	SmartDashboard.putNumber("Turn to angle rate", rotateToAngleRate);
-		    	SmartDashboard.putNumber("Velocity", outputVelocity);
-	    	}
-	    	Robot.driveSubsystem.drive(outputVelocity*-1, outputVelocity);
-    	}
+    	Robot.driveSubsystem.drive(outputVelocity*-1, outputVelocity);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return resetCompleted && (Math.abs(Robot.ahrs.getYaw() - targetAngle) < kToleranceDegrees) && turnController.onTarget();
+        return (Math.abs(Robot.ahrs.getYaw() - targetAngle) < kToleranceDegrees) && turnController.onTarget();
     }
 
     // Called once after isFinished returns true

@@ -3,15 +3,11 @@ package org.usfirst.frc.team6328.robot.commands;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
- * Turn the specified angle and drive straight using gyro corrections
+ *
  */
-public class TurnAndDriveDistance extends CommandGroup {
-	
-	public TurnAndDriveDistance(double distance, double angle) {
-		this(distance, angle, false, false);
-	}
+public class DriveDistanceTwice extends CommandGroup {
 
-    public TurnAndDriveDistance(double distance, double angle, boolean absoluteAngle, boolean talonDistance) {
+    public DriveDistanceTwice() {
         // Add Commands here:
         // e.g. addSequential(new Command1());
         //      addSequential(new Command2());
@@ -28,11 +24,9 @@ public class TurnAndDriveDistance extends CommandGroup {
         // e.g. if Command1 requires chassis, and Command2 requires arm,
         // a CommandGroup containing them would require both the chassis and the
         // arm.
-    	addSequential(new TurnToAngle(angle, absoluteAngle));
-    	if (talonDistance) {
-    		addSequential(new TalonDriveDistance(distance));
-    	} else {
-    		addSequential(new DriveDistanceOnHeading(distance, angle));
-    	}
+    		addSequential(new TalonDriveDistance(24));
+    		addSequential(new TurnToAngle(180));
+    		addSequential(new Delay(10));
+    		addSequential(new TalonDriveDistance(24));
     }
 }
