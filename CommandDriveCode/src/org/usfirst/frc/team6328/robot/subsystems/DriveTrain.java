@@ -175,10 +175,10 @@ public class DriveTrain extends Subsystem {
 		}
 		enableBrakeMode(true);
 		
-		rightTalonMaster.setSafetyEnabled(false);
+		/*rightTalonMaster.setSafetyEnabled(false);
 		rightTalonSlave.setSafetyEnabled(false);
 		leftTalonMaster.setSafetyEnabled(false);
-		leftTalonSlave.setSafetyEnabled(false);
+		leftTalonSlave.setSafetyEnabled(false);*/
 	}
 	
 	private void setupMotionProfilePID(double p, double i, double d, double f, int iZone) {
