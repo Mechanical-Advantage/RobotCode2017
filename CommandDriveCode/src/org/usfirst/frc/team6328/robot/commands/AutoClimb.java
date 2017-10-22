@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutoClimb extends CommandGroup {
 	
-	private final double wrapSpeed = 0.6;
+	private final double wrapSpeed = 0.2;
 	private final double wrapCurrent = 10;
 	private final double climbSpeed = 1;
 	private final double climbCurrent = 48;
@@ -38,6 +38,7 @@ public class AutoClimb extends CommandGroup {
         // arm.
     	addSequential(new AutoClimbRunMotor(wrapSpeed, wrapCurrent, false));
     	addSequential(new AutoClimbRunMotor(climbSpeed, climbCurrent, true));
+    	addSequential(new ClimberHold());
     }
     
     @Override
