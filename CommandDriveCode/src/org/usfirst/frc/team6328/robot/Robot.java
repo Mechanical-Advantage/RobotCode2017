@@ -17,6 +17,7 @@ import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
 import org.usfirst.frc.team6328.robot.commands.DriveToBoilerShootBallsCrossLine;
+import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick.JoystickMode;
 import org.usfirst.frc.team6328.robot.commands.MotionProfileTest;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter2;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship2;
@@ -68,6 +69,7 @@ public class Robot extends IterativeRobot {
     SendableChooser<String> secondStageSideChooser;
     SendableChooser<String> secondStageCenterChooser;
     SendableChooser<Boolean> leftRightChooser;
+    public static SendableChooser<JoystickMode> joystickModeChooser;
     
     public static boolean rightSideSelected;
     public static String secondStageSide;
@@ -83,10 +85,13 @@ public class Robot extends IterativeRobot {
         secondStageSideChooser = new SendableChooser<String>();
         secondStageCenterChooser = new SendableChooser<String>();
         leftRightChooser = new SendableChooser<Boolean>();
+        joystickModeChooser = new SendableChooser<JoystickMode>();
         //chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
         leftRightChooser.addDefault("Left", false);
         leftRightChooser.addObject("Right", true);
+        joystickModeChooser.addDefault("Tank", JoystickMode.Tank);
+        joystickModeChooser.addObject("Split Arcade", JoystickMode.SplitArcade);
         if (RobotMap.tuningMode) {
         	chooser.addObject("Rotate 90 degrees", new TurnToAngle(90));
             chooser.addObject("Rotate 180 degrees", new TurnToAngle(180));
@@ -145,6 +150,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putData("Second Stage Side Gear", secondStageSideChooser);
         SmartDashboard.putData("Second Stage Center Gear", secondStageCenterChooser);
         SmartDashboard.putData("Left-Right", leftRightChooser);
+        SmartDashboard.putData("Control Mode", joystickModeChooser);
         System.out.println("NavX firmware version " + ahrs.getFirmwareVersion());
         
         // if the current waypoint version is old, re-generate profiles

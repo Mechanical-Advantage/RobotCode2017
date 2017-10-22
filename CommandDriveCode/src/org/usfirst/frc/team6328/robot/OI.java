@@ -216,11 +216,18 @@ public class OI {
 	// reversing the joysticks should not change which joystick to use for straight drive, use
 	// different function to make that correct
 	// Note: Brian is left-handed
-	public double getDriveStraightAxis() {
+	public double getSingleDriveAxis() {
 		if (joysticksReversed) {
 			return leftController.getRawAxis(1)*-1;
 		} else {
 			return leftController.getRawAxis(1);
+		}
+	}
+	public double getHorizDriveAxis() {
+		if (joysticksReversed) {
+			return rightController.getRawAxis(0)*-1;
+		} else {
+			return rightController.getRawAxis(0);
 		}
 	}
 

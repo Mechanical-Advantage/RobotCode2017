@@ -24,19 +24,30 @@ public class DriveWithJoystick extends Command {
     protected void initialize() {
     	SmartDashboard.putBoolean("Driver Control", true);
     }
+    
+    private double processJoystickAxis(double joystickAxis) {
+		// cube to improve low speed control, multiply by -1 because negative joystick means forward, 0 if within deadband
+    		return Math.abs(joystickAxis) > deadband ? joystickAxis*Math.abs(joystickAxis)*RobotMap.maxVelocity*-1 : 0;
+    }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double joystickLeft = 0, joystickRight = 0;
-    	// cube to improve low speed control, multiply by -1 because negative joystick means forward
-    	if (Math.abs(Robot.oi.getRightAxis()) > deadband) {
-    		joystickRight = Robot.oi.getRightAxis()*Math.abs(Robot.oi.getRightAxis())*RobotMap.maxVelocity*-1;
-    	}
-    	if (Math.abs(Robot.oi.getLeftAxis()) > deadband) {
-    		joystickLeft = Robot.oi.getLeftAxis()*Math.abs(Robot.oi.getLeftAxis())*RobotMap.maxVelocity*-1;
-    	}
-		Robot.driveSubsystem.drive(joystickRight, joystickLeft);
-    	//System.out.println("Left: " + Robot.oi.getLeftAxis() + " Right: " + Robot.oi.getRightAxis());
+    		double joystickLeft = 0, joystickRight = 0;
+    		switch (Robot.joystickModeChooser.getSelected()) {
+    		case Tank:
+    			joystickRight = processJoystickAxis(Robot.oi.getRightAxis());
+    			joystickLeft = processJoystickAxis(Robot.oi.getLeftAxis());
+    			break;
+    		case SplitArcade:
+    			double baseDrive = processJoystickAxis(Robot.oi.getSingleDriveAxis());
+    			joystickRight = baseDrive + processJoystickAxis(Robot.oi.getHorizDriveAxis());
+    			joystickRight = joystickRight > RobotMap.maxVelocity ? RobotMap.maxVelocity : joystickRight;
+    			joystickLeft = baseDrive - processJoystickAxis(Robot.oi.getHorizDriveAxis());
+    			joystickLeft = joystickLeft > RobotMap.maxVelocity ? RobotMap.maxVelocity : joystickLeft;
+    			break;
+    		}
+    		Robot.driveSubsystem.drive(joystickRight, joystickLeft);
+    		//System.out.println("Left: " + Robot.oi.getLeftAxis() + " Right: " + Robot.oi.getRightAxis());
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -52,5 +63,9 @@ public class DriveWithJoystick extends Command {
     // subsystems is scheduled to run
     protected void interrupted() {
     	SmartDashboard.putBoolean("Driver Control", false);
+    }
+    
+    public static enum JoystickMode {
+    		Tank, SplitArcade;
     }
 }
