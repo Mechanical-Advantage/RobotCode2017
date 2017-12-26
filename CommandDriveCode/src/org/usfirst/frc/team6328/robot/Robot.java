@@ -22,6 +22,7 @@ import org.usfirst.frc.team6328.robot.commands.MotionProfileTest;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearCenter2;
 import org.usfirst.frc.team6328.robot.commands.PlaceGearSideOfAirship2;
 import org.usfirst.frc.team6328.robot.commands.TalonDriveDistance;
+import org.usfirst.frc.team6328.robot.commands.TestRunMotionProfileOnRio;
 import org.usfirst.frc.team6328.robot.commands.TurnAndDriveDistance;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
 import org.usfirst.frc.team6328.robot.commands.GenerateMotionProfiles;
@@ -116,6 +117,8 @@ public class Robot extends IterativeRobot {
             chooser.addObject("Talon distance 2 feet", new TalonDriveDistance(24));
             chooser.addObject("Talon distance 10 feet", new TalonDriveDistance(120));
             chooser.addObject("Talon distance 100 inches", new TalonDriveDistance(100));
+            chooser.addObject("Rio profile test", new TestRunMotionProfileOnRio(true));
+            chooser.addObject("Rio profile test comparison", new TestRunMotionProfileOnRio(false));
         } else {
         	chooser.addDefault("Do Nothing", null);
         	chooser.addObject("Cross Line not behind airship facing backward", new DriveDistanceOnHeading(-110));

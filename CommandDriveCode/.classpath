@@ -11,5 +11,7 @@
 	<classpathentry kind="var" path="USERLIBS_DIR/Pathfinder-Java.jar" sourcepath="/USERLIBS_DIR/Pathfinder-Java-sources.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc-sources.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/Pathfinder-Java-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/zmq-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/zmq.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

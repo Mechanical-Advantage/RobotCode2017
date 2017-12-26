@@ -6,6 +6,7 @@ import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.StatusFrameRate;
 import com.ctre.CANTalon.TalonControlMode;
 import com.ctre.CANTalon.TrajectoryPoint;
 
@@ -249,6 +250,10 @@ public class DriveTrain extends Subsystem {
     	setDefaultCommand(new DriveWithJoystick());
     }
     
+    public void driveInchesPerSec(double left, double right) {
+    		drive((left/(wheelDiameter*Math.PI))*60, (left/(wheelDiameter*Math.PI))*60);
+    }
+    
     public void drive(int right, int left) {
     	drive((double)right, (double)left);
     }
@@ -388,6 +393,15 @@ public class DriveTrain extends Subsystem {
     	int profile = currentControlMode == DriveControlMode.STANDARD_DRIVE ? 0 : 1;
     	rightTalonMaster.setPID(p, i, d, f, iZone, 0, profile);
     	leftTalonMaster.setPID(p, i, d, f, iZone, 0, profile);
+    }
+    
+    public void changeSensorRate(int ms) {
+    		leftTalonMaster.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, ms);
+    		rightTalonMaster.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, ms);
+    }
+    public void resetSensorRate() {
+    		leftTalonMaster.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 100);
+		rightTalonMaster.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 100);
     }
     
     
