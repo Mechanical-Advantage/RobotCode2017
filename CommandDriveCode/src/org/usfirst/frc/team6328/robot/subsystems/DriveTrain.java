@@ -4,20 +4,20 @@ import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 import org.usfirst.frc.team6328.robot.commands.DriveWithJoystick;
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
-import com.ctre.CANTalon.StatusFrameRate;
-import com.ctre.CANTalon.TalonControlMode;
-import com.ctre.CANTalon.TrajectoryPoint;
+import org.usfirst.frc.team6328.robot.CANTalon.CANTalon;
+import org.usfirst.frc.team6328.robot.CANTalon.CANTalon.FeedbackDevice;
+import org.usfirst.frc.team6328.robot.CANTalon.CANTalon.StatusFrameRate;
+import org.usfirst.frc.team6328.robot.CANTalon.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Trajectory.Segment;
-import jaci.pathfinder.modifiers.TankModifier;
 
 /**
  * Robot Drive Train
+ * MP Support has been removed because it would be complicated to make work on phoenix
+ * (It would probably make more sense to port this code directly to phoenix than to fix MP support in the compatibility layer anyway)
+ * (Talon MP support is obsolete anyway, updating the on rio support is better)
+ * (The 2017 code doesn't really need MP support anymore)
  */
 public class DriveTrain extends Subsystem {
 
@@ -78,8 +78,6 @@ public class DriveTrain extends Subsystem {
 	private static final boolean sniperModeLocked = false; // when set, sniper mode uses value above, when unset, value comes from throttle control on joystick
 	private static final int currentLimit = 50;
 	private static final boolean enableCurrentLimit = false;
-	private static final int requiredTrajPoints = 5; // point to send to talon before starting profile
-	
 	private CANTalon rightTalonMaster;
 	private CANTalon rightTalonSlave;
 	private CANTalon rightTalonSlave2;
@@ -89,13 +87,9 @@ public class DriveTrain extends Subsystem {
 	private FeedbackDevice encoderType;
 	private int ticksPerRotation; // getEncPosition values in one turn
 	private double wheelDiameter; // inches
-	private double wheelBaseWidth; // inches, distance between left and right wheels
 	private boolean reverseSensorLeft;
 	private boolean reverseSensorRight;
 	private DriveControlMode currentControlMode = DriveControlMode.STANDARD_DRIVE; // enum defined at end of file
-	private ProcessTalonMotionProfileBuffer processTalonMotionProfile = new ProcessTalonMotionProfileBuffer();
-	private Notifier processMotionProfileNotifier = new Notifier(processTalonMotionProfile);
-	private double motionProfileNotifierUpdateTime;
 	
 	public DriveTrain() {
 		rightTalonMaster = new CANTalon(RobotMap.rightMaster);
@@ -106,7 +100,6 @@ public class DriveTrain extends Subsystem {
 			encoderType = FeedbackDevice.QuadEncoder;
 			ticksPerRotation = 1440;
 			wheelDiameter = 5.9000000002; // 6
-			wheelBaseWidth = 26.3; // 27.875
 			reverseSensorRight = true;
 			reverseSensorLeft = false;
 			rightTalonMaster.configEncoderCodesPerRev(ticksPerRotation/4); // For quad encoders, talon codes are 4 ticks
@@ -125,8 +118,6 @@ public class DriveTrain extends Subsystem {
 //			wheelDiameter = 4.24881941; // 7:48 AM worlds
 			reverseSensorRight = false;
 			reverseSensorLeft = true;
-//			wheelBaseWidth = 22.5; // 18
-			wheelBaseWidth = 18;
 			rightTalonMaster.reverseSensor(reverseSensorRight);
 			rightTalonMaster.reverseOutput(true);
 			leftTalonMaster.reverseSensor(reverseSensorLeft);
@@ -455,6 +446,7 @@ public class DriveTrain extends Subsystem {
      * Loads the passed trajectory, and activates motion profiling mode
      * @param trajectory
      */
+    @Deprecated
     public void loadMotionProfile(Trajectory trajectory) {
     	loadMotionProfile(trajectory, false);
     }
@@ -462,69 +454,19 @@ public class DriveTrain extends Subsystem {
      * Loads the passed trajectory, and activates motion profiling mode
      * @param trajectory
      */
+    @Deprecated
     public void loadMotionProfile(Trajectory trajectory, boolean flipLeftRight) {
-    	if (currentControlMode == DriveControlMode.STANDARD_DRIVE) {
-    		currentControlMode = DriveControlMode.MOTION_PROFILE;
-    		rightTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
-    		leftTalonMaster.changeControlMode(TalonControlMode.MotionProfile);
-    		rightTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    		leftTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    		rightTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
-    		leftTalonMaster.configNominalOutputVoltage(+1.0f, -1.0f);
-    		System.out.println(rightTalonMaster.GetNominalClosedLoopVoltage());
-
-    		TankModifier modifier = new TankModifier(trajectory);
-    		TrajectoryPoint[] leftTrajectory;
-    		TrajectoryPoint[] rightTrajectory;
-    		modifier.modify(wheelBaseWidth);
-    		if (flipLeftRight) {
-    			leftTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
-    			rightTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false);
-    		} else {
-    			leftTrajectory = convertToTalonPoints(modifier.getRightTrajectory(), false); // Pathfinder seems to return swapped left/right, so swap them back
-    			rightTrajectory = convertToTalonPoints(modifier.getLeftTrajectory(), false);
-    		}
-    		/*File leftFile = new File("/home/lvuser/lastMP/traj-left.csv");
-    		File rightFile = new File("/home/lvuser/lastMP/traj-right.csv");
-    		Pathfinder.writeToCSV(leftFile, modifier.getRightTrajectory()); // also swap here
-    		Pathfinder.writeToCSV(rightFile, modifier.getLeftTrajectory());
-    		File csvFile = new File("/home/lvuser/lastMP/trajectory.csv");
-    		Pathfinder.writeToCSV(csvFile, trajectory);*/
-    		motionProfileNotifierUpdateTime = trajectory.segments[0].dt/2;
-    		processMotionProfileNotifier.stop();
-    		processTalonMotionProfile.reset();
-    		rightTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
-    		leftTalonMaster.changeMotionControlFramePeriod((int) (motionProfileNotifierUpdateTime*1000));
-    		rightTalonMaster.clearMotionProfileTrajectories();
-    		leftTalonMaster.clearMotionProfileTrajectories();
-    		for (int i = 0; i < trajectory.length(); i++) {
-    			rightTalonMaster.pushMotionProfileTrajectory(rightTrajectory[i]);
-    			leftTalonMaster.pushMotionProfileTrajectory(leftTrajectory[i]);
-    		}
-    	}
+    	// Removed for phoenix compatibility
     }
     
+    @Deprecated
     public void startMotionProfile() {
-    	if (currentControlMode == DriveControlMode.MOTION_PROFILE && Robot.oi.getDriveEnabled()) {
-    		enable();
-    		processMotionProfileNotifier.startPeriodic(motionProfileNotifierUpdateTime);
-    	} else if (!Robot.oi.getDriveEnabled()) {
-    		disable();
-    	}
+    	// Removed for phoenix compatibility
     }
-
+    
+    @Deprecated
     public void stopMotionProfile() {
-    	if (currentControlMode == DriveControlMode.MOTION_PROFILE) {
-    		processMotionProfileNotifier.stop();
-    		rightTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    		leftTalonMaster.set(CANTalon.SetValueMotionProfile.Disable.value);
-    		currentControlMode = DriveControlMode.STANDARD_DRIVE; // this needs to be changed before calling useClosed/OpenLoop so that they work
-    		if (Robot.oi.getOpenLoop()) {
-    			useOpenLoop();
-    		} else {
-    			useClosedLoop();
-    		}
-    	}
+    	// Removed for phoenix compatibility
     }
     
     /**
@@ -532,90 +474,9 @@ public class DriveTrain extends Subsystem {
      * @return
      */
     public boolean isMotionProfileComplete() {
-    	CANTalon.MotionProfileStatus leftStatus = new CANTalon.MotionProfileStatus();
-    	CANTalon.MotionProfileStatus rightStatus = new CANTalon.MotionProfileStatus();
-    	if (currentControlMode == DriveControlMode.MOTION_PROFILE) {
-    		rightTalonMaster.getMotionProfileStatus(rightStatus);
-    		leftTalonMaster.getMotionProfileStatus(leftStatus);
-//    		System.out.println("isMotionProfileComplete " + (leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
-//    				&& processTalonMotionProfile.isProfileStarted()));
-    		return leftStatus.activePoint.isLastPoint && rightStatus.activePoint.isLastPoint
-    				&& processTalonMotionProfile.isProfileStarted();
-    	}
-    	return false; // if motion profiling not active
-    }
-    
-    private TrajectoryPoint[] convertToTalonPoints(Trajectory t, boolean invert) {
-    	TrajectoryPoint[] points = new TrajectoryPoint[t.length()];
-    	for (int i = 0; i < points.length; i++) {
-    		Segment s = t.get(i);
-    		TrajectoryPoint point = new TrajectoryPoint();
-    		point.position = s.position/(wheelDiameter*Math.PI);
-    		point.velocity = (s.velocity/(wheelDiameter*Math.PI)) * 60;
-    		point.timeDurMs = (int) (s.dt * 1000.0);
-    		point.profileSlotSelect = 1;
-    		point.velocityOnly = false;
-    		point.zeroPos = i == 0;
-    		point.isLastPoint = i == t.length() - 1;
-
-    		if (invert) {
-    			point.position = -point.position;
-    			point.velocity = -point.velocity;
-    		}
-
-    		points[i] = point;
-    	}
-    	return points;
-    }
-    
-    private class ProcessTalonMotionProfileBuffer implements Runnable {
-    	
-    	private boolean profileStarted = false;
-    	private boolean clearCompleted = false;
-    	private CANTalon.MotionProfileStatus leftStatus = new CANTalon.MotionProfileStatus();
-    	private CANTalon.MotionProfileStatus rightStatus = new CANTalon.MotionProfileStatus();
-    	
-    	public void reset() {
-    		System.out.println("Thread reset, previous clearCompleted: " + clearCompleted);
-    		profileStarted = false;
-    		clearCompleted = false;
-    	}
-    	
-    	private void startProfile() {
-    		rightTalonMaster.set(CANTalon.SetValueMotionProfile.Enable.value);
-    		leftTalonMaster.set(CANTalon.SetValueMotionProfile.Enable.value);
-    	}
-
-    	@Override
-    	public void run() {
-    		rightTalonMaster.getMotionProfileStatus(rightStatus);
-    		leftTalonMaster.getMotionProfileStatus(leftStatus);
-    		if (clearCompleted) {
-    			rightTalonMaster.processMotionProfileBuffer();
-    			leftTalonMaster.processMotionProfileBuffer();
-    			System.out.println("R- Bottom Buffer Points: " + rightStatus.btmBufferCnt + " Active Point pos: " + rightStatus.activePoint.position + " vel: " + rightStatus.activePoint.velocity);
-    			System.out.println("L- Bottom Buffer Points: " + leftStatus.btmBufferCnt + " Active Point pos: " + leftStatus.activePoint.position + " vel: " + leftStatus.activePoint.velocity);
-    			if (!profileStarted && rightStatus.btmBufferCnt>=requiredTrajPoints && leftStatus.btmBufferCnt>=requiredTrajPoints) {
-    				startProfile();
-    				profileStarted = true;
-    			}
-    		} else {
-    			System.out.println("Clear not completed " + leftStatus.btmBufferCnt);
-    			clearCompleted = leftStatus.btmBufferCnt == 0 && rightStatus.btmBufferCnt == 0;
-    			if (clearCompleted) {
-    				System.out.println("Before points pushed R - active point pos " + rightStatus.activePoint.position + " vel " 
-    						+ rightStatus.activePoint.velocity + " valid " + rightStatus.activePointValid + " bottom buffer " + rightStatus.btmBufferCnt);
-    				System.out.println("Before points pushed L - active point pos " + leftStatus.activePoint.position + " vel " 
-    						+ leftStatus.activePoint.velocity + " valid " + leftStatus.activePointValid + " bottom buffer " + leftStatus.btmBufferCnt);
-    			}
-    		}
-    	}
-
-		public boolean isProfileStarted() {
-			return profileStarted;
-		}
-    }
-    
+    	// Removed for phoenix compatibility
+    	return true;
+    }    
     
     private enum DriveControlMode {
     	STANDARD_DRIVE, MOTION_PROFILE, DISTANCE_CLOSE_LOOP

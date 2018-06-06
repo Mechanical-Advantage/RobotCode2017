@@ -1,8 +1,7 @@
 package org.usfirst.frc.team6328.robot.subsystems;
 
 import org.usfirst.frc.team6328.robot.RobotMap;
-
-import com.ctre.CANTalon;
+import org.usfirst.frc.team6328.robot.CANTalon.CANTalon;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 

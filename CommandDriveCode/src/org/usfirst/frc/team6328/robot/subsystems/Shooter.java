@@ -2,8 +2,7 @@ package org.usfirst.frc.team6328.robot.subsystems;
 
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
-
-import com.ctre.CANTalon;
+import org.usfirst.frc.team6328.robot.CANTalon.CANTalon;
 
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.PIDSource;
