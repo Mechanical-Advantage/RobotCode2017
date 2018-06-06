@@ -159,6 +159,7 @@ public class OI {
 		shoot.whileHeld(runLoader);
 		shoot.whileHeld(runIntakeShoot);
 		shoot.whenReleased(runIntakeNormal);
+		shoot.whileHeld(runShooter);
 		//shoot.whenReleased(runTriggerNormal);
 		//shoot.whenReleased(runLoader);
 		shakeBalls.whileHeld(new ShakeLoader());
@@ -170,12 +171,13 @@ public class OI {
 		expelGear.whileHeld(new ExpelGearOnSensor());
 		
 		// trying to enable practice robot will not work
-		if (!RobotMap.practiceRobot) {
+		// Now mapped to shoot button, this is for switch
+		/*if (!RobotMap.practiceRobot) {
 			// there is no WhileNotHeld, so start when inactive and cancel when switch flipped on
 			// if flipped at start, run
 			shooterDisableSwitch.whenReleased(runShooter);
 			shooterDisableSwitch.cancelWhenPressed(runShooter);
-		}
+		}*/
 		
 		autoClimb.toggleWhenPressed(new AutoClimb());
 		climberHold.toggleWhenPressed(new ClimberHold());
@@ -273,9 +275,10 @@ public class OI {
 	
 	@SuppressWarnings("unused")
 	public void initSwitches() {
-		if (!shooterDisableSwitch.get() && !RobotMap.practiceRobot) {
+		// Shooter flywheels now mapped to shoot button, this is for switch control
+		/*if (!shooterDisableSwitch.get() && !RobotMap.practiceRobot) {
 			runShooter.start();
-		}
+		}*/
 		if (openLoopDrive.get()) {
 			Robot.driveSubsystem.useOpenLoop();
 		} else {
