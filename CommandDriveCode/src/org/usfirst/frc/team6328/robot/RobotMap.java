@@ -49,7 +49,7 @@ public class RobotMap {
 	public static double maxAcceleration; // RPM/sec
 	public static ShooterControlType shooterControlType;
 	public static final boolean practiceRobot = false;
-	public static final boolean tuningMode = true;
+	public static final boolean tuningMode = false;
 	public RobotMap(){
 		if (practiceRobot) {
 				rightMaster = 1;
