@@ -116,10 +116,13 @@ public class DriveTrain extends Subsystem {
 			ticksPerRotation = 4096;
 			wheelDiameter = 4.1791666667; // before worlds
 //			wheelDiameter = 4.24881941; // 7:48 AM worlds
-			reverseSensorRight = false;
+			reverseSensorRight = true;
 			reverseSensorLeft = true;
+			// Phoenix does not invert slaves when master is inverted
 			rightTalonMaster.reverseSensor(reverseSensorRight);
 			rightTalonMaster.reverseOutput(true);
+			rightTalonSlave.reverseOutput(true);
+			rightTalonSlave2.reverseOutput(true);
 			leftTalonMaster.reverseSensor(reverseSensorLeft);
 			leftTalonMaster.reverseOutput(false);
 			setupMotionProfilePID(kPCompetitionMP, kICompetitionMP, kDCompetitionMP, kFCompetitionMP, kIZoneCompetitionMP);
@@ -141,10 +144,12 @@ public class DriveTrain extends Subsystem {
 		useClosedLoop();
 		resetPosition();
 		rightTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
+		rightTalonSlave.enable();
 		rightTalonSlave.set(RobotMap.rightMaster);
 		rightTalonSlave.EnableCurrentLimit(enableCurrentLimit);
 		rightTalonSlave.setCurrentLimit(currentLimit);
 		leftTalonSlave.changeControlMode(CANTalon.TalonControlMode.Follower);
+		leftTalonSlave.enable();
 		leftTalonSlave.set(RobotMap.leftMaster);
 		leftTalonSlave.EnableCurrentLimit(enableCurrentLimit);
 		leftTalonSlave.setCurrentLimit(currentLimit);
@@ -154,8 +159,10 @@ public class DriveTrain extends Subsystem {
 		leftTalonSlave.setExpiration(safetyExpiration);
 		if (!RobotMap.practiceRobot){
 			rightTalonSlave2.changeControlMode(CANTalon.TalonControlMode.Follower);
+			rightTalonSlave2.enable();
 			rightTalonSlave2.set(RobotMap.rightMaster);
 			leftTalonSlave2.changeControlMode(CANTalon.TalonControlMode.Follower);
+			leftTalonSlave2.enable();
 			leftTalonSlave2.set(RobotMap.leftMaster);
 			rightTalonSlave2.setExpiration(safetyExpiration);
 			leftTalonSlave2.setExpiration(safetyExpiration);

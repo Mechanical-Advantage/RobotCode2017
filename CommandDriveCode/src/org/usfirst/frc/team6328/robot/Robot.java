@@ -12,7 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.usfirst.frc.team6328.robot.OI.OILED;
+import org.usfirst.frc.team6328.robot.LogitechOI.OILED;
 import org.usfirst.frc.team6328.robot.commands.DriveDistance;
 import org.usfirst.frc.team6328.robot.commands.DriveDistanceOnHeading;
 import org.usfirst.frc.team6328.robot.commands.DriveSquare;
@@ -61,7 +61,7 @@ public class Robot extends IterativeRobot {
 	public static final Climber climberSubsystem = new Climber();
 	public static final Shooter shooterSubsystem = new Shooter();
 		
-	public static OI oi;
+	public static LogitechOI oi;
 	public static AHRS ahrs = new AHRS(SPI.Port.kMXP);
 	public static final CameraSystem cameraSubsystem = new CameraSystem();
 
@@ -81,7 +81,7 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-		oi = new OI();
+		oi = new LogitechOI();
         chooser = new SendableChooser<Command>();
         secondStageSideChooser = new SendableChooser<String>();
         secondStageCenterChooser = new SendableChooser<String>();

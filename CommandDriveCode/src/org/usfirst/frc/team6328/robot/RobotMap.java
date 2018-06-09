@@ -76,8 +76,8 @@ public class RobotMap {
 			shooterSensor = 9; // DIO
 			topGearSolenoid1 = 3;
 			topGearSolenoid2 = 2;
-			gearExpellerSolenoid1 = 0;
-			gearExpellerSolenoid2 = 1;
+			gearExpellerSolenoid1 = 1;
+			gearExpellerSolenoid2 = 0;
 			gearExpellerSensor1 = 7; // DIO
 			gearExpellerSensor2 = 8; // DIO
 			maxVelocity = 525;

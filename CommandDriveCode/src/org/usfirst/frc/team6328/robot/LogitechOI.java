@@ -27,12 +27,13 @@ import org.usfirst.frc.team6328.robot.commands.RunTrigger;
 import org.usfirst.frc.team6328.robot.commands.SetCamera;
 import org.usfirst.frc.team6328.robot.commands.ShakeLoader;
 import org.usfirst.frc.team6328.robot.commands.TurnToAngle;
+import org.usfirst.frc.team6328.robot.triggers.POVTrigger;
 
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
  */
-public class OI {
+public class LogitechOI {
     //// CREATING BUTTONS
     // One type of button is a joystick button which is any button on a joystick.
     // You create one by telling it which joystick it's on and which button
@@ -62,50 +63,26 @@ public class OI {
 	
 	private boolean joysticksReversed = false;
 	
-	// map left stick to ID 0 and right to ID 1 in driver station
-	private Joystick leftController = new Joystick(0);
-	private Joystick rightController = new Joystick(1);
-	private Joystick oiController1 = new Joystick(2);
-	private Joystick oiController2 = new Joystick(3);
+	private Joystick logitechController = new Joystick(0);
 	
-	private Button right90Button = new JoystickButton(leftController, 5);
-	private Button left90Button = new JoystickButton(leftController, 4);
-	private Button right45Button = new JoystickButton(rightController, 5);
-	private Button left45Button = new JoystickButton(rightController, 4);
-	private Button frontCameraButton = new JoystickButton(rightController, 3);
-	private Button rearCameraButton = new JoystickButton(rightController, 2);
-	private Button backupFromBoiler = new JoystickButton(leftController, 6);
-	private Button intakeOn = new JoystickButton(oiController2, 2);
-	private Button intakeOff = new JoystickButton(oiController2, 3);
-	private Button shoot = new JoystickButton(oiController2, 1);
-	private Button topGearOpen = new JoystickButton(oiController2, 5);
-	private Button topGearClose = new JoystickButton(oiController2, 6);
-	private Button expelGear = new JoystickButton(oiController2, 4);
-	private Button shooterDisableSwitch = new JoystickButton(oiController1, 7);
-	private Button driveDisableSwitch = new JoystickButton(oiController1, 9);
-//	private Button openLoopShooter = new JoystickButton(oiController1, 8);
-	private Button smartGearExpel = new JoystickButton(oiController1, 8);
-	private Button autoClimb = new JoystickButton(oiController2, 7);
-	private Button climberHold = new JoystickButton(oiController2, 8);
-	private Button openLoopDrive = new JoystickButton(oiController1, 10);
-	private Button straightAssist = new JoystickButton(leftController, 1);
-	private Button joysticksForward = new JoystickButton(leftController, 3);
-	private Button joysticksBackward = new JoystickButton(leftController, 2);
-	private Button sniperMode = new JoystickButton(rightController, 1);
-	private Button shakeBalls = new JoystickButton(oiController2, 9);
-	private Button ejectBalls = new JoystickButton(oiController2, 10);
-	
-	private Button loaderForward = new JoystickButton(oiController1, 3);
-	private Button loaderBackward = new JoystickButton(oiController1, 4);
-	private Button intakeForward = new JoystickButton(oiController1, 1);
-	private Button intakeBackward = new JoystickButton(oiController1, 2);
-	private Button triggerForward = new JoystickButton(oiController1, 5);
-	private Button triggerBackward = new JoystickButton(oiController1, 6);
+	private Button intakeOn = new JoystickButton(logitechController, 1);
+	private Button intakeOff = new JoystickButton(logitechController, 2);
+	private Button shoot = new JoystickButton(logitechController, 6);
+	private Button topGearOpen = new JoystickButton(logitechController, 3);
+	private Button topGearClose = new JoystickButton(logitechController, 4);
+	private Button expelGear = new JoystickButton(logitechController, 5);
+	private Button smartGearExpel = new POVTrigger(logitechController, 270);
+	private Button straightAssist = new JoystickButton(logitechController, 9);
+	private Button joysticksForward = new POVTrigger(logitechController, 0);
+	private Button joysticksBackward = new POVTrigger(logitechController, 180);
+	private Button sniperMode = new JoystickButton(logitechController, 10);
+	private Button shakeBalls = new JoystickButton(logitechController, 8);
+	private Button ejectBalls = new JoystickButton(logitechController, 7);
 	
 	Command runShooter;
 	NetworkTable table;
 
-	public OI() {
+	public LogitechOI() {
 		table = NetworkTable.getTable("LEDs");
 		if (!RobotMap.practiceRobot) {
 			switch (RobotMap.shooterControlType) {
@@ -121,24 +98,6 @@ public class OI {
 				break;
 			}
 		}
-		
-		// turn only while the button is held
-		// note: can't just use whileHeld because that will repeatedly run the command
-		TurnToAngle right90 = new TurnToAngle(90);
-		TurnToAngle left90 = new TurnToAngle(-90);
-		TurnToAngle right45 = new TurnToAngle(45);
-		TurnToAngle left45 = new TurnToAngle(-45);
-		right90Button.whenPressed(right90);
-		right90Button.whenReleased(new CancelCommand(right90));
-		left90Button.whenPressed(left90);
-		left90Button.whenReleased(new CancelCommand(left90));
-		right45Button.whenPressed(right45);
-		right45Button.whenReleased(new CancelCommand(right45));
-		left45Button.whenPressed(left45);
-		left45Button.whenReleased(new CancelCommand(left45));
-		
-		frontCameraButton.whenPressed(new SetCamera(true));
-		rearCameraButton.whenPressed(new SetCamera(false));
 		
 		RunIntake runIntakeNormal = new RunIntake(false);
 		RunIntakeShoot runIntakeShoot = new RunIntakeShoot();
@@ -159,6 +118,7 @@ public class OI {
 		shoot.whileHeld(runLoader);
 		shoot.whileHeld(runIntakeShoot);
 		shoot.whenReleased(runIntakeNormal);
+		shoot.whileHeld(runShooter);
 		//shoot.whenReleased(runTriggerNormal);
 		//shoot.whenReleased(runLoader);
 		shakeBalls.whileHeld(new ShakeLoader());
@@ -170,70 +130,60 @@ public class OI {
 		expelGear.whileHeld(new ExpelGearOnSensor());
 		
 		// trying to enable practice robot will not work
-		if (!RobotMap.practiceRobot) {
+		// Now mapped to shoot button, this is for switch
+		/*if (!RobotMap.practiceRobot) {
 			// there is no WhileNotHeld, so start when inactive and cancel when switch flipped on
 			// if flipped at start, run
 			shooterDisableSwitch.whenReleased(runShooter);
 			shooterDisableSwitch.cancelWhenPressed(runShooter);
-		}
+		}*/
 		
-		autoClimb.toggleWhenPressed(new AutoClimb());
-		climberHold.toggleWhenPressed(new ClimberHold());
-		openLoopDrive.whenPressed(new ApplyOpenLoopSwitch(false));
-		openLoopDrive.whenReleased(new ApplyOpenLoopSwitch(true));
+//		openLoopDrive.whenPressed(new ApplyOpenLoopSwitch(false));
+//		openLoopDrive.whenReleased(new ApplyOpenLoopSwitch(true));
 		straightAssist.whileHeld(new DriveWithJoystickOnHeading());
 		joysticksForward.whenPressed(new ReverseJoysticks(false));
 		joysticksBackward.whenPressed(new ReverseJoysticks(true));
 		joysticksForward.whenPressed(new SetCamera(true));
 		joysticksBackward.whenPressed(new SetCamera(false));
-		BackUpFromBoiler backupFromBoilerCommand = new BackUpFromBoiler();
-		backupFromBoiler.whenPressed(backupFromBoilerCommand);
-		backupFromBoiler.whenReleased(new CancelCommand(backupFromBoilerCommand));
-		
-		loaderForward.whileHeld(new RunLoader(false));
-		loaderBackward.whileHeld(new RunLoader(true));
-		intakeForward.whileHeld(new RunIntake(false));
-		intakeBackward.whileHeld(new RunIntake(true));
-		triggerForward.whileHeld(new RunTrigger(false));
-		triggerBackward.whileHeld(new RunTrigger(true));
 	}
 	
 	public double getLeftAxis() {
 		if (joysticksReversed) {
-			return rightController.getRawAxis(1)*-1;
+			return logitechController.getRawAxis(5)*-1;
 		} else {
-			return leftController.getRawAxis(1);
+			return logitechController.getRawAxis(1);
 		}
 	}
 	public double getRightAxis() {
 		if (joysticksReversed) {
-			return leftController.getRawAxis(1)*-1;
+			return logitechController.getRawAxis(1)*-1;
 		} else {
-			return rightController.getRawAxis(1);
+			return logitechController.getRawAxis(5);
 		}
 	}
 	
 	// reversing the joysticks should not change which joystick to use for straight drive, use
 	// different function to make that correct
 	// Note: Brian is left-handed
-	public double getDriveStraightAxis() {
+	public double getSingleDriveAxis() {
 		if (joysticksReversed) {
-			return leftController.getRawAxis(1)*-1;
+			return logitechController.getRawAxis(1)*-1;
 		} else {
-			return leftController.getRawAxis(1);
+			return logitechController.getRawAxis(1);
 		}
+	}
+	public double getHorizDriveAxis() {
+		return logitechController.getRawAxis(4);
 	}
 
 	public double getClimbAxis() {
-		return oiController1.getRawAxis(1);
-	}
-	
-	public boolean getOpenLoop() {
-		return openLoopDrive.get();
-	}
-	
-	public boolean getDriveEnabled() {
-		return !driveDisableSwitch.get();
+		double climbUpTrigger = logitechController.getRawAxis(3);
+		double climbDownTrigger = logitechController.getRawAxis(2);
+		if (climbUpTrigger > 0) {
+			return climbUpTrigger;
+		} else {
+			return climbDownTrigger*-1;
+		}
 	}
 	
 	public boolean getOpenLoopShooter() {
@@ -246,15 +196,7 @@ public class OI {
 	public boolean getSniperMode() {
 		return sniperMode.get();
 	}
-	
-	public double getSniperLevel() {
-		double sniperLimit = 0.5;
-		return (1-((rightController.getRawAxis(2)+1)/2))*sniperLimit; // control returns -1 to 1, scale to 0 to 1, subtract from 1 so 1 is up
-	}
-	
-	public double getShooterSpeed() {
-		return (1-((leftController.getRawAxis(2)+1)/2));
-	}
+
 	
 	public void reverseJoysticks(boolean reverse) {
 		joysticksReversed = reverse;
@@ -264,17 +206,26 @@ public class OI {
 		return !smartGearExpel.get();
 	}
 	
-	@SuppressWarnings("unused")
 	public void initSwitches() {
-		if (!shooterDisableSwitch.get() && !RobotMap.practiceRobot) {
-			runShooter.start();
-		}
-		if (openLoopDrive.get()) {
-			Robot.driveSubsystem.useOpenLoop();
-		} else {
-			Robot.driveSubsystem.useClosedLoop();
-		}
+		
 	}
+	
+	public boolean getDriveEnabled() {
+		return true;
+	}
+	
+	public boolean getOpenLoop() {
+		return false;
+	}
+	
+	public double getSniperLevel() {
+		return 0.25;
+	}
+	
+	public double getShooterSpeed() {
+		return 1;
+	}
+
 	
 	
 	public void updateLED(OILED led, boolean state) {

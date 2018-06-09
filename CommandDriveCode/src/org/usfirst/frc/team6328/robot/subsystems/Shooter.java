@@ -83,6 +83,7 @@ public class Shooter extends Subsystem implements PIDSource {
      * @param speed
      */
     public void run(double speed) {
+    	shooterMaster.enable();
     	shooterMaster.set(speed*-1); // everything is backwards
     }
     

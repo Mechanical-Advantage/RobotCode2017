@@ -290,7 +290,7 @@ public class CANTalon
 //		public SetValueMotionProfile outputEnable;
 //	}
 
-	private TalonControlMode m_controlMode;
+	private TalonControlMode m_controlMode = TalonControlMode.PercentVbus;
 
 	private boolean m_controlEnabled;
 	private boolean m_stopped = false;
@@ -413,7 +413,7 @@ public class CANTalon
 	 */
 	public void set(double outputValue) {
 		/* feed safety helper since caller just updated our output */
-		m_safetyHelper.feed();
+//		m_safetyHelper.feed(); // This never gets instantiated so disable it
 		if (m_stopped) {
 			enableControl();
 			m_stopped = false;
@@ -441,10 +441,10 @@ public class CANTalon
 				_srx.set(ControlMode.PercentOutput, outputValue * scalar);
 				break;
 			case Position:
-				_srx.set(ControlMode.Position, outputValue * scalar);
+				_srx.set(ControlMode.Position, scaleRotationsToNativeUnits(m_feedbackDevice, outputValue) * scalar);
 				break;
 			case Speed:
-				_srx.set(ControlMode.Velocity, outputValue * scalar);
+				_srx.set(ControlMode.Velocity, scaleVelocityToNativeUnits(m_feedbackDevice, outputValue) * scalar);
 				break;
 			case Voltage:
 				EnsureSaturationVoltageIsSet();
@@ -1964,27 +1964,30 @@ public class CANTalon
 
 	@Override
 	public void setExpiration(double timeout) {
-		m_safetyHelper.setExpiration(timeout);
+//		m_safetyHelper.setExpiration(timeout);
 	}
 
 	@Override
 	public double getExpiration() {
-		return m_safetyHelper.getExpiration();
+//		return m_safetyHelper.getExpiration();
+		return 1;
 	}
 
 	@Override
 	public boolean isAlive() {
-		return m_safetyHelper.isAlive();
+//		return m_safetyHelper.isAlive();
+		return true;
 	}
 
 	@Override
 	public boolean isSafetyEnabled() {
-		return m_safetyHelper.isSafetyEnabled();
+//		return m_safetyHelper.isSafetyEnabled();
+		return false;
 	}
 
 	@Override
 	public void setSafetyEnabled(boolean enabled) {
-		m_safetyHelper.setSafetyEnabled(enabled);
+//		m_safetyHelper.setSafetyEnabled(enabled);
 	}
 
 	@Override

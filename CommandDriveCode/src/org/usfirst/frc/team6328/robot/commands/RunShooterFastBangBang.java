@@ -1,6 +1,6 @@
 package org.usfirst.frc.team6328.robot.commands;
 
-import org.usfirst.frc.team6328.robot.OI.OILED;
+import org.usfirst.frc.team6328.robot.LogitechOI.OILED;
 import org.usfirst.frc.team6328.robot.Robot;
 import org.usfirst.frc.team6328.robot.RobotMap;
 
